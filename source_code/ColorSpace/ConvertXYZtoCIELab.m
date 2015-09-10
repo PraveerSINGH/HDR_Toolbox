@@ -4,7 +4,7 @@ function imgOut = ConvertXYZtoCIELab(img, inverse, conv_whitePoint)
 %
 %
 %        Input:
-%           -img: image to convert from XYZ to CIE Lab or from Luv to XYZ
+%           -img: image to convert from XYZ to CIE Lab or from Lab to XYZ
 %           -inverse: takes as values 0 or 1. If it is set to 0 the
 %                     transformation from XYZ to CIE Lab is applied, otherwise
 %                     the transformation from CIE Lab to XYZ
