@@ -53,7 +53,7 @@ log_detail = log10(Ldetail);
 compression_factor = log10(target_contrast) / (max_log_base - min(log_base(:)));
 log_absolute = compression_factor * max_log_base;
 
-log_compressed = log_base * compression_factor + log_detail - compression_factor - log_absolute;
+log_compressed = log_base * compression_factor + log_detail  - log_absolute;
 
 output = 10.^(log_compressed); 
 

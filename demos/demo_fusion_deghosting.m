@@ -8,7 +8,7 @@
 clear all;
 
 %Pence and Kautz
-disp('1) Applying fusion + deghosting operator by Pence and Kautz to images in a stack folder');
+disp('1) Applying fusion + deghosting operator by Pece and Kautz to images in a stack folder');
 img_merged = PeceKautzMerge([], 'stack_ghost', 'jpg', 1, 3, 17);
 
 disp('2) Showing the image after fusion, note that there is no need of gamma correction!');
