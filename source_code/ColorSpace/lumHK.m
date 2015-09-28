@@ -1,18 +1,17 @@
-function imgOut = ColorToGrayFusion(img)
+function l = lumHK(img)
+%
+%       l = lum(img)
+%
+%       This function calculates the Helmholtz-Kohlrausch luminance
 %
 %
-%       imgOut = ColorToGrayFusion(img)
+%       input:
+%           img: an RGB image
 %
-%       This function converts an image into a grey-scale using Exposure
-%       Fusion
+%       output:
+%           l: normalized Helmholtz-Kohlrausch luminance
 %
-%       Input:
-%           -img: a color image
-%
-%       Output:
-%           -imgOut: a grey-scale image
-%
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2015  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -28,16 +27,18 @@ function imgOut = ColorToGrayFusion(img)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-[r, c, col] = size(img);
+checkColor3(img);
 
-stack = zeros(r, c, 1, col + 1);
+imgXYZ = ConvertRGBtoXYZ(img, 0);
+imgLCh = ConvertXYZtoCIELCh(imgXYZ, 0);
 
-for i=1:col
-    stack(:,:,:,i) = img(:,:,i);
-end
- 
-stack(:,:,:,4) = lumHK(img);
+L = imgLCh(:,:,1);
+C = imgLCh(:,:,2);
+h = imgLCh(:,:,3);
 
-imgOut = MertensTMO([], '', '', stack, 1.0, 0.0, 1.0, 0);
+h2 = deg2rad((h - 90)/2);
+
+l = L + (2.5 - 0.025 * L) .* (0.116 * abs(sin(h2)) + 0.085) .* C;
+l = out / max(l(:));
 
 end
