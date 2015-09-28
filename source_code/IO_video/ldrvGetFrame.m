@@ -29,7 +29,7 @@ function [frame, ldrv] = ldrvGetFrame(ldrv, frameCounter)
 %
 
 %which frame?
-maxFrames = length(ldrv.list);
+maxFrames = ldrv.totalFrames;
 
 if(~exist('frameCounter', 'var'))
     frameCounter = ldrv.frameCounter;
@@ -38,7 +38,7 @@ else
         frameCounter = 1;
     end
     
-    if(frameCounter>maxFrames)
+    if(frameCounter > maxFrames)
         frameCounter = maxFrames;
     end
 end
@@ -52,7 +52,7 @@ switch ldrv.type
     case 'TYPE_LDR_JPEG_2000'
         frame = imread([ldrv.path,'/',ldrv.list(frameCounter).name]);
     case 'TYPE_LDR_VIDEO'
-        frame = read(hdrv.stream, frameCounter); 
+        frame = read(ldrv.stream, frameCounter); 
 end
 
 if(~isempty(frame))

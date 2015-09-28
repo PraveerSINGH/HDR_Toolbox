@@ -28,9 +28,9 @@ function ldrv = ldrvopen(ldrv)
 %
 
 if(ldrv.streamOpen == 0)
-    if(strfind(ldrv.type, 'TYPE_LDR_VIDEO') == 1)
-        open(ldrv.stream);
-    end
+%     if(strfind(ldrv.type, 'TYPE_LDR_VIDEO') == 1)
+%         open(ldrv.stream);
+%     end
     
     ldrv.streamOpen = 1;
 end
