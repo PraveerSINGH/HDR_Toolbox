@@ -111,8 +111,8 @@ for i=1:hdrv.totalFrames
         [~, ind] = min(abs(histo_cdf-beta_clamping_c));
         minL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
 
-        frame(frame>maxL) = maxL;
-        frame(frame<minL) = minL;
+        frame(frame > maxL) = maxL;
+        frame(frame < minL) = minL;
         frame = frame - minL;
     end
    
