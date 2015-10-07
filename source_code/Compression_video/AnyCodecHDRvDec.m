@@ -35,19 +35,19 @@ function AnyCodecHDRvDec(hdrv, name)
 %
 %
 
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 name = RemoveExt(filenameOutput);
 ext  = fileExtension(filenameOutput);
 
 for i=1:hdrv.totalFrames
-    disp(['Processing frame ',num2str(i)]);
+    disp(['Processing frame ', num2str(i)]);
     
     %getting the current HDR frame
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
 
     %saving the frame    
-    hdrimwrite(frame,[name,sprintf('%.10d',i),'.',ext]);
+    hdrimwrite(frame, [name, sprintf('%.10d',i), '.', ext]);
 end
 
 hdrvclose(hdrv);

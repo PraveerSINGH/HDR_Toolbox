@@ -37,19 +37,19 @@ function ZhangHDRvEnc(hdrv, name, hdrv_profile, hdrv_quality)
 %
 %
 
-if(~exist('hdrv_quality','var'))
+if(~exist('hdrv_quality', 'var'))
     hdrv_quality = 95;
 end
 
-if(hdrv_quality<1)
+if(hdrv_quality < 1)
     hdrv_quality = 95;
 end
 
-if(~exist('hdrv_profile','var'))
+if(~exist('hdrv_profile', 'var'))
     hdrv_profile = 'Motion JPEG AVI';
 end
 
-if(strcmp(hdrv_profile,'MPEG-4')==0)
+if(strcmp(hdrv_profile,'MPEG-4') == 0)
     disp('Note that the H.264 profile needs to be used for fair comparisons!');
 end
 
@@ -61,7 +61,7 @@ nameLogLuv = [nameOut,'_ZRB11_LUV.',fileExt];
 n_bits = 8;
 
 %Opening hdr stream
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 writerObj = VideoWriter(nameLogLuv, hdrv_profile);
 writerObj.Quality = hdrv_quality;
@@ -72,7 +72,7 @@ a = zeros(1, hdrv.totalFrames);
 b = zeros(1, hdrv.totalFrames);
 
 for i=1:hdrv.totalFrames
-    disp(['Processing frame ',num2str(i)]);
+    disp(['Processing frame ', num2str(i)]);
     
     %getting the HDR frame
     [frame, hdrv] = hdrvGetFrame(hdrv, i);

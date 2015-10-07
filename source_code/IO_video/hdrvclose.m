@@ -11,7 +11,7 @@ function hdrv = hdrvclose(hdrv)
 %
 %        This function closes a video stream (hdrv) for reading frames
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,25 +27,18 @@ function hdrv = hdrvclose(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(hdrv.streamOpen==1)
+if(hdrv.streamOpen == 1)
     
-    switch hdrv.type
-        case 'TYPE_HDRV_MB06'
-            if(~isempty(hdrv.streamTMO))
-                close(hdrv.streamTMO)
-            end
-            
-            if(~isempty(hdrv.streamR))
-                close(hdrv.streamR)
-            end
-            
+    switch hdrv.type           
         case 'TYPE_HDRV_LK08'
-            if(~isempty(hdrv.streamTMO))
-                close(hdrv.streamTMO)
-            end
-            
-            if(~isempty(hdrv.streamR))
-                close(hdrv.streamR)
+            if(hdrv.permission == 'w') 
+                if(~isempty(hdrv.streamTMO))
+                    close(hdrv.streamTMO)
+                end
+
+                if(~isempty(hdrv.streamR))
+                    close(hdrv.streamR)
+                end
             end
     end
     

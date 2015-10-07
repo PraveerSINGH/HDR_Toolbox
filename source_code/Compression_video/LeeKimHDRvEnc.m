@@ -65,8 +65,8 @@ fileExt = fileExtension(name);
 nameTMO = [nameOut,'_LK08_tmo.',fileExt];
 nameResiduals = [nameOut,'_LK08_residuals.',fileExt];
 
-%Opening hdr stream
-hdrv = hdrvopen(hdrv);
+%Opening the input HDR stream
+hdrv = hdrvopen(hdrv, 'r');
 
 %Lee and Kim TMO
 tmo_gamma = 2.2;    %as in the original paper
