@@ -31,18 +31,18 @@ function imgOut = LeeKimTMOv_frame(img, imgTmoPrev, fBeta, fLambda)
 %is it a three color channels image?
 check13Color(img);
 
-if(~exist('fBeta','var'))
+if(~exist('fBeta', 'var'))
     fBeta = 0.95;
 end
 
-if(~exist('fLambda','var'))
+if(~exist('fLambda', 'var'))
     fLambda = 0.15;
 end
 
 %Luminance channel
-Lori=lum(img);
+Lori = lum(img);
 
-L = log(Lori+1e-6);
+L = log(Lori + 1e-6);
 
 %Computing Gaussian Pyramid + Gradient
 [r,c]   = size(L);
@@ -54,41 +54,41 @@ kernel = [1,4,6,4,1]'*[1,4,6,4,1];
 kernel = kernel/sum(kernel(:));
 
 %Generation of the pyramid
-G = [[], struct('fx',imfilter(L,kernelX,'same')/2,'fy',imfilter(L,kernelY,'same')/2)];
-G2 = sqrt(G(1).fx.^2+G(1).fy.^2);
-fAlpha = 0.1*mean(G2(:));
+G = [[], struct('fx',imfilter(L, kernelX, 'same') / 2,'fy',imfilter(L, kernelY, 'same') / 2)];
+G2 = sqrt(G(1).fx.^2 + G(1).fy.^2);
+fAlpha = 0.1 * mean(G2(:));
 
 imgTmp = L;
 for i=1:numPyr
-    imgTmp=imresize(conv2(imgTmp,kernel,'same'),0.5,'bilinear');
-    Fx = imfilter(imgTmp,kernelX,'same')/(2^(i+1));
-    Fy = imfilter(imgTmp,kernelY,'same')/(2^(i+1));
-    G = [G, struct('fx',Fx/(2^(i+1)),'fy',Fy/(2^(i+1)))];
+    imgTmp=imresize(conv2(imgTmp,kernel, 'same'), 0.5, 'bilinear');
+    Fx = imfilter(imgTmp, kernelX, 'same')/(2^(i + 1));
+    Fy = imfilter(imgTmp, kernelY, 'same')/(2^(i + 1));
+    G = [G, struct('fx', Fx / (2^(i+1)), 'fy', Fy / (2^(i + 1)))];
 end
 
 %Generation of the Attenuation mask
-Phi_kp1 = FattalPhi(G(numPyr+1).fx, G(numPyr+1).fy, fAlpha, fBeta);
+Phi_kp1 = FattalPhi(G(numPyr + 1).fx, G(numPyr + 1).fy, fAlpha, fBeta);
 
 for k=numPyr:-1:1
     [r,c] = size(G(k).fx);
-    G2 = sqrt(G(k).fx.^2+G(k).fy.^2);
-    fAlpha = 0.1*mean(G2(:));
+    G2 = sqrt(G(k).fx.^2 + G(k).fy.^2);
+    fAlpha = 0.1 * mean(G2(:));
     Phi_k = FattalPhi(G(k).fx, G(k).fy, fAlpha, fBeta);
-    Phi_kp1 = imresize(Phi_kp1,[r,c],'bilinear').*Phi_k;
+    Phi_kp1 = imresize(Phi_kp1, [r, c], 'bilinear') .* Phi_k;
 end
 
 %Calculating the divergence with backward differences
 G = struct('fx',G(1).fx.*Phi_kp1,'fy',G(1).fy.*Phi_kp1);
 kernelX = [0,0,0;-1,1,0;0,0,0];
 kernelY = [0,0,0;0,1,0;0,-1,0];
-dx = imfilter(G(1).fx.*Phi_kp1,kernelX,'same');
-dy = imfilter(G(1).fy.*Phi_kp1,kernelY,'same');
+dx = imfilter(G(1).fx .* Phi_kp1, kernelX, 'same');
+dy = imfilter(G(1).fy .* Phi_kp1, kernelY, 'same');
 
-P_lum = log(lum(imgTmoPrev)+1e-6);
-divG = RemoveSpecials(dx+dy-fLambda*P_lum);
+P_lum = log(lum(imgTmoPrev) + 1e-6);
+divG = RemoveSpecials(dx + dy - fLambda * P_lum);
 
 %Solving Poisson equation
-Ld = exp(PoissonSolver(divG,fLambda));
+Ld = exp(PoissonSolver(divG, fLambda));
 
 %Changing luminance
 imgOut = ChangeLuminance(img, Lori, Ld);

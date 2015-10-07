@@ -38,35 +38,35 @@ function LeeKimTMOv(hdrv, filenameOutput, fBeta, fLambda, fSaturation, tmo_gamma
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('fBeta','var'))
+if(~exist('fBeta', 'var'))
     fBeta = 0.92;
 end
 
-if(~exist('fLambda','var'))
+if(~exist('fLambda', 'var'))
     fLambda = 0.3;
 end
 
-if(~exist('fSaturation','var'))
+if(~exist('fSaturation', 'var'))
     fSaturation = 0.6;
 end
 
 fSaturation = ClampImg(fSaturation, 1e-3 , 1);
 
-if(~exist('tmo_gamma','var'))
+if(~exist('tmo_gamma', 'var'))
     tmo_gamma = 2.2;
 end
 
-if(tmo_gamma<0)
+if(tmo_gamma < 0)
     bsRGB = 1;
 else
     bsRGB = 0;
 end
 
-if(~exist('tmo_quality','var'))
+if(~exist('tmo_quality', 'var'))
     tmo_quality = 95;
 end
 
-if(~exist('tmo_video_profile','var'))
+if(~exist('tmo_video_profile', 'var'))
     tmo_video_profile = 'Motion JPEG AVI';
 end
 
@@ -76,7 +76,7 @@ ext  = fileExtension(filenameOutput);
 bVideo = 0;
 writerObj = 0;
 
-if(strfind(ext,'avi')|strfind(ext,'mp4'))
+if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
     bVideo = 1;
     writerObj = VideoWriter(filenameOutput, tmo_video_profile);
     writerObj.FrameRate = hdrv.FrameRate;
@@ -123,7 +123,7 @@ for i=1:hdrv.totalFrames
     if(bVideo)
         writeVideo(writerObj,frameOut);
     else
-        imwrite(frameOut,[name,sprintf('%.10d',i),'.',ext]);
+        imwrite(frameOut, [name, sprintf('%.10d', i), '.', ext]);
     end    
 end
 
