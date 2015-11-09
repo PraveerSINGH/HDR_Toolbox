@@ -30,15 +30,15 @@ function S = ColorCorrectionSigmoid(L, sr_n, sr_sigma, sr_B)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('sr_n','var'))
+if(~exist('sr_n', 'var'))
     sr_n = 0.73;
 end
 
-if(~exist('sr_sigma','var'))
+if(~exist('sr_sigma', 'var'))
     sr_sigma = 1.0;
 end
 
-if(~exist('sr_B','var'))
+if(~exist('sr_B', 'var'))
     sr_B = 1.0;
 end
 

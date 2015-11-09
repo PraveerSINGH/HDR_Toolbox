@@ -29,6 +29,12 @@ function imgOut = ColorCorrection(img, schlick_correction)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Color Correction for Tone Reproduction"
+% 	  by Tania Pouli1, Alessandro Artusi, Francesco Banterle, 
+%     Ahmet Oguz Akyuz, Hans-Peter Seidel and Erik Reinhard
+%     in the Twenty-first Color and Imaging Conference (CIC21), Albuquerque, Nov. 2013 
+%
 
 %is it a three color channels image?
 check3Color(img);

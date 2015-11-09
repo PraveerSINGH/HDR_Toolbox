@@ -33,7 +33,6 @@ function imgTMO_c = ColorCorrectionPouli(imgHDR, imgTMO)
 %     Ahmet Oguz Akyuz, Hans-Peter Seidel and Erik Reinhard
 %     in the Twenty-first Color and Imaging Conference (CIC21), Albuquerque, Nov. 2013 
 %
-%
 
 %is it a three color channels image?
 check3Color(imgHDR);

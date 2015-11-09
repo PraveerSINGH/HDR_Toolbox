@@ -1,6 +1,6 @@
-function imgOut = ColorCorrectionMantiuk(img, mantiuk_p)
+function imgOut = ColorCorrectionLinear(img, mantiuk_p)
 %
-%       imgOut = ColorCorrection(img, mantiuk_p)
+%       imgOut = ColorCorrectionLinear(img, mantiuk_p)
 %
 %       This function saturates/desaturates colors in img
 %
@@ -12,7 +12,7 @@ function imgOut = ColorCorrectionMantiuk(img, mantiuk_p)
 %       output:
 %         - imgOut: corrected values
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ function imgOut = ColorCorrectionMantiuk(img, mantiuk_p)
 % 	  by Radoslaw Mantiuk, Rafal Mantiuk, Anna Tomaszewska, Wolfgang Heindrich
 %     in Computer Graphics Forum, 2009 (Eurographics 2009)
 %
+%     Note: this is only the linear compression formula, Equation 3 of
+%     the original paper.
 %
 
 %is it a three color channels image?
