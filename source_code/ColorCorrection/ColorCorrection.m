@@ -30,10 +30,9 @@ function imgOut = ColorCorrection(img, schlick_correction)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %     The paper describing this technique is:
-%     "Color Correction for Tone Reproduction"
-% 	  by Tania Pouli1, Alessandro Artusi, Francesco Banterle, 
-%     Ahmet Oguz Akyuz, Hans-Peter Seidel and Erik Reinhard
-%     in the Twenty-first Color and Imaging Conference (CIC21), Albuquerque, Nov. 2013 
+%     "Quantization Techniques for Visualization of High Dynamic Range Pictures"
+% 	  by Christophe Schlick
+%     in Photorealistic Rendering Techniques, 1995
 %
 
 %is it a three color channels image?
