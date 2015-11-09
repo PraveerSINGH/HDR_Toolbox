@@ -1,21 +1,19 @@
-function [imgOut, pAlpha, pWhite] = ReinhardBilTMO(img, pAlpha, pWhite, pPhi)
+function L_adapt = ReinhardBilateralFiltering(L, pAlpha, pPhi, pEpsilon)  
 %
 %
-%      [imgOut, pAlpha, pWhite] = ReinhardBilTMO(img, pAlpha, pWhite, pPhi)
+%      L_adapt = ReinhardBilateralFiltering(L, pAlpha, pPhi, pEpsilon)  
 %
 %
 %       Input:
-%           -img: input HDR image
+%           -L: input grayscale image
 %           -pAlpha: value of exposure of the image
-%           -pWhite: the white point 
 %           -pPhi: a parameter which controls the sharpening
+%           -pEpsilon: smoothing threshold
 %
 %       Output:
-%           -imgOut: output tone mapped image in linear domain
-%           -pAlpha: as in input
-%           -pWhite: as in input
-% 
-%     Copyright (C) 2011-15  Francesco Banterle
+%           -L_adapt: filtered image
+%
+%     Copyright (C) 2015  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -31,44 +29,24 @@ function [imgOut, pAlpha, pWhite] = ReinhardBilTMO(img, pAlpha, pWhite, pPhi)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-check13Color(img);
-
-%Luminance channel
-L = lum(img);
-
 if(~exist('pAlpha', 'var'))
     pAlpha = ReinhardAlpha(L);
-end
-
-if(~exist('pWhite', 'var'))
-    pWhite = ReinhardWhitePoint(L);
 end
 
 if(~exist('pPhi', 'var'))
     pPhi = 8;
 end
 
-%Logarithmic mean calcultaion
-Lwa = logMean(L);
+if(~exist('pEpsilon', 'var'))
+    pEpsilon = 0.05;%as in the original paper
+end
 
-%Scale luminance using alpha and logarithmic mean
-Lscaled = (pAlpha * L) / Lwa;
-
-%Local calculation?
 sMax    = 8;     
-epsilon = 0.05;
-alpha1  = (((2^pPhi) * pAlpha) / (sMax^2)) * epsilon;
+alpha1  = (((2^pPhi) * pAlpha) / (sMax^2)) * pEpsilon;
 alpha2  = round(1.6^sMax);    
 
-L_tmp = Lscaled ./ (Lscaled + 1);
+L_tmp = L ./ (L + 1);
 L_adapt = bilateralFilter(L_tmp, [], 0, 1, alpha2, alpha1);
 L_adapt = L_adapt ./ (1 - L_adapt);
-
-%Range compression
-pWhite2 = pWhite * pWhite;
-Ld = (Lscaled .* (1 + Lscaled/ pWhite2))./(1 + L_adapt);
-
-%Changing luminance
-imgOut = ChangeLuminance(img, L, Ld);
 
 end

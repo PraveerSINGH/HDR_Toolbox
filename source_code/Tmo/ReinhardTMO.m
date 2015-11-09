@@ -8,8 +8,12 @@ function [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPh
 %           -img: input HDR image
 %           -pAlpha: value of exposure of the image
 %           -pWhite: the white point 
-%           -pLocal: boolean value. If it is true a local version is used
-%                   otherwise a global version.
+%           -pLocal: local mode
+%                 - 'global': the method will not compute local adaptation
+%                 - 'local': the method will compute classic local
+%                 adaptation as in the original paper
+%                 - 'bilateral': the method will compute local adaptation
+%                 using the bilateral filter
 %           -pPhi: a parameter which controls the sharpening
 %
 %       Output:
@@ -39,7 +43,7 @@ check13Color(img);
 L = lum(img);
 
 if(~exist('pLocal', 'var'))
-    pLocal = 0;
+    pLocal = 'global';
 end
 
 if(~exist('pAlpha', 'var'))
@@ -73,10 +77,18 @@ Lwa = logMean(L);
 Lscaled = (pAlpha * L) / Lwa;
 
 %Local calculation?
-if(pLocal)
-    L_adapt = ReinhardFiltering(Lscaled, pAlpha, pPhi);
-else
-    L_adapt = Lscaled;
+switch pLocal
+    case 'global'
+        L_adapt = Lscaled;
+        
+    case 'local'
+        L_adapt = ReinhardFiltering(Lscaled, pAlpha, pPhi);
+
+    case 'bilateral'
+        L_adapt = ReinhardBilateralFiltering(Lscaled, pAlpha, pPhi);
+        
+    otherwise
+        L_adapt = Lscaled;        
 end
 
 %Range compression

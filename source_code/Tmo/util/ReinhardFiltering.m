@@ -29,28 +29,28 @@ function L_adapt = ReinhardFiltering(L, pAlpha, pPhi, pEpsilon)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('pAlpha','var'))
+if(~exist('pAlpha', 'var'))
     pAlpha = ReinhardAlpha(L);
 end
 
-if(~exist('pPhi','var'))
+if(~exist('pPhi', 'var'))
     pPhi = 8;
 end
 
-if(~exist('pEpsilon','var'))
+if(~exist('pEpsilon', 'var'))
     pEpsilon = 0.05;%as in the original paper
 end
 
 %precomputation of 9 filtered images
 sMax = 8; 
-[r,c] = size(L);
-V1_vec = zeros(r,c,sMax); 
-V_vec = zeros(r,c,sMax);
+[r, c] = size(L);
+V1_vec = zeros(r, c, sMax); 
+V_vec = zeros(r, c, sMax);
 
-alpha1 = 1/(2*sqrt(2));
-alpha2 = alpha1*1.6;
+alpha1 = 1/(2 * sqrt(2));
+alpha2 = alpha1 * 1.6;
     
-constant = (2^pPhi)*pAlpha;
+constant = (2^pPhi) * pAlpha;
 sizeWindow = 1;
 
 for i=1:sMax        
