@@ -1,6 +1,6 @@
-function S = ColorCorrectionSigmoid(L, sr_n, sr_sigma, sr_B)
+function S = SigmoidColorResponse(L, sr_n, sr_sigma, sr_B)
 %
-%       S = SigmoidResponse(img, sr_n, sr_sigma, sr_B)
+%       S = SigmoidColorResponse(L, sr_n, sr_sigma, sr_B)
 %
 %       This function computes sigmoid response
 %
