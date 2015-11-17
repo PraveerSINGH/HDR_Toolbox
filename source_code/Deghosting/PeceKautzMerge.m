@@ -130,7 +130,7 @@ end
 weight_move = weight;
 
 [moveMask, num] = PeceKautzMoveMask(imageStack, iterations, ke_size, kd_size, ward_percentile);
-hdrimwrite(moveMask, 'moveMask.pfm');
+
 for i=0:num
     indx = find(moveMask == i);
     
