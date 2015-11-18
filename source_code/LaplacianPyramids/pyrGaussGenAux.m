@@ -26,7 +26,7 @@ function imgOut = pyrGaussGenAux(img)
 %
 
 %5x5 Gaussian Kernel
-kernel = [1,4,6,4,1];
+kernel = [1, 4, 6, 4, 1];
 mtx = kernel' * kernel;
 mtx = mtx / sum(mtx(:));
 
