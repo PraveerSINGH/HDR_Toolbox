@@ -72,7 +72,7 @@ for i=1:nSamples
     vec = PolarVec3(angles(2), angles(1));
     pdf = (pdf1 * pdf2) / (pi22 * abs(sin(angles(1))));
     %creating a sample
-    sample = struct('dir', vec, 'x', x/c, 'y', y/r, 'col', img(y,x,:), 'pdf', pdf);
+    sample = struct('dir', vec, 'x', x / c, 'y', y / r, 'col', img(y,x,:), 'pdf', pdf);
     samples = [samples, sample];    
     imgOut(y, x) = imgOut(y, x) + 1;
 end
