@@ -84,7 +84,6 @@ Pcum = Pcum / max(Pcum);
 %Calculate tone mapped luminance
 L(L > LMax) = LMax;
 x = (LlMin:((LlMax - LlMin) / (nBin - 1)):LlMax)';
-pps = spline(x, Pcum);
 PcumL = interp1(x , Pcum , real(log(L)), 'linear');
 Ld  = exp(LldMin + (LldMax - LldMin) * PcumL;
 Ld  = (Ld - LdMin) / (LdMax - LdMin);
