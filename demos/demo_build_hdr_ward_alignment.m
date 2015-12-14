@@ -41,6 +41,6 @@ hdrimwrite(imgHDR, 'hdr_image_ward_alignment.hdr');
 disp('7) Show the tone mapped version of the radiance map');
 h = figure(2);
 set(h, 'Name', 'Tone mapped built HDR Image from stack_alignment');
-GammaTMO(ReinhardBilTMO(imgHDR), 2.2, 0, 1);
+GammaTMO(ReinhardTMO(imgHDR), 2.2, 0, 1);
 
 disp('Note that the image needs to be cropped due to alignment');

@@ -37,4 +37,4 @@ hdrimwrite(imgHDR, 'hdr_image.pfm');
 disp('6) Show the tone mapped version of the radiance map with gamma encoding');
 h = figure(2);
 set(h, 'Name', 'Tone mapped version of the built HDR image');
-GammaTMO(ReinhardBilTMO(imgHDR, 0.18), 2.2, 0, 1);
+GammaTMO(ReinhardTMO(imgHDR, 0.18), 2.2, 0, 1);
