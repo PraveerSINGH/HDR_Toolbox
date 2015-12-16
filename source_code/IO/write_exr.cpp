@@ -1,19 +1,13 @@
 /*==========================================================
- * write_exr.c - example in MATLAB External Interfaces
+ * write_exr.cpp
  *
- * Multiplies an input scalar (multiplier) 
- * times a 1xN matrix (inMatrix)
- * and outputs a 1xN matrix (outMatrix)
+ * This file writes a $n \times m \times 3$ matrix into an exr file
  *
- * The calling syntax is:
- *
- *		outMatrix = write_exr(multiplier, inMatrix)
- *
- * This is a MEX-file for MATLAB.
- * Copyright 2007-2008 The MathWorks, Inc.
+ * written Francesco Banterle
+ * (c) 2015
  *
  *========================================================*/
-/* $Revision: 1.1.10.2 $ */
+/* $Revision: 0.1 $ */
 
 #include "mex.h"
 #include <vector>
@@ -56,8 +50,8 @@ bool write_exr(char *nameFile, double *data, int width, int height, int channels
              int indexOut = j * width + i;
 
              images[0][indexOut] = data[index    ];
-            images[1][indexOut] = data[index + nPixels];
-            images[2][indexOut] = data[index + nPixels2];
+             images[1][indexOut] = data[index + nPixels];
+             images[2][indexOut] = data[index + nPixels2];
          }
      }
 
@@ -95,29 +89,15 @@ bool write_exr(char *nameFile, double *data, int width, int height, int channels
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
 {
-    double *inMatrix;               /* 1xN input matrix */
+    double *inMatrix;
 
     /* check for proper number of arguments */
     if(nrhs != 2) {
-        mexErrMsgIdAndTxt("HDRToolbox:write_exr:nrhs", "One input is required.");
-    }
-       
-    /* make sure the first input argument is scalar */
-/*    if( !mxIsDouble(prhs[0]) || 
-         mxIsComplex(prhs[0]) ||
-         mxGetNumberOfElements(prhs[0])!=1 ) {
-        mexErrMsgIdAndTxt("MyToolbox:write_exr:notScalar","Input multiplier must be a scalar.");
-    }
-    */
-    
-    /* check that number of rows in second input argument is 1 */
-    if(mxGetM(prhs[1]) !=1 ) {
-        mexErrMsgIdAndTxt("MyToolbox:write_exr:notRowVector","Input must be a row vector.");
+        mexErrMsgIdAndTxt("HDRToolbox:write_exr:nrhs", "Two inputs are required.");
     }
     
     /* create a pointer to the real data in the input matrix  */
     inMatrix = mxGetPr(prhs[0]);
-    
     
     char *buf;
     mwSize buflen;
@@ -132,7 +112,23 @@ void mexFunction( int nlhs, mxArray *plhs[],
     const mwSize *dims;
     dims = mxGetDimensions(prhs[0]);
        
-    write_exr(buf, inMatrix, dims[1], dims[0], dims[2]);
+    int nDim = (int)mxGetNumberOfDimensions(prhs[0]);
+
+    int channels;
+    if(nDim == 2) {
+        channels = 1;
+    } else {
+      channels = dims[2];
+
+      if(channels > 3) {
+          channels = 3;
+          printf("Only the first three color channels of this matrix will be written on the disk!\n");
+      }
+    }
     /* call the computational routine */
-//    write_exr(multiplier,inMatrix,outMatrix,ncols);
+    if(dims[0] > 0 && dims[1] > 0) {
+        write_exr(buf, inMatrix, dims[1], dims[0], channels );
+    } else {
+        printf("This matrix is not valid and the exr file cannot be written on the disk!\n");
+    }
 }

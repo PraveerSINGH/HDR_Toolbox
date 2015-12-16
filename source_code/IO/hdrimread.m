@@ -16,7 +16,7 @@ function [img, hdr_info] = hdrimread(filename)
 %           -img: the opened image
 %           -hdr_info: RGBE format extra datum such as: exposure, gamma, etc.
 %
-%     Copyright (C) 2011-13  Francesco Banterle
+%     Copyright (C) 2011-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -63,12 +63,10 @@ switch extension
             end
         end
         
-    %OpenEXR
+    %OpenEXR support using TinyEXR
     case 'exr'
         try
-            if(~exist('exrread'))
-                img = exrread(filename);
-            end
+            img = read_exr(filename);
         catch err
             disp('Warning: this .exr file can not be read.');
         end
