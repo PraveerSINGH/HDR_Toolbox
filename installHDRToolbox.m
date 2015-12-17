@@ -84,10 +84,14 @@ disp('A few operators (e.g. Mertens et al.''s operator) return gamma encoded val
 disp('so there is no need to apply gamma to them; in this case a message (e.g. a Warning) is displayed');
 disp('after tone mapping alerting that there is no need of gamma encoding.');
 
+str_cur = pwd();
 try
-    mex([pwd(), '/source_code/IO/read_exr.cpp']);
-    mex([pwd(), '/source_code/IO/write_exr.cpp']);
+    cd([pwd(), '/source_code/IO/']);
+    mex('read_exr.cpp');
+    mex('write_exr.cpp');
 catch err
     disp('read_exr.cpp and write_exr.cpp were not compiled');
 end
+
+cd(str_cur);
 
