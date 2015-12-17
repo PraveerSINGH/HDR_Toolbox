@@ -85,7 +85,7 @@ Pcum = Pcum / max(Pcum);
 L(L > LMax) = LMax;
 x = (LlMin:((LlMax - LlMin) / (nBin - 1)):LlMax)';
 PcumL = interp1(x , Pcum , real(log(L)), 'linear');
-Ld  = exp(LldMin + (LldMax - LldMin) * PcumL;
+Ld  = exp(LldMin + (LldMax - LldMin) * PcumL);
 Ld  = (Ld - LdMin) / (LdMax - LdMin);
 
 %Changing luminance
