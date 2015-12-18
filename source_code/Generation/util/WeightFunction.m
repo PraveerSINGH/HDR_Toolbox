@@ -52,6 +52,7 @@ end
 
 if(strcmp(weight_type, 'Deb97_p05'))
     bounds = [0.05, 0.95];
+    weight_type = Deb97;
 end
 
 switch weight_type
@@ -75,6 +76,7 @@ switch weight_type
     case 'Deb97'
         Zmin = bounds(1);
         Zmax = bounds(2);
+        delta = Zmax - Zmin;
         tr = (Zmin + Zmax) / 2;
         indx1 = find (img <= tr);
         indx2 = find (img > tr);
@@ -82,7 +84,6 @@ switch weight_type
         weight(indx1) = img(indx1) - Zmin;
         weight(indx2) = Zmax - img(indx2);
         weight(weight < 0) = 0;
-        weight = weight / max(weight(:));
         
     otherwise 
         weight = -1;
