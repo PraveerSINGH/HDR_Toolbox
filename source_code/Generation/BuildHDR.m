@@ -95,8 +95,15 @@ if(~exist('lin_fun', 'var'))
     lin_fun = [];
 end
 
+%stack exposure checks
 if(isempty(stack) || isempty(stack_exposure))
     error('The stack is set empty!');
+end
+
+stack_exposure_check = unique(stack_exposure);
+
+if(length(stack_exposure) ~= length(stack_exposure_check))
+    error('The stack contains images with the same exposure value. Please remove these duplicated images!');
 end
 
 %merging
