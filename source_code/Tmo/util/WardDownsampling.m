@@ -32,6 +32,7 @@ viewAngleHeight = 2 * atan(n / (2 * maxCoord * 0.75));
 fScaleX = (2 * tan(viewAngleWidth / 2) / 0.01745);
 fScaleY = (2 * tan(viewAngleHeight / 2) / 0.01745);
 
-imgOut = imresize(img, [round(fScaleY), round(fScaleX)], 'bilinear');
+
+imgOut = imresize(img, [round(fScaleY), round(fScaleX)]);
 
 end
