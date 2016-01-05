@@ -1,6 +1,6 @@
 function info = read_raw_info(name)
 %
-%       exposure = read_raw_info(name)
+%       info = read_raw_info(name)
 %
 %       This function extracts information from a RAW image file using
 %       dcraw. Please download dcraw from: 

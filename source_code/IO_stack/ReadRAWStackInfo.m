@@ -8,7 +8,7 @@ function exposure = ReadRAWStackInfo(dir_name, format)
 %           -format: a RAW format for reading MDR images.
 %
 %        Output:
-%           -exposure: a stack of exposure values from images in dir_name
+%           -exposure: an array of exposure values from images in dir_name
 %
 %     Copyright (C) 2015  Francesco Banterle
 % 
@@ -28,7 +28,7 @@ function exposure = ReadRAWStackInfo(dir_name, format)
 
 list = dir([dir_name, '/*.', format]);
 n = length(list);
-exposure = ones(n, 1);
+exposure = zeros(n, 1);
 
 for i=1:n
     try
