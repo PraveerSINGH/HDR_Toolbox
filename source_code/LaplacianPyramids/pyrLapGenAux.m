@@ -35,7 +35,7 @@ imgB = imfilter(img, mtx, 'replicate');
 
 %Downsampling
 [r, c] = size(img);
-L0 = imgB(1:2:r, 1:2:c,:);%imresize(imgB, 0.5, 'bilinear');
+L0 =  imgB(1:2:r, 1:2:c); %imresize(imgB, 0.5, 'bilinear');
 
 %Upsampling
 imgE = imresize(L0, [r, c], 'bilinear');
