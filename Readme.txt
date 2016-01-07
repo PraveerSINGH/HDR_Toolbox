@@ -13,7 +13,7 @@
 == Title: HDR Toolbox for Matlab
 
 
-== Version: 1.0.7
+== Version: 1.1.0
 
 
 == How To Install:
@@ -51,6 +51,7 @@ Run the demos to understand how to use I/O function, visualize images, tone Map 
 
 
 ==Update Report
+07/01/2016: -Improved the toolbox, especially BuildHDR
 17/02/2015: -Added iCAM06 (KuangTMO), added Mitsunaga and Nayar method for recovering inverse CRF, added RAW support through DCRAW, bug fixes, and more...
 16/07/2014: -Fixed some reported bugs for single input and FattalTMO, thanks to Areias Figueiras Edite and Bin Hu
 29/04/2014: -Added a novel framework for HDR video compression and three compression schemes 

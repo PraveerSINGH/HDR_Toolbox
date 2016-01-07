@@ -7,11 +7,11 @@ Author: Francesco Banterle
 
 License: This software is distributed under GPL v3 license (see license.txt)
 
-Year: Fall 2010-2015
+Year: Fall 2010-2016
 
 Title: HDR Toolbox for Matlab
 
-Version: 1.0.7
+Version: 1.1.0
 
 Contact:
 ========
