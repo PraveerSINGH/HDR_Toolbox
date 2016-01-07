@@ -187,10 +187,9 @@ if(~isempty(totWeight <= saturation))
     bSaturation = 1;
     disp('WARNING: the stack has saturated pixels!');
     
-    mask = zeros(size(totWeight));
-    mask(totWeight <= saturation) = 1;
-    imwrite(mask, 'sat.bmp');
-
+%     mask = zeros(size(totWeight));
+%     mask(totWeight <= saturation) = 1;
+%     imwrite(mask, 'sat.bmp');
 end
 
 %handling saturated pixels
