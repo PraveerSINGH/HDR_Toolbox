@@ -29,7 +29,7 @@ function ldrv = ldrvclose(ldrv)
 
 if(ldrv.streamOpen == 1)
 
-    if(strfind(ldrv.type,'TYPE_LDR_VIDEO') == 1)
+    if(strfind(ldrv.type, 'TYPE_LDR_VIDEO') == 1 & ldrv.permission == 'w')
         if(~isempty(ldrv.stream))
             close(ldrv.stream);
         end

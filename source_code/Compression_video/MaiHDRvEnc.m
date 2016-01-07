@@ -60,7 +60,7 @@ nameTMO = [nameOut,'_MAI11_tmo.',fileExt];
 nameResiduals = [nameOut,'_MAI11_residuals.',fileExt];
 
 %Opening hdr stream
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 %Tone mapping pass
 writerObj = VideoWriter(nameTMO, hdrv_profile);
@@ -110,7 +110,7 @@ for i=1:hdrv.totalFrames
     %Normalize in [0,1]
     r_min(i) = min(r(:));
     r_max(i) = max(r(:));    
-    r = (r-r_min(i))/(r_max(i)-r_min(i));
+    r = (r - r_min(i)) / (r_max(i) - r_min(i));
     
     %writing residuals
     writeVideo(writerObj_residuals, r);
@@ -118,7 +118,7 @@ end
 
 close(writerObj_residuals);
 
-save([nameOut,'_MAI11_info.mat'], 'tone_function', 'r_min', 'r_max');
+save([nameOut, '_MAI11_info.mat'], 'tone_function', 'r_min', 'r_max');
 
 hdrvclose(hdrv);
 

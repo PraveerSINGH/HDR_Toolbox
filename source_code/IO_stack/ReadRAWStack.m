@@ -1,6 +1,6 @@
-function stack = ReadRAWStack(dir_name, format, saturation_level, bNormalization)
+function stack = ReadRAWStack(dir_name, format, saturation_level)
 %
-%       stack = ReadRAWStack(dir_name, format, saturation_level, bNormalization)
+%       stack = ReadRAWStack(dir_name, format, saturation_level)
 %
 %
 %        Input:
@@ -29,10 +29,6 @@ function stack = ReadRAWStack(dir_name, format, saturation_level, bNormalization
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('bNormalization', 'var'))
-    bNormalization = 0;
-end
-
 if(~exist('saturation_level', 'var'))
     saturation_level = 2^12 - 1;
 end
@@ -50,14 +46,8 @@ if(n > 0)
         %read an image, and convert it into floating-point
         [img, ~, saturation_level] = read_raw(name, saturation_level);
         
-        img = ClampImg(single(img), 0, saturation_level);
-        
-        if(bNormalization)
-            img = img / saturation_level;
-        end
-
         %store in the stack
-        stack(:,:,:,i) = img;    
+        stack(:,:,:,i) =  single(img) / (2^16 - 1);    
     end
 end
 

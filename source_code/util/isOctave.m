@@ -1,17 +1,18 @@
-function hdrv = hdrvclose(hdrv)
+function val = isOctave()
 %
-%        hdrv = hdrvclose(hdrv)
 %
+%        val = isOctave()
+%
+%
+%        Description: it checks if the running environment is MATLAB
+%                     or Octave.
 %
 %        Input:
-%           -hdrv: a HDR video structure
 %
 %        Output:
-%           -hdrv: a HDR video structure
+%           -val: a boolean value: 1 if the environment is Ocatve, otherwise 0.
 %
-%        This function closes a video stream (hdrv) for reading frames
-%
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2015  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,22 +28,16 @@ function hdrv = hdrvclose(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(hdrv.streamOpen == 1)
-    
-    switch hdrv.type           
-        case 'TYPE_HDRV_LK08'
-            if(hdrv.permission == 'w') 
-                if(~isempty(hdrv.streamTMO))
-                    close(hdrv.streamTMO)
-                end
+tmp = ver();
 
-                if(~isempty(hdrv.streamR))
-                    close(hdrv.streamR)
-                end
-            end
+val = 0;
+
+if(isfield(tmp, 'Name'))
+    try
+        val = (strcmp(tmp(1).Name, 'Octave') == 1);
+    catch expr
+        disp(expr);
     end
-    
-    hdrv.streamOpen = 0;
 end
 
 end

@@ -29,6 +29,12 @@ function imgOut = SchlickTMO(img, schlick_mode, schlick_p, schlick_bit, schlick_
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Quantization Techniques for Visualization of High Dynamic Range Pictures"
+% 	  by Christophe Schlick
+%     in "Photorealistic Rendering Techniques" 1995 
+%
+
 
 check13Color(img);
 

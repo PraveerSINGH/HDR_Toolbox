@@ -83,7 +83,7 @@ if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
     open(writerObj);
 end
 
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
 tmo_alpha_coeff_c = 1.0 - tmo_alpha_coeff;
@@ -111,8 +111,8 @@ for i=1:hdrv.totalFrames
         [~, ind] = min(abs(histo_cdf-beta_clamping_c));
         minL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
 
-        frame(frame>maxL) = maxL;
-        frame(frame<minL) = minL;
+        frame(frame > maxL) = maxL;
+        frame(frame < minL) = minL;
         frame = frame - minL;
     end
    
@@ -148,7 +148,7 @@ for i=1:hdrv.totalFrames
     if(bVideo)
         writeVideo(writerObj, frameOut);
     else
-        imwrite(frameOut, [name,sprintf('%.10d',i),'.',ext]);
+        imwrite(frameOut, [name, sprintf('%.10d',i), '.', ext]);
     end
     
     %updating for the next frame

@@ -49,10 +49,15 @@ if(isdir(filename))
     
     totalFrames = length(tmp_list);
     
-    ldrv = struct('type',type,'path',filename,'list',tmp_list,'totalFrames',totalFrames,'FrameRate',30,'frameCounter',1,'streamOpen',0);
+    ldrv = struct('type', type, 'path', filename, 'list', tmp_list, ...
+                  'totalFrames', totalFrames, 'FrameRate', 30, ...
+                  'frameCounter', 1, 'streamOpen', 0, 'permission', 'u');
 else
     stream = VideoReader(filename);
-    ldrv = struct('type','TYPE_LDR_VIDEO','path',filename,'totalFrames',stream.NumberOfFrames,'FrameRate',stream.FrameRate,'frameCounter',1,'streamOpen',0,'stream',stream);
+    ldrv = struct('type', 'TYPE_LDR_VIDEO', 'path', filename, ...
+                  'totalFrames', stream.NumberOfFrames, 'FrameRate', ...
+                  stream.FrameRate, 'frameCounter', 1, 'streamOpen', 0, ...
+                  'stream', stream, 'permission', 'u');
 end
 
 end

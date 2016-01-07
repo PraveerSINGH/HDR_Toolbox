@@ -1,7 +1,7 @@
 function imgOut = LischinskiTMO(img, pAlpha, pWhite)
 %
 %
-%      imgOut=LischinskiTMO(img)
+%      imgOut = LischinskiTMO(img)
 %
 %
 %       Input:

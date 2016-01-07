@@ -1,17 +1,11 @@
-function hdrv = hdrvclose(hdrv)
-%
-%        hdrv = hdrvclose(hdrv)
+function plotChannels(imgIn, imgOut)
 %
 %
-%        Input:
-%           -hdrv: a HDR video structure
+%        plotChannels(imgIn, imgOut)
 %
-%        Output:
-%           -hdrv: a HDR video structure
+%        This function plots colors channels
 %
-%        This function closes a video stream (hdrv) for reading frames
-%
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2015  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,22 +21,31 @@ function hdrv = hdrvclose(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(hdrv.streamOpen == 1)
-    
-    switch hdrv.type           
-        case 'TYPE_HDRV_LK08'
-            if(hdrv.permission == 'w') 
-                if(~isempty(hdrv.streamTMO))
-                    close(hdrv.streamTMO)
-                end
+[r_i, c_i, col_i] = size(imgIn);
+[r_o, c_o, col_o] = size(imgOut);
 
-                if(~isempty(hdrv.streamR))
-                    close(hdrv.streamR)
-                end
-            end
-    end
+if(col_o ~= col_i)
+    error('different images!');
+end
+
+hold on;
+figure(1);
+
+for i=1:col_i
+    tmpX = imgIn(:,:,i);
+    tmpX = imresize(tmpX, [16, 16], 'bilinear');
+    tmpX = tmpX(:);
     
-    hdrv.streamOpen = 0;
+    tmpY = imgOut(:,:,i);
+    tmpY = imresize(tmpY, [16, 16], 'bilinear');
+    tmpY = tmpY(:);
+    
+    [tmpX, ind] = sort(tmpX(:), 'ascend');
+    windowSize = 16;
+    tmpY = tmpY(ind);
+    tmpY = filter( (1/windowSize)*ones(1,windowSize), 1, tmpY);
+    
+    plot(tmpX, tmpY);
 end
 
 end

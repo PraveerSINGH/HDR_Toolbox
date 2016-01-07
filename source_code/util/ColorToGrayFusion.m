@@ -30,12 +30,14 @@ function imgOut = ColorToGrayFusion(img)
 
 [r, c, col] = size(img);
 
-stack = zeros(r, c, 1, col);
+stack = zeros(r, c, 1, col + 1);
 
 for i=1:col
     stack(:,:,:,i) = img(:,:,i);
 end
  
+stack(:,:,:,4) = lumHK(img);
+
 imgOut = MertensTMO([], '', '', stack, 1.0, 0.0, 1.0, 0);
 
 end

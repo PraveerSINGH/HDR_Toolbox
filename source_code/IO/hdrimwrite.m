@@ -61,7 +61,7 @@ end
 
 extension = lower(fileExtension(filename));
 
-if(strcmpi(extension,'pic')==1)
+if(strcmpi(extension,'pic') == 1)
     extension = 'hdr';
 end
 
@@ -74,7 +74,15 @@ switch extension
         catch
             error('This PIC/HDR file can not be written.');
         end
-        
+
+    %OpenEXR support using TinyEXR
+    case 'exr'
+        try
+            write_exr(img, filename);
+        catch
+            error('This EXR file can not be written.');
+        end
+
     %Portable float map (.pfm)
     case 'pfm'
         try

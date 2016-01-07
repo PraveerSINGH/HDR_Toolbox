@@ -27,13 +27,10 @@ function ConvLDRvtoLDRi(filename, outputname, format)
 %
 
 ldrv = ldrvread(filename);
-ldrv = ldrvopen(ldrv);
 
 for i=1:ldrv.totalFrames
     [frame, ldrv] = ldrvGetFrame(ldrv, i);
     imwrite(frame, [outputname, sprintf('_%07d.', i), format]);
 end
-
-ldrvclose(ldrv);
 
 end

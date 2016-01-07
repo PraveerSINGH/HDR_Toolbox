@@ -32,9 +32,9 @@ disp('4) Build the radiance map using the stack and stack_exposure');
 imgHDR = BuildHDR(stack, stack_exposure, 'LUT', lin_fun, 'Deb97', 'log');
 
 disp('5) Save the radiance map in the .hdr format');
-hdrimwrite(imgHDR, 'hdr_image.pfm');
+hdrimwrite(imgHDR, 'hdr_image.hdr');
 
 disp('6) Show the tone mapped version of the radiance map with gamma encoding');
 h = figure(2);
 set(h, 'Name', 'Tone mapped version of the built HDR image');
-GammaTMO(ReinhardBilTMO(imgHDR, 0.18), 2.2, 0, 1);
+GammaTMO(ReinhardTMO(imgHDR, 0.18), 2.2, 0, 1);

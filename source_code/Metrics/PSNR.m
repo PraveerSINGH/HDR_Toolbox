@@ -32,15 +32,22 @@ if(CheckSameImage(img1, img2) == 0)
     error('The two images are different they can not be used.');
 end
 
-disp('PSNR is not very meaningful for HDR images/videos, please consider mPSNR instead!');
-
+b1 = 0;
 if(isa(img1, 'uint8'))
+    b1 = 1;
     img1 = double(img1) / 255.0;
 end
 
+b2 = 0;
 if(isa(img2, 'uint8'))
+    b2 = 1;
     img2 = double(img2) / 255.0;
 end
+
+if(~(b1 && b2))
+    disp('PSNR is not very meaningful for HDR images/videos, please consider mPSNR instead!');
+end
+
 
 img1 = ClampImg(img1, 0, 1);
 img2 = ClampImg(img2, 0, 1);

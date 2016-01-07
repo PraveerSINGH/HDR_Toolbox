@@ -1,17 +1,21 @@
-function hdrv = hdrvclose(hdrv)
+function [img1, img2, img3] = decomposeImage3(img)
 %
-%        hdrv = hdrvclose(hdrv)
 %
+%        [img1, img2, img3] = decomposeImage3(img)
+%
+%        This function visualizes colors of the image in its 3D color
+%        space.
 %
 %        Input:
-%           -hdrv: a HDR video structure
+%           -img: an image
 %
 %        Output:
-%           -hdrv: a HDR video structure
+%           -img1: img first channel
+%           -img2: img second channel
+%           -img3: img third channel
 %
-%        This function closes a video stream (hdrv) for reading frames
 %
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2015  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,22 +31,15 @@ function hdrv = hdrvclose(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(hdrv.streamOpen == 1)
-    
-    switch hdrv.type           
-        case 'TYPE_HDRV_LK08'
-            if(hdrv.permission == 'w') 
-                if(~isempty(hdrv.streamTMO))
-                    close(hdrv.streamTMO)
-                end
+check3Color(img);
 
-                if(~isempty(hdrv.streamR))
-                    close(hdrv.streamR)
-                end
-            end
-    end
-    
-    hdrv.streamOpen = 0;
-end
+img1 = zeros(size(img));
+img1(:,:,1) = img(:,:,1);
+
+img2 = zeros(size(img));
+img2(:,:,2) = img(:,:,1);
+
+img3 = zeros(size(img));
+img3(:,:,3) = img(:,:,1);
 
 end

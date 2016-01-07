@@ -95,8 +95,15 @@ if(~exist('lin_fun', 'var'))
     lin_fun = [];
 end
 
+%stack exposure checks
 if(isempty(stack) || isempty(stack_exposure))
     error('The stack is set empty!');
+end
+
+stack_exposure_check = unique(stack_exposure);
+
+if(length(stack_exposure) ~= length(stack_exposure_check))
+    error('The stack contains images with the same exposure value. Please remove these duplicated images!');
 end
 
 %merging
@@ -114,7 +121,6 @@ end
 if(isa(stack, 'uint16'))
     scale = 65535.0;
 end
-
 
 if(isa(stack, 'double') | isa(stack, 'single'))
     max_val = max(stack(:));
@@ -135,6 +141,7 @@ for i=1:n
     %computing the weight function    
     weight  = WeightFunction(tmpStack, weight_type, bMeanWeight);
 
+    %imwrite(weight, ['test',num2str(i),'.bmp']);
     %linearization of the image
     switch lin_type
         case 'gamma2.2'
@@ -175,29 +182,32 @@ end
 
 %checking for saturated pixels
 bSaturation = 0;
-if(~isempty(totWeight <= 0.0))
+saturation = 1e-4;
+if(~isempty(totWeight <= saturation))
     bSaturation = 1;
-    disp('WARNING: the stack has saturated pixels.');
+    disp('WARNING: the stack has saturated pixels!');
+    
+%     mask = zeros(size(totWeight));
+%     mask(totWeight <= saturation) = 1;
+%     imwrite(mask, 'sat.bmp');
 end
 
 %handling saturated pixels
 if(bSaturation)
-    [~, index] = min(stack_exposure);
+    [t, index] = min(stack_exposure);
  
     for i=1:col
-        max_val = double(max(max(stack(:,:,i,index)))) / (t * scale);
+        slice = stack(:,:,i,index);
+        max_val = double(max(slice(:))) / (t * scale);
  
         saturation_value = max_val;
-        for j=1:n
-            if(j ~= index)
-                saturation_value = saturation_value + (1.0 / stack_exposure(j));
-            end
-        end
  
         tmp = imgOut(:,:,i);
+        tmp_stack = stack(:,:,i,index);
+        tmp_tw = totWeight(:,:,i);
         
-        tmp((isnan(tmp) | isinf(tmp)) & stack(:,:,i,index) > 0.9) = saturation_value;
-        tmp((isnan(tmp) | isinf(tmp)) & stack(:,:,i,index) < 0.5) = 0.0;
+        tmp(tmp_tw < saturation & tmp_stack > 0.9) = saturation_value;
+        tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
          
         imgOut(:,:,i) = tmp;
     end

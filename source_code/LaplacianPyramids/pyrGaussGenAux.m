@@ -26,7 +26,7 @@ function imgOut = pyrGaussGenAux(img)
 %
 
 %5x5 Gaussian Kernel
-kernel = [1,4,6,4,1];
+kernel = [1, 4, 6, 4, 1];
 mtx = kernel' * kernel;
 mtx = mtx / sum(mtx(:));
 
@@ -34,6 +34,7 @@ mtx = mtx / sum(mtx(:));
 imgB = imfilter(img, mtx, 'replicate');
 
 %Downsampling
-imgOut = imresize(imgB, 0.5, 'bilinear');
+[r, c] = size(img);
+imgOut = imgB(1:2:r, 1:2:c); %imresize(imgB, 0.5, 'bilinear');
 
 end

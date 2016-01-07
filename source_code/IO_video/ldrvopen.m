@@ -1,17 +1,19 @@
-function ldrv = ldrvopen(ldrv)
+function ldrv = ldrvopen(ldrv, permission)
 %
-%        ldrv = ldrvopen(ldrv)
+%        ldrv = ldrvopen(ldrv, permission)
 %
 %
 %        Input:
-%           -ldrv: a LDR video structure
+%           -ldrv: a LDR video structure.
+%           -permission: writing, 'w' value, or reading, 'r' value,
+%           permissions.
 %
 %        Output:
-%           -ldrv: a LDR video structure
+%           -ldrv: a LDR video structure.
 %
 %        This function opens the video stream for reading frames
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -28,8 +30,12 @@ function ldrv = ldrvopen(ldrv)
 %
 
 if(ldrv.streamOpen == 0)
-    if(strfind(ldrv.type, 'TYPE_LDR_VIDEO') == 1)
-        open(ldrv.stream);
+    ldrv.permission = permission;
+    
+    if(permission == 'w') 
+        if((strfind(ldrv.type, 'TYPE_LDR_VIDEO') == 1))
+           open(ldrv.stream);
+        end       
     end
     
     ldrv.streamOpen = 1;

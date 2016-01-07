@@ -37,11 +37,15 @@ M_CAT02 = [ 0.7328 0.4296 -0.1624;...
            -0.7036 1.6975  0.0061;...
             0.003  0.0136  0.9834];
         
-img_RGB_w = ConvertLinearSpace(img_white_XYZ, M_CAT02);
+if(exist('img_white_XYZ', 'var'))
+    img_RGB_w = ConvertLinearSpace(img_white_XYZ, M_CAT02);
+    L_A = 0.2 * img_white_XYZ(:,:,2); %adaptation luminance
+else
+    img_RGB_w = ones(1,1,3);
+    L_A = 1.0;
+end
 
-imgRGB = ConvertLinearSpace(imgXYZ, M_CAT02);
-        
-L_A = 0.2 * img_white_XYZ(:,:,2); %adaptation luminance
+imgRGB = ConvertLinearSpace(imgXYZ, M_CAT02);       
 
 D = CIECAM02_DegreeAdaptation(L_A);
 

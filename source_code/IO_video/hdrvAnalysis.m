@@ -12,7 +12,7 @@ function [hm_v, max_v, min_v, mean_v] = hdrvAnalysis(hdrv)
 %           -min_v : min value of each frame
 %           -mean_v: mean of each frame
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ mean_v = [];
 
 bClose = 0;
 
-if(hdrv.streamOpen==0)
-    hdrv = hdrvopen(hdrv);
+if(hdrv.streamOpen == 0)
+    hdrv = hdrvopen(hdrv, 'r');
     bClose = 1;
 end
 
@@ -57,6 +57,7 @@ for i=1:hdrv.totalFrames
     min_v  = [min_v,  min(L(:))];
     mean_v = [mean_v, mean(L(:))];
 end
+
 disp('done');
 
 if(bClose)

@@ -66,7 +66,7 @@ if(~exist('tmo_video_profile', 'var'))
     tmo_video_profile = 'Motion JPEG AVI';
 end
 
-if(tmo_gamma<0)
+if(tmo_gamma < 0)
     bsRGB = 1;
 else
     bsRGB = 0;
@@ -86,7 +86,7 @@ if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
     open(writerObj);
 end
 
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
 for i=1:hdrv.totalFrames

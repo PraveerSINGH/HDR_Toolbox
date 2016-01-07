@@ -1,17 +1,20 @@
-function hdrv = hdrvclose(hdrv)
+function S = SigmoidColorResponse(L, sr_n, sr_sigma, sr_B)
 %
-%        hdrv = hdrvclose(hdrv)
+%       S = SigmoidColorResponse(L, sr_n, sr_sigma, sr_B)
 %
+%       This function computes sigmoid response
 %
-%        Input:
-%           -hdrv: a HDR video structure
+%       input:
+%           -L: a luminance image
+%           -sr_n: power 
+%           -sr_sigma:
+%           -sr_B:
 %
-%        Output:
-%           -hdrv: a HDR video structure
+%       output:
+%           -S: color correction for taking into account sigmoid
+%           compression
 %
-%        This function closes a video stream (hdrv) for reading frames
-%
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2011-14  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,22 +30,22 @@ function hdrv = hdrvclose(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(hdrv.streamOpen == 1)
-    
-    switch hdrv.type           
-        case 'TYPE_HDRV_LK08'
-            if(hdrv.permission == 'w') 
-                if(~isempty(hdrv.streamTMO))
-                    close(hdrv.streamTMO)
-                end
-
-                if(~isempty(hdrv.streamR))
-                    close(hdrv.streamR)
-                end
-            end
-    end
-    
-    hdrv.streamOpen = 0;
+if(~exist('sr_n', 'var'))
+    sr_n = 0.73;
 end
+
+if(~exist('sr_sigma', 'var'))
+    sr_sigma = 1.0;
+end
+
+if(~exist('sr_B', 'var'))
+    sr_B = 1.0;
+end
+
+L_n = L.^sr_n;
+sigma_n = sr_sigma.^sr_n;
+
+S = L_n ./ ((L_n + sigma_n).^2); 
+S = S * (sr_n * sr_B * sigma_n);
 
 end

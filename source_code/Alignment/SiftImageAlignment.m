@@ -108,7 +108,7 @@ im2g = RemoveSpecials(im2g);
 [f1,d1] = vl_sift(im1g) ;
 [f2,d2] = vl_sift(im2g) ;
 
-[matches, ~] = vl_ubcmatch(d1,d2) ;
+[matches, ~] = vl_ubcmatch(d1, d2) ;
 
 numMatches = size(matches,2) ;
 

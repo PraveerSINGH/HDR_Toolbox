@@ -1,7 +1,7 @@
-function imgOut = PeceKautzMerge(imageStack, folder_name, format, iterations, ke_size, kd_size, ward_percentile)
+function imgOut = PeceKautzMerge(imageStack, folder_name, format, wE, wS, wC, iterations, ke_size, kd_size, ward_percentile)
 %
 %
-%        imgOut = PeceKautzMerge(imageStack, folder_name, format, iterations, kernelSize, ward_percentile)
+%        imgOut = PeceKautzMerge(imageStack, folder_name, format, wE, wS, wC, iterations, kernelSize, ward_percentile)
 %
 %
 %        Input:
@@ -11,6 +11,15 @@ function imgOut = PeceKautzMerge(imageStack, folder_name, format, iterations, ke
 %           -format: the format of LDR images ('bmp', 'jpg', etc) in case
 %                    imageStack=[] and the tone mapped images is built from a sequence of
 %                    images in the current folder_name
+%           -wE: the weight for the well exposedness in [0,1]. Well exposed
+%                pixels are taken more into account if the wE is near 1
+%                otherwise they are not taken into account.
+%           -wS: the weight for the saturation in [0,1]. Saturated
+%                pixels are taken more into account if the wS is near 1
+%                otherwise they are not taken into account.
+%           -wC: the weight for the contrast in [0,1]. Strong edgese are 
+%                taken more into account if the wE is near 1
+%                otherwise they are not taken into account.
 %           -iterations: number of iterations for improving the movements'
 %           mask
 %           -ke_size: size of the erosion kernel
@@ -45,6 +54,19 @@ function imgOut = PeceKautzMerge(imageStack, folder_name, format, iterations, ke
 %     London, UK, November 2010
 %
 
+%default parameters if they are missing
+if(~exist('wE', 'var'))
+    wE = 1.0;
+end
+
+if(~exist('wS', 'var'))
+    wS = 1.0;
+end
+
+if(~exist('wC', 'var'))
+    wC = 1.0;
+end
+
 %imageStack generation
 if(~exist('imageStack', 'var'))
     imageStack = [];
@@ -75,7 +97,7 @@ if(~exist('kd_size', 'var'))
 end
 
 if(~exist('ward_percentile', 'var'))
-    ward_percentile = 0.6;
+    ward_percentile = 0.5;
 end
 
 %number of images in the stack
@@ -84,38 +106,48 @@ end
 %Computation of weights for each image
 total  = zeros(r, c);
 weight = ones(r, c, n);
-for i=1:n
-    %calculation of the weights
-    L = lum(imageStack(:,:,:,i));  
 
-    weight(:,:,i) = MertensWellExposedness(imageStack(:,:,:,i));
+for i=1:n
+    if(wE > 0.0)
+        weightE = MertensWellExposedness(imageStack(:,:,:,i));
+        weight(:,:,i) = weight(:,:,i) .* weightE.^wE;
+    end
     
-    weight(:,:,i) = weight(:,:,i) .* MertensContrast(L);
-     
-    weight(:,:,i) = weight(:,:,i) .* MertensSaturation(imageStack(:,:,:,i));
+    if(wC > 0.0)
+        L = mean(imageStack(:,:,:,i), 3);  
+        weightC = MertensContrast(L);
+        weight(:,:,i) = weight(:,:,i) .* (weightC.^wC);
+    end
+
+    if(wS > 0.0)
+        weightS = MertensSaturation(imageStack(:,:,:,i));
+        weight(:,:,i) = weight(:,:,i) .* (weightS.^wS);
+    end
     
-    weight(:,:,i) = weight(:,:,i) + 1e-12;  
+    weight(:,:,i) = weight(:,:,i) + 1e-12;
 end
 
-[moveMask, num] = PeceKautzMoveMask(imageStack, iterations, ke_size, kd_size, ward_percentile);
 weight_move = weight;
+
+[moveMask, num] = PeceKautzMoveMask(imageStack, iterations, ke_size, kd_size, ward_percentile);
+
 for i=0:num
     indx = find(moveMask == i);
     
     Wvec = zeros(n,1);
     for j=1:n
         W = weight(:,:,j);
-        Wvec(j) = mean(W(indx));
+        Wvec(j) = sum(W(indx));
     end
     [~, j] = max(Wvec);
 
     W = zeros(r, c);
     W(indx) = 1;
-    weight_move(:,:,j) = weight_move(:,:,j) .* (1 - W) + W;
-    
+    W_inv = 1.0 - W;
+
     for k=1:n
         if(j ~= k)
-            weight_move(:,:,k) = weight_move(:,:,k) .* (1 - W);
+            weight_move(:,:,k) = weight_move(:,:,k) .* W_inv;
         end
     end
 end
@@ -154,7 +186,7 @@ for i=1:col
 end
 
 %Clamping
-imgOut = ClampImg(imgOut, 0.0, 1.0);
+imgOut = ClampImg(imgOut / max(imgOut(:)), 0.0, 1.0);
 
 disp('This algorithm outputs images with gamma encoding. Inverse gamma is not required to be applied!');
 end

@@ -1,6 +1,6 @@
 function CrossCutter(img, cb_name, cb_format)
 %
-%        ret = CrossCutter(img, cb_name, cb_format)
+%        CrossCutter(img, cb_name, cb_format)
 %
 %
 %        Input:

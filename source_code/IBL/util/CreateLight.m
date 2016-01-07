@@ -12,7 +12,7 @@ function light = CreateLight(xMin, xMax, yMin, yMax, L, img)
 %        Output:
 %           -light: a directional light
 %
-%     Copyright (C) 2011  Francesco Banterle
+%     Copyright (C) 2011-15  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -35,14 +35,15 @@ totL = sum(tmpL(:));
 if((tot > 0) && (totL > 0))
     %color value
     col = reshape(img(yMin:yMax, xMin:xMax,:), tot, 1, size(img, 3));
-    value = sum(col,1);    
+    value = sum(col, 1);    
     %position
     [r, c] = size(L);
     [X, Y] = meshgrid(xMin:xMax, yMin:yMax);   
     x_light = sum(sum(tmpL .* X)) / (totL * c);    
     y_light = sum(sum(tmpL .* Y)) / (totL * r);  
     %struct
-    light = struct('col', value, 'x', x_light, 'y', y_light);
+    light = struct('col', value, 'x', x_light, 'y', y_light, ...
+                   'x_bound', [xMin, xMax], 'y_bound', [yMin, yMax]);
 else
     light = [];   
 end

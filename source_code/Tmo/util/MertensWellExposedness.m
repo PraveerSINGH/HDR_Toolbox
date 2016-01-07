@@ -1,10 +1,10 @@
-function We = MertensWellExposedness(img)
+function We = MertensWellExposedness(img, we_mean, we_sigma)
 %
 %
-%        We = MertensWellExposedness(img)
+%        We = MertensWellExposedness(img, we_mean, we_sigma)
 %
 % 
-%     Copyright (C) 2010 Francesco Banterle
+%     Copyright (C) 2010-15 Francesco Banterle
 %  
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -20,15 +20,24 @@ function We = MertensWellExposedness(img)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-%sigma for the Well-exposedness weights.
-sigma  = 0.2; %as in the original paper
-sigma2 = 2.0*sigma^2;
 
-[r,c,col] = size(img);
-We = ones(r,c);
+%mean for the Well-exposedness weights.
+if(~exist('we_mean', 'var'))
+    we_mean = 0.5; %as in the original paper
+end
+
+%sigma for the Well-exposedness weights.
+if(~exist('we_sigma', 'var'))
+    we_sigma = 0.2; %as in the original paper
+end
+
+sigma2 = 2.0 * we_sigma^2;
+
+[r, c, col] = size(img);
+We = ones(r, c);
 
 for i=1:col
-    We = We .* exp(-(img(:,:,i)-0.5).^2/sigma2);
+    We = We .* exp(-(img(:,:,i) - we_mean).^2 / sigma2);
 end
 
 end

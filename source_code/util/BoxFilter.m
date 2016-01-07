@@ -1,20 +1,18 @@
-function S = ColorCorrectionSigmoid(L, sr_n, sr_sigma, sr_B)
+function imgBlur = BoxFilter(img, radius)
 %
-%       S = SigmoidResponse(img, sr_n, sr_sigma, sr_B)
 %
-%       This function computes sigmoid response
+%       imgBlur = BoxFilter(img, radius)
 %
-%       input:
-%           -L: a luminance image
-%           -sr_n: power 
-%           -sr_sigma:
-%           -sr_B:
 %
-%       output:
-%           -S: color correction for taking into account sigmoid
-%           compression
+%       Input:
+%           -img: the input image
+%           -radius: the radius of the box filter
 %
-%     Copyright (C) 2011-14  Francesco Banterle
+%       Output:
+%           -imgBlur: a filtered image
+%
+%
+%     Copyright (C) 2011-15 Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -30,22 +28,16 @@ function S = ColorCorrectionSigmoid(L, sr_n, sr_sigma, sr_B)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('sr_n','var'))
-    sr_n = 0.73;
+if(~exist('radius', 'var'))
+    radius = 1;
 end
 
-if(~exist('sr_sigma','var'))
-    sr_sigma = 1.0;
+if(radius < 1)
+    radius = 1;
 end
 
-if(~exist('sr_B','var'))
-    sr_B = 1.0;
-end
-
-L_n = L.^sr_n;
-sigma_n = sr_sigma.^sr_n;
-
-S = L_n ./ ((L_n + sigma_n).^2); 
-S = S * (sr_n * sr_B * sigma_n);
+H = fspecial('average', round(radius * 2 + 1));
+imgBlur = imfilter(img, H, 'replicate');
 
 end
+
