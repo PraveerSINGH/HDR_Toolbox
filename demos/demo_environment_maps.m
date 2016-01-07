@@ -27,4 +27,4 @@ disp('4) Write the cube map on the disk');
 hdrimwrite(imgOut,'CS_Warwick_CUBE_MAP_format.hdr');
 
 disp('5) Write each face of the cube map on the disk');
-ret = CrossCutter(imgOut,'CS_Warwick_CM','hdr');
+CrossCutter(imgOut,'CS_Warwick_CM','hdr');
