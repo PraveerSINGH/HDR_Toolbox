@@ -7,13 +7,13 @@ function imgOut = ConvertRGBtosRGB(img, inverse)
 %           -img: image to convert from linear RGB to sRGB or from sRGB to
 %                 linear RGB.
 %           -inverse: takes as values 0 or 1. If it is set to 0 the
-%                     transformation from sRGB to linear RGB is applied,
-%                     otherwise the transformation from linear RGB to sRGB.
+%                     transformation from linear RGB to sRGB is applied,
+%                     otherwise the transformation from sRGB linear RGB.
 %
 %        Output:
 %           -imgOut: converted image in sRGB or linear RGB.
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by

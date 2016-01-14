@@ -6,13 +6,14 @@ function imgOut = ConvertRGBtoYUV(img, inverse)
 %        Input:
 %           -img: image to convert from RGB to YUV or from YUV to RGB.
 %           -inverse: takes as values 0 or 1. If it is set to 0 the
-%                     transformation from YUV to RGB is applied, otherwise
-%                     the transformation from RGB to YUV.
+%                     transformation from linear RGB to YUV is applied,
+%                     otherwise the transformation from linear RGB to YUV
+%                     is applied.
 %
 %        Output:
 %           -imgOut: converted image in YUV or RGB.
 %
-%     Copyright (C) 2011-14  Francesco Banterle
+%     Copyright (C) 2011-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
