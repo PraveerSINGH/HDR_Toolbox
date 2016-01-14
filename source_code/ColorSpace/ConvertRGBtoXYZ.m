@@ -6,13 +6,14 @@ function imgOut = ConvertRGBtoXYZ(img, inverse)
 %        Input:
 %           -img: image to convert from RGB to XYZ or from XYZ to RGB.
 %           -inverse: takes as values 0 or 1. If it is set to 0 the
-%                     transformation from XYZ to RGB is applied, otherwise
-%                     the transformation from RGB to XYZ.
+%                     transformation from linear RGB to XYZ is applied,
+%                     otherwise the transformation from XYZ to linear RGB
+%                     is applied.
 %
 %        Output:
 %           -imgOut: converted image in XYZ or RGB.
 %
-%     Copyright (C) 2011  Francesco Banterle
+%     Copyright (C) 2011-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
