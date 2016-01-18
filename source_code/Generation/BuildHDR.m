@@ -13,7 +13,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %           -lin_type: the linearization function:
 %                      - 'linear': images are already linear
 %                      - 'gamma2.2': gamma function 2.2 is used for
-%                                    linearisation;
+%                                    linearization;
 %                      - 'sRGB': images are encoded using sRGB
 %                      - 'LUT': the lineraziation function is a look-up
 %                               table defined stored as an array in the 
@@ -134,6 +134,17 @@ if((strcmp(lin_type, 'LUT') == 1) && isempty(lin_fun))
     [lin_fun, ~] = ComputeCRF(single(stack) / scale, stack_exposure);        
 end
 
+gamma_k = strfind(lin_type, 'gamma');
+if(gamma_k == 1)
+    tmp_str = lin_type(gamma_k + 5:end);
+    gamma_value = str2double(tmp_str);
+    if(gamma_value <= 0.0)
+        gamma_value = 2.2;
+    end
+    
+    lin_type = 'gamma';
+end
+
 %for each LDR image...
 for i=1:n
     tmpStack = ClampImg(single(stack(:,:,:,i)) / scale, 0.0, 1.0);
@@ -141,17 +152,20 @@ for i=1:n
     %computing the weight function    
     weight  = WeightFunction(tmpStack, weight_type, bMeanWeight);
 
-    %imwrite(weight, ['test',num2str(i),'.bmp']);
+    %imwrite(weight, ['test', num2str(i), '.bmp']);
     %linearization of the image
     switch lin_type
-        case 'gamma2.2'
-            tmpStack = tmpStack.^2.2;
+        case 'gamma'
+            tmpStack = tmpStack.^gamma_value;
+            %this value is added for numerical stability
+            tmpStack = tmpStack + 1.0 / 65536.0; 
 
         case 'sRGB'
             tmpStack = ConvertRGBtosRGB(tmpStack, 1);
-        
+
         case 'LUT'
             tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
+
         otherwise
     end
    
