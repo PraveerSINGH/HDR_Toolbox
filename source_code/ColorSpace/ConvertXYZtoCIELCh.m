@@ -42,15 +42,19 @@ if(inverse == 0)%forward transform
     
     imgOut(:,:,1) = imgLab(:,:,1);
     imgOut(:,:,2) = sqrt(imgLab(:,:,2).^2 + imgLab(:,:,3).^2);
-    tmp = radtodeg(atan2(imgLab(:,:,3), imgLab(:,:,2))); 
+
+    rad_to_deg = 180 / pi;
+    tmp = atan2(imgLab(:,:,3), imgLab(:,:,2)) * rad_to_deg;
     tmp(tmp < 0) = tmp(tmp < 0) + 360;
     imgOut(:,:,3) = tmp;
 end
 
 if(inverse == 1)%inverse transform    
     imgLab(:,:,1) = img(:,:,1);
-    imgLab(:,:,2) = cos(degtorad(img(:,:,3))) .* img(:,:,2);
-    imgLab(:,:,3) = sin(degtorad(img(:,:,3))) .* img(:,:,2);
+    deg_to_rad = pi / 180;
+    rad = img(:,:,3) * deg_to_rad;
+    imgLab(:,:,2) = cos(rad) .* img(:,:,2);
+    imgLab(:,:,3) = sin(rad) .* img(:,:,2);
     
     imgOut = ConvertXYZtoCIELab(imgLab, 1, conv_whitePoint);
 end

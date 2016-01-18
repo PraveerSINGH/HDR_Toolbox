@@ -27,7 +27,7 @@ function l = lumHK(img)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-checkColor3(img);
+check3Color(img);
 
 imgXYZ = ConvertRGBtoXYZ(img, 0);
 imgLCh = ConvertXYZtoCIELCh(imgXYZ, 0);
@@ -36,9 +36,9 @@ L = imgLCh(:,:,1);
 C = imgLCh(:,:,2);
 h = imgLCh(:,:,3);
 
-h2 = deg2rad((h - 90)/2);
+h2 = deg2rad((h - 90) / 2);
 
 l = L + (2.5 - 0.025 * L) .* (0.116 * abs(sin(h2)) + 0.085) .* C;
-l = out / max(l(:));
+l = l / max(l(:));
 
 end
