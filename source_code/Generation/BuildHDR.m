@@ -8,8 +8,10 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %           -stack: an input stack of LDR images. This has to be set if we
 %           the stack is already in memory and we do not want to load it
 %           from the disk using the tuple (dir_name, format).
+%
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s).
+%
 %           -lin_type: the linearization function:
 %                      - 'linear': images are already linear
 %                      - 'gamma2.2': gamma function 2.2 is used for
@@ -18,10 +20,12 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %                      - 'LUT': the lineraziation function is a look-up
 %                               table defined stored as an array in the 
 %                               lin_fun 
+%
 %           -lin_fun: it is the camera response function of the camera that
 %           took the pictures in the stack. If it is empty, [], and 
 %           type is 'LUT' it will be estimated using Debevec and Malik's
 %           method.
+%
 %           -weight_type:
 %               - 'all':   weight is set to 1
 %               - 'hat':   hat function 1-(2x-1)^12
@@ -30,6 +34,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %                          This function produces good results when some 
 %                          under-exposed or over-exposed images are present
 %                          in the stack.
+%
 %           -merge_type:
 %               - 'linear': it merges different LDR images in the linear
 %               domain.
@@ -37,9 +42,13 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %               logarithmic domain.
 %               - 'robertson': it merges different LDR images in the linear
 %               domain using Robertson et al.'s weighting.
-%           -bRobertson: if it is set to 1 it enables the Robertson's
-%           modification for assembling exposures for reducing noise.
-%           This value is set to 0 by default.
+%
+%           -bMeanWeight: if it is set to 1, it will compute a single
+%           weight for each exposure (not a weight for each color channel)
+%           for assembling all images.
+%           Note that this option typicallt improves numerical stability,
+%           but it can introduce bias in the final colors. This option is
+%           set to 0 by default.
 %
 %        Output:
 %           -imgOut: the final HDR image.
@@ -55,7 +64,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %               BuildHDR(stack, stack_exposure,'tabledDeb97',[],'Deb97');
 %
 %
-%     Copyright (C) 2011-15  Francesco Banterle
+%     Copyright (C) 2011-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
