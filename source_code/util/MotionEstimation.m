@@ -1,6 +1,6 @@
-function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, bVisualize)
+function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, bVisualize)
 %
-%       [motionMap, uv] = MotionEstimation(img1, img2, blockSize, bVisualize)
+%       [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, bVisualize)
 %
 %       This computes motion estimation between frames
 %
@@ -8,6 +8,7 @@ function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, bVisualize)
 %         - img1: source
 %         - img2: target
 %         - blockSize: size of the block
+%         - maxSearchRadius: search size in blocks
 %         - bVisualize: 
 %
 %       output:
@@ -40,7 +41,9 @@ if(~exist('blockSize', 'var'))
     blockSize = max([2^ceil(log10(nPixels)), 4]);
 end
 
-maxSearchRadius = 2; %size in blocks
+if(~exist('maxSearchRadius', 'var'))
+    maxSearchRadius = 2; %size in blocks
+end
 
 shift = round(blockSize * maxSearchRadius);
 
@@ -51,41 +54,50 @@ motionMap = zeros(r, c, 3);
 
 uv = zeros(block_r, block_c, 4);
 
+k_vec = [];
+l_vec = [];
+for k=(-shift):shift
+	for l=(-shift):shift
+        k_vec = [k_vec, k];
+        l_vec = [l_vec, l];
+    end
+end
+
+vec_n = length(k_vec);
+
 for i=1:block_r   
     for j=1:block_c     
         dx = 0;
         dy = 0;
-        err = 1e30;
-        
+        err = 1e20;
+                
         i_b = (i - 1) * blockSize + 1;
-        j_b = (j - 1) * blockSize + 1;
         i_e = min([i_b + blockSize - 1, r]);
+
+        j_b = (j - 1) * blockSize + 1;
         j_e = min([j_b + blockSize - 1, c]);
                 
         block1(1:length(i_b:i_e),1:length(j_b:j_e),:) = img1(i_b:i_e, j_b:j_e, :);
-        
-        for k=(-shift):shift
-            for l=(-shift):shift
-                i_b2 = i_b + k;
-                j_b2 = j_b + l;
-                i_e2 = i_e + k;
-                j_e2 = j_e + l;
-                  
-                if((i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
-                    block2(1:length(i_b2:i_e2),1:length(j_b2:j_e2),:) = img2(i_b2:i_e2, j_b2:j_e2, :);
+                
+        for p=1:vec_n
+            i_b2 = i_b + k_vec(p);
+            i_e2 = i_e + k_vec(p);
+            
+            j_b2 = j_b + l_vec(p);
+            j_e2 = j_e + l_vec(p);
 
-                    tmp_err = abs(block1 - block2);
-                    tmp_err = sum(tmp_err(:));
-
-                    if(tmp_err < err)
-                        err = tmp_err;
-                        dx = l;
-                        dy = k;
-                    end
-                end
+            if((i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
+                tmp_err = abs(block1 - img2(i_b2:i_e2, j_b2:j_e2, :));
+                tmp_err = sum(tmp_err(:));
+                
+                if(tmp_err < err)
+                    err = tmp_err;
+                    dx = l_vec(p);
+                    dy = k_vec(p);
+                end 
             end
         end
-           
+        
         motionMap(i_b:i_e,j_b:j_e,1) = dx;
         motionMap(i_b:i_e,j_b:j_e,2) = dy;
         motionMap(i_b:i_e,j_b:j_e,3) = err;
@@ -98,8 +110,7 @@ for i=1:block_r
 end
 
 if(bVisualize)
-    figure(bVisualize)
-    
+    figure(bVisualize)    
     quiver(uv(:, :, 1), r - uv(:, :, 2) + 1, uv(:, :, 3), -uv(:, :, 4));
 end
 
