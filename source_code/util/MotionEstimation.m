@@ -1,6 +1,6 @@
-function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, bVisualize)
+function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, bVisualize)
+%       [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
 %       This computes motion estimation between frames
 %
@@ -9,6 +9,7 @@ function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadi
 %         - img2: target
 %         - blockSize: size of the block
 %         - maxSearchRadius: search size in blocks
+%         - lambda_reg: regularization coefficient
 %         - bVisualize: 
 %
 %       output:
@@ -45,6 +46,14 @@ if(~exist('maxSearchRadius', 'var'))
     maxSearchRadius = 2; %size in blocks
 end
 
+if(~exist('maxSearchRadius', 'var'))
+    maxSearchRadius = 2; %size in blocks
+end
+
+if(~exist('lambda_reg', 'var'))
+    lambda_reg = 0;
+end
+
 shift = round(blockSize * maxSearchRadius);
 
 block_r = ceil(r / blockSize);
@@ -56,10 +65,12 @@ uv = zeros(block_r, block_c, 4);
 
 k_vec = [];
 l_vec = [];
+n_vec = [];
 for k=(-shift):shift
 	for l=(-shift):shift
         k_vec = [k_vec, k];
         l_vec = [l_vec, l];
+        n_vec = [n_vec, sqrt(k*k + l*l)];
     end
 end
 
@@ -73,22 +84,24 @@ for i=1:block_r
                 
         i_b = (i - 1) * blockSize + 1;
         i_e = min([i_b + blockSize - 1, r]);
-
         j_b = (j - 1) * blockSize + 1;
         j_e = min([j_b + blockSize - 1, c]);
-                
-        block1(1:length(i_b:i_e),1:length(j_b:j_e),:) = img1(i_b:i_e, j_b:j_e, :);
-                
+        
         for p=1:vec_n
+            i_b1 = i_b - k_vec(p);
+            i_e1 = i_e - k_vec(p);            
+            j_b1 = j_b - l_vec(p);
+            j_e1 = j_e - l_vec(p);
+
             i_b2 = i_b + k_vec(p);
-            i_e2 = i_e + k_vec(p);
-            
+            i_e2 = i_e + k_vec(p);            
             j_b2 = j_b + l_vec(p);
             j_e2 = j_e + l_vec(p);
 
-            if((i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
-                tmp_err = abs(block1 - img2(i_b2:i_e2, j_b2:j_e2, :));
-                tmp_err = sum(tmp_err(:));
+            if( (i_b1 > 0) && (j_b1 > 0) && (i_e1 <= r) && (j_e1 <= c) &&...
+                (i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
+                tmp_err = abs(img1(i_b1:i_e1, j_b1:j_e1, :) - img2(i_b2:i_e2, j_b2:j_e2, :));
+                tmp_err = sum(tmp_err(:)) + lambda_reg * n_vec(p);
                 
                 if(tmp_err < err)
                     err = tmp_err;
@@ -109,7 +122,7 @@ for i=1:block_r
     end
 end
 
-if(bVisualize)
+if(bVisualize > 0)
     figure(bVisualize)    
     quiver(uv(:, :, 1), r - uv(:, :, 2) + 1, uv(:, :, 3), -uv(:, :, 4));
 end
