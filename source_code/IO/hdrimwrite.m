@@ -78,6 +78,11 @@ switch extension
     %OpenEXR support using TinyEXR
     case 'exr'
         try
+            if(~isa(img, 'double'))
+                disp('Warning: This image is not a double, automatic cast to double for saving it as EXR.');
+                img = double(img);
+            end
+            
             write_exr(img, filename);
         catch
             error('This EXR file can not be written.');
@@ -95,10 +100,10 @@ switch extension
     case 'jp2'
          try
             if(~exist('hdr_info.compression_ratio', 'var'))
-	        HDRJPEG2000Enc(img, filename, 2.0);
-  	    else
-                HDRJPEG2000Enc(img, filename, hdr_info.compression_ratio);
-	    end
+                HDRJPEG2000Enc(img, filename, 2.0);
+            else
+            	HDRJPEG2000Enc(img, filename, hdr_info.compression_ratio);
+            end
          catch
              error('This HDR JPEG 2000 file can not be written.');
          end        
