@@ -70,9 +70,11 @@ for k=(-shift):shift
 	for l=(-shift):shift
         k_vec = [k_vec, k];
         l_vec = [l_vec, l];
-        n_vec = [n_vec, sqrt(k*k + l*l)];
+        n_vec = [n_vec, abs(k) + abs(l)];
     end
 end
+
+n_vec = n_vec / (2 * shift);
 
 vec_n = length(k_vec);
 
@@ -101,7 +103,7 @@ for i=1:block_r
             if( (i_b1 > 0) && (j_b1 > 0) && (i_e1 <= r) && (j_e1 <= c) &&...
                 (i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
                 tmp_err = abs(img1(i_b1:i_e1, j_b1:j_e1, :) - img2(i_b2:i_e2, j_b2:j_e2, :));
-                tmp_err = sum(tmp_err(:)) + lambda_reg * n_vec(p);
+                tmp_err = mean(tmp_err(:)) + lambda_reg * n_vec(p);
                 
                 if(tmp_err < err)
                     err = tmp_err;
