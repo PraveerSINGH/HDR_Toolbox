@@ -1,6 +1,6 @@
-function disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity, dm_metric)
+function disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity, dm_metric, dm_regularization)
 %
-%       disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity, dm_metric)
+%       disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity, dm_metric, dm_regularization)
 %
 %       Computing stereo disparity map
 %
@@ -12,6 +12,7 @@ function disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity,
 %         - dm_metric: the type of metric for computing disparity: 'SSD' (sum of
 %           squared differences), 'SAD' (sum of absolute differences), 'NCC'
 %           (normalized cross-correlation)
+%         -dm_regularization: regularization value 
 %
 %       output:
 %         - offsetMap: shift vectors from img1 to img2
@@ -44,6 +45,10 @@ if(~exist('dm_metric', 'var'))
     dm_metric = 'SSD';    
 end
 
+if(~exist('dm_regularization', 'var'))
+    dm_regularization = 0.0;
+end
+
 [r, c, ~] = size(imgL);
 
 halfPatchSize = ceil(dm_patchSize / 2);
@@ -51,33 +56,41 @@ halfPatchSize = ceil(dm_patchSize / 2);
 disparityMap = zeros(r, c, 2);
 
 for i=(dm_patchSize + 1):(r - dm_patchSize - 1)
-    
+            
     for j=(dm_patchSize + 1):(c - dm_patchSize - 1)
         
         err = 1e30;
-        disp = j;
+        disp = 0;
         patch1 = imgL((i - halfPatchSize):(i + halfPatchSize), (j - halfPatchSize):(j + halfPatchSize), :);
-        p1_2 = patch1.^2;
+        patch1_sq = patch1.^2;
         
-        min_j = max([j-dm_maxDisparity, dm_patchSize + 1]);
-        max_j = min([j+dm_maxDisparity, c - dm_patchSize - 1]);
+        min_j = max([j - dm_maxDisparity, dm_patchSize + 1]);
+        max_j = min([j + dm_maxDisparity, c - dm_patchSize - 1]);
         
+        lambda = dm_regularization / (max_j - min_j + 1);
+                
         for k=min_j:max_j
             patch2 = imgR((i - halfPatchSize):(i + halfPatchSize), (k - halfPatchSize):(k + halfPatchSize), :);
-            p2_2 = patch2.^2;
                 
+            tmp_err = 1e30;
+            
             switch dm_metric
                 case 'SSD'
                     tmp_err = (patch1 - patch2).^2;
                 case 'SAD'
                     tmp_err = abs(patch1 - patch2);
                 case 'NCC'
-                    tmp_err = (patch1 .* patch2) / sqrt(sum(p1_2(:)) * sum(p2_2(:)));
+                    patch2_sq = patch2.^2;
+                    tmp_err = (patch1 .* patch2) / sqrt(sum(patch1_sq(:)) * sum(patch2_sq(:)));
                 otherwise
                     tmp_err = (patch1 - patch2).^2;
             end
             
-            tmp_err = sum(tmp_err(:));
+            if(dm_regularization > 0.0)
+                tmp_err = mean(tmp_err(:)) + lambda * abs(k - j);
+            else
+                tmp_err = sum(tmp_err(:));
+            end
                 
             if(tmp_err < err)
                 err  = tmp_err;
@@ -85,9 +98,10 @@ for i=(dm_patchSize + 1):(r - dm_patchSize - 1)
             end            
         end
         
-        disparityMap(i,j,1) =  disp;
-        disparityMap(i,j,2) =  err;
+        disparityMap(i, j, 1) = disp;
+        disparityMap(i, j, 2) = err;
     end
+    
 end
 
 end

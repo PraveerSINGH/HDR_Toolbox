@@ -10,7 +10,7 @@ function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadi
 %         - blockSize: size of the block
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
-%         - bVisualize: 
+%         - bVisualize: if it is set to 1 it visualizes the motion field 
 %
 %       output:
 %         - motionMap: motion map for each pixel
@@ -40,10 +40,6 @@ end
 if(~exist('blockSize', 'var'))
     nPixels = r * c;
     blockSize = max([2^ceil(log10(nPixels)), 4]);
-end
-
-if(~exist('maxSearchRadius', 'var'))
-    maxSearchRadius = 2; %size in blocks
 end
 
 if(~exist('maxSearchRadius', 'var'))
