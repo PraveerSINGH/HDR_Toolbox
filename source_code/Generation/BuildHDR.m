@@ -206,13 +206,14 @@ end
 %checking for saturated pixels
 bSaturation = 0;
 saturation = 1e-4;
+
 if(~isempty(totWeight <= saturation))
     bSaturation = 1;
+    mask = zeros(size(totWeight));
+    mask(totWeight <= saturation) = 1;
     disp('WARNING: the stack has saturated pixels!');
     
     if(exist('debug_mode', 'var'))
-        mask = zeros(size(totWeight));
-        mask(totWeight <= saturation) = 1;
         imwrite(mask, 'saturation_mask.bmp');
     end
 end
@@ -220,22 +221,33 @@ end
 %handling saturated pixels
 if(bSaturation)
     [t, index] = min(stack_exposure);
- 
+    
+    mask = max(mask, [], 3);
+    slice = stack(:,:,:,index) / (t * scale);
+    
     for i=1:col
-        slice = stack(:,:,i,index);
-        max_val = double(max(slice(:))) / (t * scale);
- 
-        saturation_value = max_val;
- 
         tmp = imgOut(:,:,i);
-        tmp_stack = stack(:,:,i,index);
-        tmp_tw = totWeight(:,:,i);        
-        
-        tmp(tmp_tw < saturation & tmp_stack > 0.9) = saturation_value;
-        tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
-         
+        slice_i = slice(:,:,i);
+        tmp(mask == 1) = slice_i(mask == 1);
         imgOut(:,:,i) = tmp;
     end
+    
+%      for i=1:col
+%         slice = stack(:,:,i,index);
+%         max_val = double(max(slice(:))) / (t * scale);
+%  
+%         saturation_value = max_val;
+%  
+%         tmp = imgOut(:,:,i);
+%         tmp_stack = stack(:,:,i,index);
+%         tmp_tw = totWeight(:,:,i);        
+%         
+%         tmp(tmp_tw <= saturation) = slice(tmp_tw <= saturation)/ (t * scale);
+%        % tmp(tmp_tw < saturation & tmp_stack > 0.95) = saturation_value;
+%        % tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
+%          
+%         imgOut(:,:,i) = tmp;
+%     end
 end
 
 %forcing to double type for allowing this image to be used in some MATLAB functions
