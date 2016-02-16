@@ -26,7 +26,7 @@ disp('3) Estimate the Camera Response Function (CRF)');
 [lin_fun, ~] = ComputeCRF(stack, stack_exposure, 512);    
 h = figure(1);
 set(h, 'Name', 'The Camera Response Function (CRF)');
-plot(lin_fun);
+plot(0:255, lin_fun(:,1), 'r', 0:255, lin_fun(:,2),'g', 0:255, lin_fun(:,3), 'b');
 
 disp('4) Build the radiance map using the stack and stack_exposure');
 imgHDR = BuildHDR(stack, stack_exposure, 'LUT', lin_fun, 'Deb97', 'log');
