@@ -35,8 +35,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
     /* Copy the string data into buf. */ 
     status = mxGetString(prhs[0], nameFile, buflen);
     
-
-    
     /* call the computational routine */
     EXRImage image;
     InitEXRImage(&image);
@@ -98,5 +96,5 @@ void mexFunction( int nlhs, mxArray *plhs[],
         }
     }
     
-    
+    FreeEXRImage(&image);
 }
