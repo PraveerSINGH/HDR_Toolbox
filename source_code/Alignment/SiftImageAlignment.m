@@ -117,6 +117,10 @@ X2 = f2(1:2,matches(2,:)); X2(3,:) = 1;
 
 % RANSAC with homography model
 %clear H score ok ;
+score = -1;
+H = zeros(3, 3);
+ok = [];
+
 for t = 1:maxIterations
   % estimate homograpyh
   subset = vl_colsubset(1:numMatches, 4);
@@ -126,19 +130,22 @@ for t = 1:maxIterations
   end
   
   [~, ~, V] = svd(A);
-  H{t} = reshape(V(:,9),3,3);
+  H_t = reshape(V(:,9),3,3);
 
   % score homography
-  X2_ = H{t} * X1;
+  X2_ = H_t * X1;
   du = X2_(1,:)./X2_(3,:) - X2(1,:)./X2(3,:);
   dv = X2_(2,:)./X2_(3,:) - X2(2,:)./X2(3,:);
-  ok{t} = (du.*du + dv.*dv) < 4;
-  score(t) = sum(ok{t});
+  ok_t = (du.*du + dv.*dv) < 4;
+  
+  score_t = sum(ok_t);
+  if(score_t > score) 
+      H = H_t;
+      score = score_t;
+      ok = ok_t;
+  end
 end
 
-[~, best] = max(score);
-H = H{best};
-ok = ok{best};
 
 % Optional refinement
 function err = residual(H)

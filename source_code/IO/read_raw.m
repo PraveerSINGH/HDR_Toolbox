@@ -37,7 +37,7 @@ if(~exist('saturation_level', 'var'))
 end
 
 try
-    %reading the raw file
+    %reading the raw file    
     [~, output] = dos(['dcraw -6 -w -W -S ', num2str(saturation_level), ' -q 3 -g 1 1 -T ', name]);
 
     if(~isempty(strfind(output, 'is not recognized as an internal')))

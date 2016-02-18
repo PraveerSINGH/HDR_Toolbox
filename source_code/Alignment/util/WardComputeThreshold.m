@@ -41,7 +41,7 @@ if(~exist('wardTolerance', 'var'))
     wardTolerance = 4 / 256;
 end
 
-if(size(img,3) == 1)
+if(size(img, 3) == 1)
     grey = img;
 else
     grey = (54 * img(:,:,1) + 183 * img(:,:,2) +  19 * img(:,:,3)) / 256;

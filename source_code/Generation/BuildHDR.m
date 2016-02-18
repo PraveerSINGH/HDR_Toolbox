@@ -154,6 +154,9 @@ if(gamma_k == 1)
     lin_type = 'gamma';
 end
 
+%this value is added for numerical stability
+delta_value = 1.0 / 65536.0;
+
 %for each LDR image...
 for i=1:n
     tmpStack = ClampImg(single(stack(:,:,:,i)) / scale, 0.0, 1.0);
@@ -166,9 +169,6 @@ for i=1:n
     switch lin_type
         case 'gamma'
             tmpStack = tmpStack.^gamma_value;
-            %this value is added for numerical stability
-            tmpStack = tmpStack + 1.0 / 65536.0; 
-
         case 'sRGB'
             tmpStack = ConvertRGBtosRGB(tmpStack, 1);
 
@@ -180,14 +180,14 @@ for i=1:n
    
     %summing things up...
     t = stack_exposure(i);    
-    if(t > 0.0)
+    if(t > 0.0)                
         switch merge_type
             case 'linear'
                 imgOut = imgOut + (weight .* tmpStack) / t;
                 totWeight = totWeight + weight;
             
             case 'log'
-                imgOut = imgOut + weight .* (log(tmpStack) - log(t));
+                imgOut = imgOut + weight .* (log(tmpStack + delta_value) - log(t));
                 totWeight = totWeight + weight;                
             
             case 'robertson'
@@ -206,37 +206,51 @@ end
 %checking for saturated pixels
 bSaturation = 0;
 saturation = 1e-4;
+
 if(~isempty(totWeight <= saturation))
     bSaturation = 1;
+    mask = zeros(size(totWeight));
+    mask(totWeight <= saturation) = 1;
     disp('WARNING: the stack has saturated pixels!');
     
-%     mask = zeros(size(totWeight));
-%     mask(totWeight <= saturation) = 1;
-%     imwrite(mask, 'sat.bmp');
+    if(exist('debug_mode', 'var'))
+        imwrite(mask, 'saturation_mask.bmp');
+    end
 end
 
 %handling saturated pixels
 if(bSaturation)
     [t, index] = min(stack_exposure);
- 
+    
+    mask = max(mask, [], 3);
+    slice = stack(:,:,:,index) / (t * scale);
+    
     for i=1:col
-        slice = stack(:,:,i,index);
-        max_val = double(max(slice(:))) / (t * scale);
- 
-        saturation_value = max_val;
- 
         tmp = imgOut(:,:,i);
-        tmp_stack = stack(:,:,i,index);
-        tmp_tw = totWeight(:,:,i);
-        
-        tmp(tmp_tw < saturation & tmp_stack > 0.9) = saturation_value;
-        tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
-         
+        slice_i = slice(:,:,i);
+        tmp(mask == 1) = slice_i(mask == 1);
         imgOut(:,:,i) = tmp;
     end
+    
+%      for i=1:col
+%         slice = stack(:,:,i,index);
+%         max_val = double(max(slice(:))) / (t * scale);
+%  
+%         saturation_value = max_val;
+%  
+%         tmp = imgOut(:,:,i);
+%         tmp_stack = stack(:,:,i,index);
+%         tmp_tw = totWeight(:,:,i);        
+%         
+%         tmp(tmp_tw <= saturation) = slice(tmp_tw <= saturation)/ (t * scale);
+%        % tmp(tmp_tw < saturation & tmp_stack > 0.95) = saturation_value;
+%        % tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
+%          
+%         imgOut(:,:,i) = tmp;
+%     end
 end
- 
-%forcing to double type for allowing to be used in some MATLAB functions
+
+%forcing to double type for allowing this image to be used in some MATLAB functions
 imgOut = double(imgOut);
 
 end

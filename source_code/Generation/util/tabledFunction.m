@@ -1,11 +1,11 @@
-function img = tabledFunction(img, table)
+function imgOut = tabledFunction(img, table)
 %
 %
 %        img = tabledFunction(img, table)
 %
 %
 %        Input:
-%           -img: an LDR image with values in [0,255]
+%           -img: an LDR image with values in [0,2^nBit - 1]
 %           -table: three functions for remapping image pixels values
 %
 %        Output:
@@ -29,20 +29,23 @@ function img = tabledFunction(img, table)
 
 col = size(img, 3);
 
-img = img + 1;
+total_values = size(table, 1);
+x = 0:(total_values - 1);
+imgOut = zeros(size(img));
 
 for i=1:col
-    work = zeros(size(img(:,:,i)));
-    
-    values = unique(img(:,:,i));
-    n = length(values);
-    
-    for j=1:n
-        k = values(j);    
-        work(img(:,:,i) == k) = table(k, i);
-    end
-    
-    img(:,:,i) = work;
+    imgOut(:,:,i) = interp1(x, table(:, i), img(:,:,i), 'nearest', 'extrap');
+%     work = zeros(size(img(:,:,i)));
+%     
+%     values = unique(img(:,:,i));
+%     n = length(values);
+%     
+%     for j=1:n
+%         k = values(j);    
+%         work(img(:,:,i) == k) = table(k, i);
+%     end
+%     
+%     img(:,:,i) = work;
 end
 
 end

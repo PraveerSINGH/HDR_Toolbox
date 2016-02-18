@@ -79,6 +79,8 @@ bool write_exr(char *nameFile, double *data, int width, int height, int channels
          return false;
      }
 
+     //FreeEXRImage(&image);
+
      free(image.pixel_types);
      free(image.requested_pixel_types);
      

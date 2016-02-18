@@ -1,4 +1,4 @@
-function motionMap = MotionEstimationHDR(img1, img2, blockSize, bVisualize)
+function motionMap = MotionEstimationHDR(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
 %        motionMap = MotionEstimationHDR(img1, img2, blockSize)
 %
@@ -8,12 +8,14 @@ function motionMap = MotionEstimationHDR(img1, img2, blockSize, bVisualize)
 %         - img1: source
 %         - img2: target
 %         - blockSize: size of the block
-%         - bVisualize
+%         - maxSearchRadius: search size in blocks
+%         - lambda_reg: regularization coefficient
+%         - bVisualize: if it is set to 1 it visualizes the motion field 
 %
 %       output:
 %         - motionMap: motion map for each pixel
 %
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2013-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -29,20 +31,28 @@ function motionMap = MotionEstimationHDR(img1, img2, blockSize, bVisualize)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-img1 = lum(img1);
-img2 = lum(img2);
+[r, c, ~] = size(img1);
 
-[r, c] = size(img1);
+if(~exist('bVisualize', 'var'))
+    bVisualize = 0;
+end
 
 if(~exist('blockSize', 'var'))
     nPixels = r * c;
     blockSize = max([2^ceil(log10(nPixels)), 4]);
 end
 
-if(~exist('bVisualize', 'var'))
-    bVisualize = 0;
+if(~exist('maxSearchRadius', 'var'))
+    maxSearchRadius = 2; %size in blocks
 end
 
-motionMap = MotionEstimation(log(img1 + 1), log(img2 + 1), blockSize, bVisualize);
+if(~exist('lambda_reg', 'var'))
+    lambda_reg = 0;
+end
+
+img1 = lum(img1);
+img2 = lum(img2);
+
+motionMap = MotionEstimation(log(img1 + 1), log(img2 + 1), blockSize, maxSearchRadius, lambda_reg, bVisualize);
 
 end
