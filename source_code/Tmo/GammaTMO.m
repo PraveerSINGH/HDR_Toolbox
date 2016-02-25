@@ -35,6 +35,10 @@ if(~exist('TMO_gamma','var'))
     TMO_gamma = 2.2;
 end
 
+if(TMO_gamma <= 0)
+    error('TMO_gamma must be a positive scalar.');
+end
+
 if(~exist('TMO_fstop','var'))
     TMO_fstop = 0.0;
 end
