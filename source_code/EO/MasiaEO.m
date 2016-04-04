@@ -1,7 +1,7 @@
 
-function [imgOut, bWarning] = MasiaEO(img, Masia_Max, Masia_noise_removal, gammaRemoval)
+function [imgOut, bWarning] = MasiaEO(img, Masia_Max, Masia_noise_removal, Masia_multi_reg, gammaRemoval)
 %
-%       [imgOut, bWarning] = MasiaEO(img, Mesia_Max, Masia_noise_removal, gammaRemoval)
+%       [imgOut, bWarning] = MasiaEO(img, Mesia_Max, Masia_noise_removal, Masia_multi_reg, gammaRemoval)
 %
 %
 %        Input:
@@ -9,6 +9,8 @@ function [imgOut, bWarning] = MasiaEO(img, Masia_Max, Masia_noise_removal, gamma
 %           -Masia_Max: maximum luminance output in cd/m^2
 %           -Masia_noise_removal: if set to 1 it removes noise or artifacts
 %           using the bilateral filter
+%           -Masia_multi_reg: if set to 1 it applies multi regression (2),
+%           otherwise it uses SIGGRAPH ASIA paper regression (1)
 %           -gammaRemoval: the gamma value to be removed if known
 %
 %        Output:
@@ -30,6 +32,15 @@ function [imgOut, bWarning] = MasiaEO(img, Masia_Max, Masia_noise_removal, gamma
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The papers describing this technique are:
+%     1) "Evaluation of Reverse Tone Mapping Through Varying Exposure Conditions"
+%     By B. Masia, S. Augustin, R. Fleming, O. Sorkine, D. Gutierrez
+%     in SIGGRAPH ASIA 2009   
+%
+%     2) "Dynamic Range Expansion Based on Image Statistics"
+%     By B. Masia, A. Serrano, D. Gutierrez
+%     in Multimedia Tools and Applications 2015     
+%
 
 %is it a three color channels image?
 check3Color(img);
@@ -44,6 +55,10 @@ end
 
 if(~exist('Masia_noise_removal', 'var'))
     Masia_noise_removal = 1;
+end
+
+if(~exist('Masia_multi_reg', 'var'))
+    Masia_multi_reg = 0;
 end
 
 if(gammaRemoval > 0.0)
@@ -62,9 +77,17 @@ minL = MaxQuart(L(L > 0), 0.01);
 imageKey = (log(Lav) - log(minL)) / (log(maxL) - log(minL));
 
 %Calculate the gamma correction value
-a_var = 10.44;
-b_var = -6.282;
-gamma_cor = imageKey * a_var + b_var;
+if(Masia_multi_reg == 0)
+    a_var = 10.44;
+    b_var = -6.282;
+    gamma_cor = imageKey * a_var + b_var;
+else
+    %percentage of over-exposed pixels
+    [r,c] = size(L);
+    p_ov = length(find((L * 255) >= 254 )) / (r * c) * 100.0;
+    %Equation 5 of (2) paper
+    gamma_cor = 2.4379 + 0.2319 * log(Lav) - 1.1228 * imageKey + 0.0085 * p_ov;
+end
 
 if(gamma_cor <= 0.0)
     disp('WARNING: gamma_cor value is negative so the image may have a false color appearance.');
