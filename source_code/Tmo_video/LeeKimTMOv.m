@@ -89,12 +89,12 @@ hdrv = hdrvopen(hdrv);
 disp('Tone Mapping...');
 
 for i=1:hdrv.totalFrames
-    disp(['Processing frame ',num2str(i)]);
+    disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
 
     %Only physical values
     frame = RemoveSpecials(frame);
-    frame(frame<0) = 0;   
+    frame(frame < 0) = 0;   
     
     if(i==1)%Note: normalization has to be taken off
         frameOut = FattalTMO(frame, fBeta, 0);
@@ -111,7 +111,7 @@ for i=1:hdrv.totalFrames
     
     %Color correction
     frameOut = ColorCorrection(frameOut, fSaturation);
-    frameOut = frameOut/MaxQuart(frameOut, 0.99995);
+    frameOut = frameOut / MaxQuart(frameOut, 0.99995);
     
     %Gamma/sRGB encoding
     if(bsRGB)

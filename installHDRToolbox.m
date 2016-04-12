@@ -93,5 +93,12 @@ catch err
     disp('read_exr.cpp and write_exr.cpp were not compiled');
 end
 
+try
+    cd([pwd(), '/source_code/util/']);
+    mex('bilateralFilterS.cpp');
+catch err
+    disp('bilateralFilterS.cpp was not compiled');
+end
+
 cd(str_cur);
 

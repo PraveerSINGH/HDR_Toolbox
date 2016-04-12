@@ -51,7 +51,7 @@ epsilon = 1e-6;
 minLLog = log2(minL + epsilon);
 Z = ceil ( log2(maxL) - minLLog);
 
-%Chose the representative Rz for each zone
+%Choose the representative Rz for each zone
 fstopMap = zeros(size(L));
 Lav = logMean(L);
 for i=0:Z
