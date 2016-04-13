@@ -30,6 +30,8 @@ function imgOut = FerwerdaTMO(img, LdMax, Lda, Lwa)
 
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('LdMax', 'var'))
     LdMax = 100; %assuming 100 cd/m^2 output display
 end

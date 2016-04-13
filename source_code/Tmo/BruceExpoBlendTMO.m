@@ -60,6 +60,8 @@ if(~exist('beb_R', 'var'))
 end
 
 if(~isempty(img))
+    checkNegative(img);
+    
     %Convert the HDR image into a imageStack
     [imageStack, ~] = GenerateExposureBracketing(img, 1);
 else

@@ -30,6 +30,8 @@ function imgOut = ExponentialTMO(img, q_exponential, k_exponential)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('q_exponential', 'var'))
     q_exponential = 1;
 end

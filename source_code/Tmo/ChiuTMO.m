@@ -38,6 +38,8 @@ function imgOut=ChiuTMO(img, chiu_k, chiu_sigma, chiu_clamping, chiu_glare, chiu
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 %Luminance channel
 L = lum(img);
 

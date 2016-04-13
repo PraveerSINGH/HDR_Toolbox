@@ -34,6 +34,8 @@ function [imgOut, Drago_LMax_out] = DragoTMO(img, Drago_Ld_Max, Drago_b, Drago_L
 %Is it a luminance or a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('Drago_Ld_Max', 'var'))
     Drago_Ld_Max = 100; %cd/m^2
 end

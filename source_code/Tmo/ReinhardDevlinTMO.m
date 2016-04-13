@@ -34,6 +34,8 @@ function imgOut = ReinhardDevlinTMO(img, rd_m, rd_f, rd_a, rd_c, bNormalization)
 
 check13Color(img);
 
+check3Color(img);
+
 %Luminance channel
 L   = lum(img);
 Lav = logMean(L);

@@ -31,6 +31,8 @@ function imgOut = VanHaterenTMO(img)
 
 check13Color(img);
 
+checkNegative(img);
+
 pupil_area = 10; %fixed pupil area 10 mm^2
 k_beta = 1.6e-4; % td/ms
 a_C = 9e-2;

@@ -31,6 +31,8 @@ function imgOut = LischinskiTMO(img, pAlpha, pWhite)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 %Luminance channel
 L = lum(img);
 
@@ -49,7 +51,8 @@ maxL = max(L(:));
 minL = min(L(:));
 epsilon = 1e-6;
 minLLog = log2(minL + epsilon);
-Z = ceil ( log2(maxL) - minLLog);
+maxLLog = log2(maxL + epsilon);
+Z = ceil (maxLLog - minLLog);
 
 %Choose the representative Rz for each zone
 fstopMap = zeros(size(L));

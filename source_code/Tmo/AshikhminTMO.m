@@ -31,6 +31,7 @@ function imgOut=AshikhminTMO(img, LdMax, pLocal)
 
 %is it a three color channels image?
 check13Color(img);
+checkNegative(img);
 
 if(~exist('pLocal','var'))
     pLocal=1;

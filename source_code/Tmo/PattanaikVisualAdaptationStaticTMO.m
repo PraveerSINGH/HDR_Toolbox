@@ -42,6 +42,8 @@ function imgOut = PattanaikVisualAdaptationStaticTMO(img, A_rod, A_cone)
 %     as the original papers.
 %
 
+checkNegative(img);
+
 if(~exist('A_rod', 'var'))
     A_rod = 80; %cd/m^2
     disp('Assuming adaptation for an office condition');

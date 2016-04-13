@@ -39,6 +39,8 @@ function [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPh
 
 check13Color(img);
 
+check3Color(img);
+
 %Luminance channel
 L = lum(img);
 

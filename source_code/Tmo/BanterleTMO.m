@@ -47,14 +47,16 @@ function [imgOut, BTMO_segments, BTMO_which_operator] = BanterleTMO(img, BTMO_se
 %
 %
 
+checkNegative(img);
+
 L = lum(img);
 
-if(~isempty(find(L > 3000)))
+if(~isempty(find(L > 3000, 1)))
     disp('WARNING: the input image that you supplied has values over 3,000 cd/m^2'); 
     disp('These values were not tested in the original paper.');
 end
 
-if(~isempty(find(L < 0.015)))
+if(~isempty(find(L < 0.015, 1)))
     disp('WARNING: the input image that you supplied has values under 0.015 cd/m^2'); 
     disp('These values were not tested in the original paper.');
 end

@@ -43,6 +43,8 @@ function imgOut = KimKautzConsistentTMO(img, Ld_max, Ld_min, KK_c1, KK_c2)
 %     International Conference on Computer Graphics and Imaging  2008
 %
 
+checkNegative(img);
+
 if(~exist('Ld_max', 'var'))
     Ld_max = 300; %300 cd/m^2
 end

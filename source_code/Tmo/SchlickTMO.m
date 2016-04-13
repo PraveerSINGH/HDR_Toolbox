@@ -35,8 +35,9 @@ function imgOut = SchlickTMO(img, schlick_mode, schlick_p, schlick_bit, schlick_
 %     in "Photorealistic Rendering Techniques" 1995 
 %
 
-
 check13Color(img);
+
+check3Color(img);
 
 if(~exist('schlick_mode', 'var'))
     schlick_mode = 'nonuniform';

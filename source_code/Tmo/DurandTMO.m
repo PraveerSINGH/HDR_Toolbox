@@ -29,6 +29,8 @@ function imgOut = DurandTMO(img, target_contrast)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 %default parameters
 if(~exist('target_contrast', 'var'))
     target_contrast = 5; %as in the original paper

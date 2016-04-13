@@ -33,6 +33,8 @@ function [imgOut, La] = YeeTMO(img, nLayer, CMax, Lda)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('nLayer', 'var'))
     nLayer = 64;
 end

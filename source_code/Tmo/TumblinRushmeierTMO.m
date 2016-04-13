@@ -30,6 +30,8 @@ function imgOut=TumblinRushmeierTMO(img, Lda, LdMax, CMax, Lwa)
 %is it a three color channels image?
 check13Color(img);
 
+check3Color(img);
+
 %default parameters
 if(~exist('Lda', 'var'))
     Lda = 20;

@@ -31,6 +31,8 @@ function imgOut=NormalizeTMO(img, bRobust)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('bRobust', 'var'))
     bRobust = 1;
 end
@@ -38,11 +40,9 @@ end
 %Luminance channel
 L = lum(img);
 
-%Computing the maximum
-maxValue = 1;
-
+%Computing the maximum value
 if(bRobust)
-    maxValue = MaxQuart(L,0.999);
+    maxValue = MaxQuart(L, 0.999);
 else
     maxValue = max(L(:));
 end

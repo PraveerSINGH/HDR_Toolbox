@@ -31,6 +31,8 @@ function imgOut = FattalTMO(img, fBeta, bNormalization)
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('fBeta', 'var'))
     fBeta = 0.95;
 end

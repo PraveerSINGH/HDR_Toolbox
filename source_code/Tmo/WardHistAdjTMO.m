@@ -29,6 +29,8 @@ function imgOut = WardHistAdjTMO(img, nBin, bPlotHistogram)
 %Is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('nBin', 'var'))
     nBin = 256;
 end
