@@ -1,13 +1,13 @@
-function val = MeanAbsoluteError(img1, img2)
+function val = MeanAbsoluteError(imgReference, imgDistorted)
 %
 %
-%      val = MeanAbsoluteError(img1, img2)
+%      val = MeanAbsoluteError(imgReference, imgDistorted)
 %
 %       the mean absolute error between two images
 %
 %       Input:
-%           -img1: input source image
-%           -img2: input target image
+%           -imgReference: input reference image
+%           -imgDistorted: input distorted image
 %
 %       Output:
 %           -val: the mean absolute error between two images
@@ -28,19 +28,27 @@ function val = MeanAbsoluteError(img1, img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if((CheckSameImage(img1, img2) == 0))
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
-if(isa(img1, 'uint8'))
-    img1 = double(img1) / 255.0;
+if(isa(imgReference, 'uint8'))
+    imgReference = double(imgReference) / 255.0;
 end
 
-if(isa(img2, 'uint8'))
-    img2 = double(img2) / 255.0;
+if(isa(imgDistorted, 'uint8'))
+    imgDistorted = double(imgDistorted) / 255.0;
 end
 
-delta = abs(img1 - img2);
+if(isa(imgReference, 'uint16'))
+    imgReference = double(imgReference) / 65535.0;
+end
+
+if(isa(imgDistorted, 'uint16'))
+    imgDistorted = double(imgDistorted) / 65535.0;
+end
+
+delta = abs(imgReference - imgDistorted);
 
 val = mean(delta(:));
 

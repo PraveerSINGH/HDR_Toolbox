@@ -1,12 +1,12 @@
-function val = logRMSE(img1, img2)
+function val = logRMSE(imgReference, imgDistorted)
 %
 %
-%      val = logRMSE(img1, img2)
+%      val = logRMSE(imgReference, imgDistorted)
 %
 %
 %       Input:
-%           -img1: input source image
-%           -img2: input target image
+%           -imgReference: input source image
+%           -imgDistorted: input target image
 %
 %       Output:
 %           -val: RMSE in Log2 Space for three channels images. Lower
@@ -28,12 +28,12 @@ function val = logRMSE(img1, img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(CheckSameImage(img1,img2)==0)
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
-subImage = img1 ./ img2;
-acc = zeros(size(img1,1),size(img1,2));
+subImage = imgReference ./ imgDistorted;
+acc = zeros(size(imgReference, 1), size(imgReference, 2));
 
 for i=1:size(img, 3)
     tmp = RemoveSpecials(log2(subImage(:,:,i)));
