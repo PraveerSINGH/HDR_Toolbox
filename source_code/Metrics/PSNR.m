@@ -1,12 +1,12 @@
-function val = PSNR(img1, img2)
+function val = PSNR(imgReference, imgDistorted)
 %
 %
-%      val = PSNR(img1, img2)
+%      val = PSNR(imgReference, imgDistorted)
 %
 %
 %       Input:
-%           -img1: input source image
-%           -img2: input target image
+%           -imgReference: input reference image
+%           -imgDistorted: input distorted image
 %
 %       Output:
 %           -val: classic PSNR for images in [0,1]. Higher values means
@@ -28,31 +28,40 @@ function val = PSNR(img1, img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(CheckSameImage(img1, img2) == 0)
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
 b1 = 0;
-if(isa(img1, 'uint8'))
+if(isa(imgReference, 'uint8'))
     b1 = 1;
-    img1 = double(img1) / 255.0;
+    imgReference = double(imgReference) / 255.0;
+end
+
+if(isa(imgReference, 'uint16'))
+    b1 = 1;
+    imgReference = double(imgReference) / 65535.0;
 end
 
 b2 = 0;
-if(isa(img2, 'uint8'))
+if(isa(imgDistorted, 'uint8'))
     b2 = 1;
-    img2 = double(img2) / 255.0;
+    imgDistorted = double(imgDistorted) / 255.0;
+end
+
+if(isa(imgDistorted, 'uint16'))
+    b2 = 1;
+    imgDistorted = double(imgDistorted) / 65535.0;
 end
 
 if(~(b1 && b2))
     disp('PSNR is not very meaningful for HDR images/videos, please consider mPSNR instead!');
 end
 
+imgReference = ClampImg(imgReference, 0, 1);
+imgDistorted = ClampImg(imgDistorted, 0, 1);
 
-img1 = ClampImg(img1, 0, 1);
-img2 = ClampImg(img2, 0, 1);
-
-valueMSE = MSE(img1, img2);
+valueMSE = MSE(imgReference, imgDistorted);
 
 val = 10 * log10(1.0 / valueMSE);
 
