@@ -100,23 +100,38 @@ void bilateralFilterS(double *img_in, double *img_edge, double *out, int width, 
 
     int stride = height * width;
 
-    int *x = new int [nSamples];
-    int *y = new int [nSamples];
-    for(int k=0; k<nSamples; k++) {
-        float u = Random(m());
-        float r = sqrtf(MAX(-logf(u) * sigma_s_sq_2, 0.0f));
+    int tile = 32;
+    int tile_sq = tile * tile;
+    int *x = new int [nSamples * tile_sq];
+    int *y = new int [nSamples * tile_sq];
+    
+    for(int i=0; i<tile; i++) {
+        int tmp = i * tile;
+        for(int j=0; j<tile; j++) {
+            int index = tmp + j;
+            for(int k=0; k<nSamples; k++) {
+                float u = Random(m());
+                float r = sqrtf(MAX(-logf(u) * sigma_s_sq_2, 0.0f));
 
-        float v = Random(m());
+                float v = Random(m());
 
-        x[k] = int(cosf(v) * r);
-        y[k] = int(sinf(v) * r);
+                x[index + k] = int(cosf(v) * r);
+                y[index + k] = int(sinf(v) * r);
+            }
+        }
     }
 
     for(int j = 0; j < width; j++) {
         int j_tmp = j * height;
+        
+        int tx = j % tile;
+        
         for(int i = 0; i < height; i++) {
+            int ty = i % tile;
             int address = j_tmp + i;
             float sum_weight = 0.0;
+            
+            int index_tile = tx * tile + ty;
 
             for(int c = 0; c < channels; c++) {
                 tmp_cur[c] = img_in[address + c * stride];
@@ -125,8 +140,8 @@ void bilateralFilterS(double *img_in, double *img_edge, double *out, int width, 
             }
 
             for(int k=0; k<nSamples; k++) {
-                int x_t = Clamp(j + x[k], 0, width - 1);
-                int y_t = Clamp(i + y[k], 0, height - 1);
+                int x_t = Clamp(j + x[index_tile + k], 0, width  - 1);
+                int y_t = Clamp(i + y[index_tile + k], 0, height - 1);
 
                 int address_samples = x_t * height + y_t;
 
@@ -137,7 +152,7 @@ void bilateralFilterS(double *img_in, double *img_edge, double *out, int width, 
                     weight += diff * diff;
                 }
 
-                weight = exp(-weight / sigma_r_sq_2);
+                weight = expf(-weight / sigma_r_sq_2);
 
                 sum_weight += weight;
 
