@@ -1,7 +1,7 @@
-function imgOut = MertensTMO( img, folder_name, format, imageStack, wE, wS, wC, bWarning)
+function imgOut = MertensTMO(img, folder_name, format, imageStack, wE, wS, wC, bWarning)
 %
 %
-%        imgOut = MertensTMO( img, folder_name, format, imageStack, wE, wS, wC, bWarning )
+%        imgOut = MertensTMO(img, folder_name, format, imageStack, wE, wS, wC, bWarning )
 %
 %
 %        Input:
@@ -31,7 +31,7 @@ function imgOut = MertensTMO( img, folder_name, format, imageStack, wE, wS, wC, 
 %        Note: Gamma correction is not needed because it works on gamma
 %        corrected images.
 % 
-%     Copyright (C) 2010 Francesco Banterle
+%     Copyright (C) 2010-2016 Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -45,6 +45,11 @@ function imgOut = MertensTMO( img, folder_name, format, imageStack, wE, wS, wC, 
 % 
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%     The paper describing this technique is:
+%     "Exposure Fusion"
+% 	  by Tom Mertens, Jan Kautz, Frank Van Reeth
+%     in Proceedings of Pacific Graphics 2007
 %
 
 %default parameters if they are missing

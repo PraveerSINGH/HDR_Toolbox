@@ -1,6 +1,6 @@
 function imgOut = WardGlobalTMO(img, Ld_Max)
 %
-%       imgOut = Ward1TMO(img,Ld_Max)
+%       imgOut = WardTMO(img,Ld_Max)
 %
 %
 %       Input:
@@ -24,6 +24,11 @@ function imgOut = WardGlobalTMO(img, Ld_Max)
 % 
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%     The paper describing this technique is:
+%     "A Contrast-Based Scalefactor for Luminance Display"
+% 	  by Greg J. Ward
+%     in Graphics Gems IV
 %
 
 %Is it a three color channels image?

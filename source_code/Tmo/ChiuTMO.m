@@ -1,4 +1,4 @@
-function imgOut=ChiuTMO(img, chiu_k, chiu_sigma, chiu_clamping, chiu_glare, chiu_glare_n, chiu_glare_width)
+function imgOut = ChiuTMO(img, chiu_k, chiu_sigma, chiu_clamping, chiu_glare, chiu_glare_n, chiu_glare_width)
 %
 %       imgOut = ChiuTMO(img, k, sigma, clamping, glare, glare_n, glare_width)
 %
@@ -33,6 +33,11 @@ function imgOut=ChiuTMO(img, chiu_k, chiu_sigma, chiu_clamping, chiu_glare, chiu
 % 
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%     The paper describing this technique is:
+%     "Spatially Nonuniform Scaling Functions for High Contrast Images"
+% 	  by Kenneth Chiu and M. Herf and Peter Shirley and S. Swamy and Changyaw Wang and Kurt Zimmerman
+%     in Proceedings of Graphics Interface '93
 %
 
 %is it a three color channels image?

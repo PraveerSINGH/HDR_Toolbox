@@ -35,7 +35,6 @@ function imgOut = KimKautzConsistentTMO(img, Ld_max, Ld_min, KK_c1, KK_c2)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%
 %     The paper describing this technique is:
 %     "Consistent Tone Reproduction"
 % 	  by Min H. Kim, Jan Kautz

@@ -1,6 +1,6 @@
-function imgOut=TumblinRushmeierTMO(img, Lda, LdMax, CMax, Lwa)
+function imgOut = TumblinRushmeierTMO(img, Lda, LdMax, CMax, Lwa)
 %
-%        imgOut=TumblinRushmeierTMO(img, Lwa, Lda, CMax)   
+%        imgOut = TumblinRushmeierTMO(img, Lwa, Lda, CMax)   
 %
 %
 %        Input:
@@ -25,6 +25,11 @@ function imgOut=TumblinRushmeierTMO(img, Lda, LdMax, CMax, Lwa)
 % 
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%     The paper describing this technique is:
+%     "Tone Reproduction for Realistic Images"
+% 	  by Jack Tumblin, Holly Rushmeier
+%     in IEEE Computer Graphics and Applications 1993
 %
 
 %is it a three color channels image?

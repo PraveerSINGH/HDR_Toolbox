@@ -25,6 +25,11 @@ function imgOut = WardHistAdjTMO(img, nBin, bPlotHistogram)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "A Visibility Matching Tone Reproduction Operator for High Dynamic Range Scenes"
+% 	  by Gregory Ward Larson, Holly Rushmeier, Christine Piatko
+%     in IEEE Transactions on Visualization and Computer Graphics 1997
+%
 
 %Is it a three color channels image?
 check13Color(img);

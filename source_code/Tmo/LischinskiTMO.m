@@ -27,6 +27,11 @@ function imgOut = LischinskiTMO(img, pAlpha, pWhite)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Interactive Local Adjustment of Tonal Values"
+% 	  by Dani Lischinski, Zeev Farbman, Matt Uyttendaele, Richard Szeliski
+%     in Proceedings of SIGGRAPH 2006
+%
 
 %is it a three color channels image?
 check13Color(img);

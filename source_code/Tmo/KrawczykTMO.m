@@ -25,6 +25,11 @@ function imgOut = KrawczykTMO(img)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "A Model of Visual Adaptation for Realistic Image Synthesis"
+% 	  by Grzegorz Krawczyk, Karol Myszkowski, Hans-Peter Seidel
+%     in Proceedings of EUROGRAPHICS 2005
+%
 
 bDebug = 0;
 

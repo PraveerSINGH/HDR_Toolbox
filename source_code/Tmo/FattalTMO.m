@@ -27,6 +27,11 @@ function imgOut = FattalTMO(img, fBeta, bNormalization)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Gradient domain high dynamic range compression"
+% 	  by Raanan Fattal, Dani lIschinski, Michael Werman
+%     in SIGGRAPH 2002
+%
 
 %is it a three color channels image?
 check13Color(img);

@@ -36,6 +36,11 @@ function [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPh
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Photographic Tone Reproduction for Digital Images"
+% 	  by Erik Reinhard, Michael Stark, Peter Shirley, James Ferwerda
+%     in Proceedings of SIGGRAPH 2002
+%
 
 check13Color(img);
 

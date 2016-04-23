@@ -1,7 +1,7 @@
-function imgOut=AshikhminTMO(img, LdMax, pLocal)
+function imgOut = AshikhminTMO(img, LdMax, pLocal)
 %
 %
-%      imgOut=AshikhminTMO(img, LdMax, pLocal)
+%      imgOut = AshikhminTMO(img, LdMax, pLocal)
 %
 %
 %       Input:
@@ -13,7 +13,7 @@ function imgOut=AshikhminTMO(img, LdMax, pLocal)
 %       Output:
 %           -imgOut: output tone mapped image in linear domain
 % 
-%     Copyright (C) 2010  Francesco Banterle
+%     Copyright (C) 2010-2016  Francesco Banterle
 %
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -28,40 +28,45 @@ function imgOut=AshikhminTMO(img, LdMax, pLocal)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "A Tone Mapping Algorithm for High Contrast Images"
+% 	  by Michael Ashikhmin
+%     in EGSR 2002
+%
 
 %is it a three color channels image?
 check13Color(img);
 checkNegative(img);
 
-if(~exist('pLocal','var'))
+if(~exist('pLocal', 'var'))
     pLocal=1;
 end
 
-if(~exist('LdMax','var'))
-    LdMax=100;
+if(~exist('LdMax', 'var'))
+    LdMax = 100;
 end
 
 %Luminance channel
-L=lum(img);
+L = lum(img);
 
 %Local calculation?
 if(pLocal)
-    [L,Ldetail] = AshikhminFiltering(L);
+    [L, Ldetail] = AshikhminFiltering(L);
 end
 
 %Roboust maximum and minimum
-maxL=MaxQuart(L,0.9995);
-minL=MaxQuart(L,0.0005);
+maxL = MaxQuart(L, 0.9995);
+minL = MaxQuart(L, 0.0005);
 
 %Range compression
-maxL_TVI=TVI_Ashikhmin(maxL);
-minL_TVI=TVI_Ashikhmin(minL);
+maxL_TVI = TVI_Ashikhmin(maxL);
+minL_TVI = TVI_Ashikhmin(minL);
 
-Ld=(LdMax/100)*(TVI_Ashikhmin(L)-minL_TVI)/(maxL_TVI-minL_TVI);
+Ld = (LdMax / 100)*(TVI_Ashikhmin(L) - minL_TVI) / (maxL_TVI - minL_TVI);
 
 %Local Recombination
 if(pLocal)
-    Ld=Ld.*Ldetail;
+    Ld = Ld .* Ldetail;
 end
 
 %Changing luminance

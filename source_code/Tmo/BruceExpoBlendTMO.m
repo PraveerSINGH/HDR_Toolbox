@@ -44,7 +44,6 @@ function imgOut = BruceExpoBlendTMO(img, folder_name, format, imageStack, beb_R,
 % 	  by Neil D. B. Bruce
 %     in Elsevier Computer&Graphics, 2013
 %
-%
 
 %imageStack generation
 if(~exist('imageStack', 'var'))
