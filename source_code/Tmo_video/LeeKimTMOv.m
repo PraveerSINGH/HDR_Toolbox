@@ -16,11 +16,11 @@ function LeeKimTMOv(hdrv, filenameOutput, fBeta, fLambda, fSaturation, tmo_gamma
 %           tonemapped image
 %           -tmo_gamma: gamma for encoding the frame
 %           -tmo_quality: the output quality in [1,100]. 100 is the best quality
-%           1 is the lowest quality.%
+%           1 is the lowest quality
 %           -tmo_video_profile: the compression profile (encoder) for compressing the stream.
 %           Please have a look to the profile of VideoWriter from the MATLAB
 %           help. Depending on the version of MATLAB some profiles may be not
-%           be present.
+%           be present
 % 
 %     Copyright (C) 2013-14 Francesco Banterle
 %  
@@ -84,7 +84,7 @@ if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
     open(writerObj);
 end
 
-hdrv = hdrvopen(hdrv);
+hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
 
@@ -96,22 +96,22 @@ for i=1:hdrv.totalFrames
     frame = RemoveSpecials(frame);
     frame(frame < 0) = 0;   
     
-    if(i==1)%Note: normalization has to be taken off
-        frameOut = FattalTMO(frame, fBeta, 0);
+    if(i == 1)%Note: normalization has to be taken off
+        [frameOut, Ld_prev] = LeeKimTMOv_frame(frame, [], fBeta, 0.0);
     else
         %Computing optical flow between frame and framePrev
-        offset_map = MotionEstimationHDR(framePrev, frame);
-        %Warping
-        imgWarped = imWarp(frameOutPrev, offset_map, 0);
-        frameOut = LeeKimTMOv_frame(frame, imgWarped, fBeta, fLambda); 
+        offset_map = MotionEstimationNextHDR(framePrev, frame, 16, 2, 0.25);
+        %Warping previous frame
+        imgWarped = imWarp(Ld_prev, offset_map, 0);
+        %Tone mapping
+        [frameOut, Ld_prev] = LeeKimTMOv_frame(frame, imgWarped, fBeta, fLambda); 
     end
     
-    frameOutPrev = frameOut;        
     framePrev = frame;
     
     %Color correction
     frameOut = ColorCorrection(frameOut, fSaturation);
-    frameOut = frameOut / MaxQuart(frameOut, 0.99995);
+    %frameOut = frameOut / MaxQuart(frameOut, 0.99995);
     
     %Gamma/sRGB encoding
     if(bsRGB)

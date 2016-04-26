@@ -35,6 +35,11 @@ if(isdir(filename))
         tmp_list = dir([filename, '/', '*.pfm']);
         type = 'TYPE_HDR_PFM';
     end
+    
+    if(isempty(tmp_list))
+        tmp_list = dir([filename, '/', '*.exr']);
+        type = 'TYPE_HDR_EXR';
+    end    
 
     if(isempty(tmp_list))%assuming frames compressed with HDR JPEG 2000
         tmp_list = dir([filename, '/', '*.jp2']);
