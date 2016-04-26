@@ -6,22 +6,22 @@ function [lin_fun, max_lin_fun] = ComputeCRF(stack, stack_exposure, nSamples, sa
 %       Malik method.
 %
 %        Input:
-%           -stack: a stack of LDR images.
+%           -stack: a stack of LDR images
 %           -stack_exposure: an array containg the exposure time of each
-%           image. Time is expressed in second (s).
-%           -nSamples: number of samples for computing the CRF.
+%           image. Time is expressed in second (s)
+%           -nSamples: number of samples for computing the CRF
 %           -sampling_strategy: how to select samples:
 %               -'Grossberg': picking samples according to Grossberg and
-%               Nayar algorithm (CDF based).
-%               -'RandomSpatial': picking random samples in the image.
-%               -'RegularSpatial': picking regular samples in the image.
-%           -bNormalize: if 1 it enables function normalization.
+%               Nayar algorithm (CDF based)
+%               -'RandomSpatial': picking random samples in the image
+%               -'RegularSpatial': picking regular samples in the image
+%           -bNormalize: if 1 it enables function normalization
 %           -smoothing_term: a smoothing term for solving the linear
-%           system.
+%           system
 %
 %        Output:
-%           -lin_fun: the inverse CRF.
-%           -max_lin_fun: maximum value of the inverse CRF.
+%           -lin_fun: the inverse CRF
+%           -max_lin_fun: maximum value of the inverse CRF
 %
 %     Copyright (C) 2014-15  Francesco Banterle
 % 
@@ -115,7 +115,7 @@ for i=1:col
     lin_fun(:,i) = g;
     max_lin_fun(i) = max(g);
     
-    if(bNormalize)
+    if(bNormalize && (max_lin_fun(i) > 0.0))
         lin_fun(:,i) = lin_fun(:,i) / max_lin_fun(i);
     end
 end

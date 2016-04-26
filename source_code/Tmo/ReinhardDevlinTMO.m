@@ -31,8 +31,15 @@ function imgOut = ReinhardDevlinTMO(img, rd_m, rd_f, rd_a, rd_c, bNormalization)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Dynamic range reduction inspired by photoreceptor physiology"
+% 	  by Erik Reinhard, Kate Devlin
+%     in IEEE Transaction on Computer Graphics and Visualization 2005
+%
 
 check13Color(img);
+
+check3Color(img);
 
 %Luminance channel
 L   = lum(img);

@@ -28,7 +28,7 @@ function val = RelativeError(imgReference, imgDistorted)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(CheckSameImage(imgReference, imgDistorted)==0)
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
@@ -38,6 +38,14 @@ end
 
 if(isa(imgDistorted, 'uint8'))
     imgDistorted = double(imgDistorted) / 255.0;
+end
+
+if(isa(imgReference, 'uint16'))
+    imgReference = double(imgReference) / 65535.0;
+end
+
+if(isa(imgDistorted, 'uint16'))
+    imgDistorted = double(imgDistorted) / 65535.0;
 end
 
 delta = abs(imgReference - imgDistorted);

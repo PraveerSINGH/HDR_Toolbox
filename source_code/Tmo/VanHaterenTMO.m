@@ -1,7 +1,7 @@
 function imgOut = VanHaterenTMO(img)
 %
 %
-%        imgOut=VanHaterenTMO(img)
+%        imgOut = VanHaterenTMO(img)
 %
 %
 %        Input:
@@ -28,8 +28,15 @@ function imgOut = VanHaterenTMO(img)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Encoding of High Dynamic Range Video with a Model of Human Cones"
+% 	  by J. Hans Van Hateren
+%     in ACM Transaction on Graphics 2006
+%
 
 check13Color(img);
+
+checkNegative(img);
 
 pupil_area = 10; %fixed pupil area 10 mm^2
 k_beta = 1.6e-4; % td/ms

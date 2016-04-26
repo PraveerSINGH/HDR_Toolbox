@@ -25,9 +25,16 @@ function imgOut = DurandTMO(img, target_contrast)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Fast Bilateral Filtering for the Display of High-Dynamic-Range Images"
+% 	  by Fredo Durand and Julie Dorsey
+%     in Proceedings of SIGGRAPH 2002
+%
 
 %is it a three color channels image?
 check13Color(img);
+
+checkNegative(img);
 
 %default parameters
 if(~exist('target_contrast', 'var'))

@@ -31,8 +31,14 @@ function imgOut = GammaTMO(img, TMO_gamma, TMO_fstop, TMO_view)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
+checkNegative(img);
+
 if(~exist('TMO_gamma','var'))
     TMO_gamma = 2.2;
+end
+
+if(TMO_gamma <= 0)
+    error('TMO_gamma must be a positive scalar.');
 end
 
 if(~exist('TMO_fstop','var'))

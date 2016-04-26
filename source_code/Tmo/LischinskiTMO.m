@@ -27,9 +27,16 @@ function imgOut = LischinskiTMO(img, pAlpha, pWhite)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Interactive Local Adjustment of Tonal Values"
+% 	  by Dani Lischinski, Zeev Farbman, Matt Uyttendaele, Richard Szeliski
+%     in Proceedings of SIGGRAPH 2006
+%
 
 %is it a three color channels image?
 check13Color(img);
+
+checkNegative(img);
 
 %Luminance channel
 L = lum(img);
@@ -49,9 +56,10 @@ maxL = max(L(:));
 minL = min(L(:));
 epsilon = 1e-6;
 minLLog = log2(minL + epsilon);
-Z = ceil ( log2(maxL) - minLLog);
+maxLLog = log2(maxL + epsilon);
+Z = ceil (maxLLog - minLLog);
 
-%Chose the representative Rz for each zone
+%Choose the representative Rz for each zone
 fstopMap = zeros(size(L));
 Lav = logMean(L);
 for i=0:Z

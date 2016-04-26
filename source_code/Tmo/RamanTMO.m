@@ -48,6 +48,8 @@ end
 
 if(~isempty(img))
     %Convert the HDR image into a imageStack
+    check3Color(img);
+
     [imageStack, ~] = GenerateExposureBracketing(img, 1);
 else
     if(isempty(imageStack))

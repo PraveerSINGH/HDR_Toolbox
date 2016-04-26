@@ -50,6 +50,9 @@ switch hdrv.type
    
     case 'TYPE_HDR_RGBE'
         frame = hdrimread([hdrv.path,'/',hdrv.list(frameCounter).name]);
+
+    case 'TYPE_HDR_EXR'
+        frame = hdrimread([hdrv.path,'/',hdrv.list(frameCounter).name]);
     
     case 'TYPE_HDR_JPEG_2000'
         frame = hdrimread([hdrv.path,'/',hdrv.list(frameCounter).name]);

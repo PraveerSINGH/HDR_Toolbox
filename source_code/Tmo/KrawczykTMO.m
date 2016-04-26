@@ -25,17 +25,24 @@ function imgOut = KrawczykTMO(img)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "A Model of Visual Adaptation for Realistic Image Synthesis"
+% 	  by Grzegorz Krawczyk, Karol Myszkowski, Hans-Peter Seidel
+%     in Proceedings of EUROGRAPHICS 2005
+%
 
 bDebug = 0;
 
 %is it a three color channels image?
 check13Color(img);
 
+checkNegative(img);
+
 %Calculate the histrogram of the HDR image in Log10 space
 nbins = 256;
 epislon = 1e-4;
 
-[histo, bound, haverage] = HistogramHDR(img, nbins, 'log10', [], 0, 0, epislon);
+[histo, bound, ~] = HistogramHDR(img, nbins, 'log10', [], 0, 0, epislon);
 
 %Determine how many K clusters (number of zones)
 C = bound(1):1:bound(2);

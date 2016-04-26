@@ -30,9 +30,16 @@ function [imgOut, Drago_LMax_out] = DragoTMO(img, Drago_Ld_Max, Drago_b, Drago_L
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Adaptive Logarithmic Mapping for Displaying High Contrast Scenes"
+% 	  by Frederic Drago, Karol Myszkowski, Thomas Annen, Norishige Chiba
+%     in Proceedings of Eurographics 2003
+%
 
 %Is it a luminance or a three color channels image?
 check13Color(img);
+
+checkNegative(img);
 
 if(~exist('Drago_Ld_Max', 'var'))
     Drago_Ld_Max = 100; %cd/m^2

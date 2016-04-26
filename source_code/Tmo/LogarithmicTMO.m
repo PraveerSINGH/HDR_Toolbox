@@ -29,6 +29,8 @@ function imgOut = LogarithmicTMO(img, q_logarithmic, k_logarithmic)
 
 check13Color(img);
 
+checkNegative(img);
+
 if(~exist('q_logarithmic', 'var'))
     q_logarithmic = 1;
 end

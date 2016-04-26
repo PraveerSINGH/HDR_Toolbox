@@ -15,7 +15,7 @@ function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadi
 %       output:
 %         - motionMap: motion map for each pixel
 %
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2013-16 Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,20 @@ if(~exist('bVisualize', 'var'))
     bVisualize = 0;
 end
 
+bAuto = 0;
 if(~exist('blockSize', 'var'))
+    bAuto = 1;
+else
+    bAuto = strcmp('blockSize', 'auto');
+end
+
+if(bAuto)
     nPixels = r * c;
     blockSize = max([2^ceil(log10(nPixels)), 4]);
+end
+
+if(blockSize < 0)
+    blockSize = 16;
 end
 
 if(~exist('maxSearchRadius', 'var'))
@@ -98,6 +109,7 @@ for i=1:block_r
 
             if( (i_b1 > 0) && (j_b1 > 0) && (i_e1 <= r) && (j_e1 <= c) &&...
                 (i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
+            
                 tmp_err = abs(img1(i_b1:i_e1, j_b1:j_e1, :) - img2(i_b2:i_e2, j_b2:j_e2, :));
                 tmp_err = mean(tmp_err(:)) + lambda_reg * n_vec(p);
                 

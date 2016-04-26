@@ -1,12 +1,13 @@
-function same = CheckSameImage(Img1, Img2)
+function checkNegative(img)
 %
 %
-%       same = CheckSameImage(Img1, Img2)
+%        checkNegative(img)
 %
 %
-%       This image checks if two images are the same.
+%        Input:
+%           -img: an image to be tested if it has negative values
 %
-%     Copyright (C) 2011  Francesco Banterle
+%     Copyright (C) 2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -22,9 +23,6 @@ function same = CheckSameImage(Img1, Img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-[r1, c1, col1] = size(Img1);
-[r2, c2, col2] = size(Img2);
-
-same = ((r1 == r2) & (c1 == c2) & (col1 == col2));
-
+if(~isempty(find(img < 0.0, 1)))
+    error('The image has negative values!');
 end

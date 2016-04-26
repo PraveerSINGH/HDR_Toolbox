@@ -29,9 +29,16 @@ function [imgOut, La] = YeeTMO(img, nLayer, CMax, Lda)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "Segmentation and Adaptive Assimilation for Detail-Preserving Display of High-Dynamic Range Images"
+% 	  by Hector Yee, Sumanta N. Pattanaik
+%     in Elsevier The Visual Computer 2003
+%
 
 %is it a three color channels image?
 check13Color(img);
+
+checkNegative(img);
 
 if(~exist('nLayer', 'var'))
     nLayer = 64;

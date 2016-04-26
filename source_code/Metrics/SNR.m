@@ -1,7 +1,7 @@
 function val = SNR(imgReference, imgDistorted)
 %
 %
-%      val = SNR(img1, img2)
+%      val = SNR(imgReference, imgDistorted)
 %
 %
 %       Input:
@@ -11,7 +11,7 @@ function val = SNR(imgReference, imgDistorted)
 %       Output:
 %           -val: classic SNR for images in dB. Higher values means better quality.
 % 
-%     Copyright (C) 2014  Francesco Banterle
+%     Copyright (C) 2014-16  Francesco Banterle
 %
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ function val = SNR(imgReference, imgDistorted)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(CheckSameImage(imgReference, imgDistorted) == 0)
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
@@ -37,6 +37,14 @@ end
 
 if(isa(imgDistorted, 'uint8'))
     imgDistorted = double(imgDistorted) / 255.0;
+end
+
+if(isa(imgReference, 'uint16'))
+    imgReference = double(imgReference) / 65535.0;
+end
+
+if(isa(imgDistorted, 'uint16'))
+    imgDistorted = double(imgDistorted) / 65535.0;
 end
 
 imgNoise2 = (imgReference - imgDistorted).^2;

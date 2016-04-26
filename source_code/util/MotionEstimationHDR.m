@@ -1,4 +1,4 @@
-function motionMap = MotionEstimationHDR(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimationHDR(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
 %        motionMap = MotionEstimationHDR(img1, img2, blockSize)
 %
@@ -14,6 +14,7 @@ function motionMap = MotionEstimationHDR(img1, img2, blockSize, maxSearchRadius,
 %
 %       output:
 %         - motionMap: motion map for each pixel
+%         - uv: motion map for each pixel
 %
 %     Copyright (C) 2013-16  Francesco Banterle
 % 
@@ -37,7 +38,14 @@ if(~exist('bVisualize', 'var'))
     bVisualize = 0;
 end
 
+bAuto = 0;
 if(~exist('blockSize', 'var'))
+    bAuto = 1;
+else
+    bAuto = strcmp('blockSize', 'auto');
+end
+
+if(bAuto)
     nPixels = r * c;
     blockSize = max([2^ceil(log10(nPixels)), 4]);
 end
@@ -50,9 +58,6 @@ if(~exist('lambda_reg', 'var'))
     lambda_reg = 0;
 end
 
-img1 = lum(img1);
-img2 = lum(img2);
-
-motionMap = MotionEstimation(log(img1 + 1), log(img2 + 1), blockSize, maxSearchRadius, lambda_reg, bVisualize);
+[motionMap, uv] = MotionEstimation(log10(img1 + 1e-6), log10(img2 + 1e-6), blockSize, maxSearchRadius, lambda_reg, bVisualize);
 
 end

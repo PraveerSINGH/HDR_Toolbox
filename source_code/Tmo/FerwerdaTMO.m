@@ -27,8 +27,15 @@ function imgOut = FerwerdaTMO(img, LdMax, Lda, Lwa)
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
+%     The paper describing this technique is:
+%     "A Model of Visual Adaptation for Realistic Image Synthesis"
+% 	  by James A. Ferwerda, Sumanta N. Pattanaik, Peter Shirley, Donald P. Greenberg
+%     in Proceedings of SIGGRAPH 1996
+%
 
 check13Color(img);
+
+checkNegative(img);
 
 if(~exist('LdMax', 'var'))
     LdMax = 100; %assuming 100 cd/m^2 output display

@@ -42,6 +42,8 @@ function imgOut = KuangTMO(img, type_param, p_param, average_surrond_param)
 %is it a three color channels image?
 check3Color(img);
 
+checkNegative(img);
+
 if(~exist('p_param', 'var'))
     p_param = 0.75;
 end

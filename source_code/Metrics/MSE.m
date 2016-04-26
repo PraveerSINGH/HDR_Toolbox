@@ -1,12 +1,12 @@
-function val=MSE(img1, img2)
+function val = MSE(imgReference, imgDistorted)
 %
 %
-%      val = MSE(img1, img2)
+%      val = MSE(imgReference, imgDistorted)
 %
 %
 %       Input:
-%           -img1: input source image
-%           -img2: input target image
+%           -imgReference: input reference image
+%           -imgDistorted: input distorted image
 %
 %       Output:
 %           -val: the Mean Squared Error assuming values in [0,1]. Lower
@@ -28,19 +28,27 @@ function val=MSE(img1, img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if((CheckSameImage(img1, img2) == 0))
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used or there are more than one channel.');
 end
 
-if(isa(img1, 'uint8'))
-    img1 = double(img1) / 255.0;
+if(isa(imgReference, 'uint8'))
+    imgReference = double(imgReference) / 255.0;
 end
 
-if(isa(img2, 'uint8'))
-    img2 = double(img2) / 255.0;
+if(isa(imgDistorted, 'uint8'))
+    imgDistorted = double(imgDistorted) / 255.0;
 end
 
-deltaSquare = (img1 - img2).^2;
+if(isa(imgReference, 'uint16'))
+    imgReference = double(imgReference) / 65535.0;
+end
+
+if(isa(imgDistorted, 'uint16'))
+    imgDistorted = double(imgDistorted) / 65535.0;
+end
+
+deltaSquare = (imgReference - imgDistorted).^2;
 
 val = mean(deltaSquare(:));
 

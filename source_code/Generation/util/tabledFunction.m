@@ -30,7 +30,7 @@ function imgOut = tabledFunction(img, table)
 col = size(img, 3);
 
 total_values = size(table, 1);
-x = 0:(total_values - 1);
+x = 0 : (total_values - 1);
 imgOut = zeros(size(img));
 
 for i=1:col

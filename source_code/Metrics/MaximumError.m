@@ -1,16 +1,16 @@
-function val = MaximumError(img1, img2)
+function val = MaximumError(imgReference, imgDistorted)
 %
 %
-%      val = MaximumError(img1, img2)
+%      val = MaximumError(imgReference, imgDistorted)
 %
 %       the maximum error between two images
 %
 %       Input:
-%           -img1: input source image
-%           -img2: input target image
+%           -imgReference: input reference image
+%           -imgDistorted: input distorted image
 %
 %       Output:
-%           -val: the absolute maximum error between img1 and img2
+%           -val: the absolute maximum error between imgReference and imgDistorted
 % 
 %     Copyright (C) 2014-2015  Francesco Banterle
 %
@@ -28,11 +28,11 @@ function val = MaximumError(img1, img2)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(CheckSameImage(img1,img2) == 0)
+if(isSameImage(imgReference, imgDistorted) == 0)
     error('The two images are different they can not be used.');
 end
 
-delta = abs(img1 - img2);
+delta = abs(imgReference - imgDistorted);
 
 val = max(delta(:));
 

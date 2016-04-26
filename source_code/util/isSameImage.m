@@ -1,18 +1,12 @@
-function imgOut=NormalizeTMO(img, bRobust)
+function same = isSameImage(img1, img2)
 %
-%        NormalizeTMO(img)
 %
-%       
-%        Simple TMO, which divides an image by the maximum
+%       same = isSameImage(img1, img2)
 %
-%        Input:
-%           -img: input HDR image
-%           -bRobust: to enable the use of robust statistics
 %
-%        Output:
-%           -imgOut: tone mapped image
-% 
-%     Copyright (C) 2010-15 Francesco Banterle
+%       This image checks if two images are the same.
+%
+%     Copyright (C) 2011-2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -28,25 +22,9 @@ function imgOut=NormalizeTMO(img, bRobust)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-%is it a three color channels image?
-check13Color(img);
+[r1, c1, col1] = size(img1);
+[r2, c2, col2] = size(img2);
 
-checkNegative(img);
-
-if(~exist('bRobust', 'var'))
-    bRobust = 1;
-end
-
-%Luminance channel
-L = lum(img);
-
-%Computing the maximum value
-if(bRobust)
-    maxValue = MaxQuart(L, 0.999);
-else
-    maxValue = max(L(:));
-end
-
-imgOut = img / maxValue;
+same = ((r1 == r2) & (c1 == c2) & (col1 == col2));
 
 end
