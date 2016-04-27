@@ -1,7 +1,7 @@
-function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_gamma, tmo_quality, tmo_video_profile)
+function RamseyTMOv(hdrv, filenameOutput, tmo_alpha_beta_gamma, tmo_white, tmo_gamma, tmo_quality, tmo_video_profile)
 %
 %
-%      KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_gamma, tmo_quality, tmo_video_profile)
+%      RamseyTMOv(hdrv, filenameOutput, tmo_alpha_beta_gamma, tmo_white, tmo_quality, tmo_video_profile)
 %
 %
 %       Input:
@@ -9,10 +9,8 @@ function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_g
 %           structure
 %           -filenameOutput: output filename (if it has an image extension,
 %           single files will be generated)
-%           -tmo_alpha_coeff: \alpha_A, \alpha_B, \alpha_C coefficients
-%           costants in the paper (Equation 3a, 3b, and 3c)
-%           -tmo_dn_clamping: a boolean value (0 or 1) for setting black
-%           and white levels clamping
+%           -tmo_alpha_beta_gamma:
+%           -tmo_white:
 %           -tmo_gamma: gamma for encoding the frame
 %           -tmo_quality: the output quality in [1,100]. 100 is the best quality
 %           1 is the lowest quality.%
@@ -37,25 +35,33 @@ function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_g
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %     The paper describing this technique is:
-%     "Real-time Automated Tone Mapping System for HDR Video"
-% 	  by Chris Kiser, Erik Reinhard, Mike Tocci and Nora Tocci
-%     in IEEE International Conference on Image Processing, 2012 
+%     "Adaptive Temporal Tone Mapping"
+% 	  by Shaun David Ramsey, J. Thomas Johnson III, Charles Hansen
+%     in CGIM 2004 
 %
 %
 
-if(~exist('tmo_alpha_coeff', 'var'))
-    tmo_alpha_coeff = 0.98;
+if(~exist('tmo_alpha_beta_gamma', 'var'))
+    tmo_alpha_beta_gamma = [];
 end
 
-if(~exist('tmo_dn_clamping', 'var'))
-    tmo_dn_clamping = 0;
+if(isempty(tmo_alpha_beta_gamma))
+    tmo_alpha_beta_gamma = [1000.0, 100.0, 3.0];
+end
+
+if(~exist('tmo_white', 'var'))
+    tmo_white = -1;
+end
+
+if(tmo_white < 0.0)
+    tmo_white = 1e10;
 end
 
 if(~exist('tmo_gamma', 'var'))
-    tmo_gamma = 2.2;
+    tmo_gamma = -1.0;
 end
 
-if(tmo_gamma<0)
+if(tmo_gamma < 0)
     bsRGB = 1;
 else
     bsRGB = 0;
@@ -85,59 +91,85 @@ end
 
 hdrv = hdrvopen(hdrv, 'r');
 
+disp('Computing statistics...');
+
+L_avg = zeros(hdrv.totalFrames, 1);
+for i=1:hdrv.totalFrames
+    [frame, hdrv] = hdrvGetFrame(hdrv, i);
+    
+    %only physical values
+    frame = RemoveSpecials(frame);
+    frame(frame < 0) = 0;    
+    
+    %computing log-mean
+    L_avg(i) = logMean(lum(frame));
+end
+
+L_a = zeros(hdrv.totalFrames, 1);
+a = zeros(hdrv.totalFrames, 1);
+NumFrames = zeros(hdrv.totalFrames, 1);
+for i=1:hdrv.totalFrames
+    %computing L_a(i)
+    L_f_i = L_avg(i);
+    range = 0.1 * L_f_i;
+    minL = L_f_i - range;
+    maxL = L_f_i + range;
+    j = i;
+    while((j > 1) && ((i - j) < 60))
+        if((L_f_i > minL) && (L_f_i < maxL))
+            j = j - 1;
+        else
+            if((i - j) < 5)
+                j = j - 1;
+            else
+                break;
+            end
+        end
+    end
+    
+    NumFrames(i) = i - j + 1;
+    total_log = 0;
+    for k=i:-1:j
+        total_log = total_log + log(L_avg(k));
+    end
+    L_a(i) = exp(total_log / NumFrames(i));
+    
+    %computing a(i)
+    alpha = tmo_alpha_beta_gamma(1);
+    beta = tmo_alpha_beta_gamma(2);
+    gamma = tmo_alpha_beta_gamma(3);
+    a(i) = - alpha * atan(beta * (L_a(i) - gamma)) + alpha * pi * 0.5;
+end
+
+
+disp('Ok');
+
 disp('Tone Mapping...');
-tmo_alpha_coeff_c = 1.0 - tmo_alpha_coeff;
-
-beta_clamping   = 0.999;
-beta_clamping_c = (1.0 - beta_clamping);
-
 for i=1:hdrv.totalFrames
     disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
-    
-    %Only physical values
+
+    %only physical values
     frame = RemoveSpecials(frame);
-    frame(frame<0) = 0;
+    frame(frame < 0) = 0;   
     
-    if(tmo_dn_clamping)%Clamping black and white levels
-        L = RemoveSpecials(lum(frame));
-        %computing CDF's histogram 
-        [histo, bound, ~] = HistogramHDR(L, 256, 'log10', [], 1);  
-        histo_cdf = cumsum(histo);
-        histo_cdf = histo_cdf/max(histo_cdf(:));
-        [~, ind] = min(abs(histo_cdf - beta_clamping));
-        maxL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
-
-        [~, ind] = min(abs(histo_cdf-beta_clamping_c));
-        minL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
-
-        frame(frame > maxL) = maxL;
-        frame(frame < minL) = minL;
-        frame = frame - minL;
+    %temporal statistics
+    a_n = 0.0;
+    j = i;
+    while((i - j) < NumFrames(i))
+        a_n = a_n + a(j);
+        j = j - 1;
     end
-   
-    %computing statistics for the current frame
+    a_n = a_n / NumFrames(i);
+    
+    %Tone mapping
     L = lum(frame);
-    Lav = logMean(L);
-    A = max(L(:)) - Lav;
-    B = Lav - min(L(:));
-   
-    if(i == 1)
-        Aprev = A;
-        Bprev = B;
-        aprev = 0.18 * 2^(2 * (B - A) / (A + B));
-    end
     
-    %temporal average
-    An = tmo_alpha_coeff_c * Aprev + tmo_alpha_coeff * A;
-    Bn = tmo_alpha_coeff_c * Bprev + tmo_alpha_coeff * B;
-
-    a = 0.18 * 2^(2 * (Bn - An) / (An + Bn));
-    an = tmo_alpha_coeff_c * aprev + tmo_alpha_coeff * a;
+    L_prime = a_n / L_a(i) * L;
+    Ld = L_prime .* (1.0 + L_prime / (tmo_white^2)) ./ (1.0 + L_prime);
+        
+    frameOut = ChangeLuminance(frame, L, Ld);
     
-    %tone mapping
-    [frameOut, ~, ~] = ReinhardTMO(frame, an);
-
     %Gamma/sRGB encoding
     if(bsRGB)
         frameOut = ClampImg(ConvertRGBtosRGB(frameOut, 0), 0, 1);
@@ -145,17 +177,15 @@ for i=1:hdrv.totalFrames
         frameOut = ClampImg(GammaTMO(frameOut, tmo_gamma, 0, 0), 0, 1);
     end
     
+    %Storing 
     if(bVideo)
         writeVideo(writerObj, frameOut);
     else
-        imwrite(frameOut, [name, sprintf('%.10d',i), '.', ext]);
+        nameOut = [name, sprintf('%.10d',i), '.', ext];
+        imwrite(frameOut, nameOut);
     end
-    
-    %updating for the next frame
-    Aprev = A;
-    Bprev = B;
-    aprev = a;   
 end
+
 disp('OK');
 
 if(bVideo)

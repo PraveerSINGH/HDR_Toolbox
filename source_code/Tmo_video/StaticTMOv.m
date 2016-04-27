@@ -95,7 +95,7 @@ for i=1:hdrv.totalFrames
     
     %Only physical values
     frame = RemoveSpecials(frame);
-    frame(frame<0) = 0;    
+    frame(frame < 0) = 0;    
     
     %Tone mapping
     frameOut = RemoveSpecials(tmo_operator(frame)); 
