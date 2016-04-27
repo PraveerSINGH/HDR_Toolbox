@@ -2,7 +2,7 @@ function disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity,
 %
 %       disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity, dm_metric, dm_regularization)
 %
-%       Computing stereo disparity map
+%       This function computes the disparity between two images.
 %
 %       input:
 %         - imgL: left image
@@ -17,7 +17,7 @@ function disparityMap = DisparitySlow(imgL, imgR, dm_patchSize, dm_maxDisparity,
 %       output:
 %         - offsetMap: shift vectors from img1 to img2
 %
-%     Copyright (C) 2013-15  Francesco Banterle
+%     Copyright (C) 2013-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
