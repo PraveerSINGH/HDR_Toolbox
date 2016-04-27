@@ -52,20 +52,24 @@ checkNegative(img);
 L = lum(img);
 
 if(~isempty(find(L > 3000, 1)))
-    disp('WARNING: the input image that you supplied has values over 3,000 cd/m^2'); 
+    disp('WARNING: the input image has values over 3,000 cd/m^2'); 
     disp('These values were not tested in the original paper.');
 end
 
 if(~isempty(find(L < 0.015, 1)))
-    disp('WARNING: the input image that you supplied has values under 0.015 cd/m^2'); 
+    disp('WARNING: the input image has values under 0.015 cd/m^2'); 
     disp('These values were not tested in the original paper.');
 end
 
-%Segmentation
+%segmentation
 if(~exist('BTMO_segments', 'var'))
     BTMO_segments = CreateSegments(img);
 else    
-    BTMO_segments = round(BTMO_segments);
+    if(isempty(BTMO_segments))
+        BTMO_segments = CreateSegments(img);        
+    else        
+        BTMO_segments = round(BTMO_segments);
+    end
 end
 
 %TMO look-up table for determing the best
@@ -84,16 +88,16 @@ for i=1:length(LumZone)
     mask(BTMO_segments == LumZone(i)) = TMOForZone(i);
 end
 
-%Check for Drago et al.'s oeprator
+%check for Drago et al.'s operator
 indx0 = find(mask == 1);
 
-%Check for Reinhard et al.'s operator
+%check for Reinhard et al.'s operator
 indx1 = find(mask == 0);
 
 %are both TMOs used?
 if(~isempty(indx0) && ~isempty(indx1)) %pyramid blending with gamma encoding
     img_dra_tmo = DragoTMO(img);
-    img_rei_tmo = ReinhardTMO(img, -1, -1, 1, -1);
+    img_rei_tmo = ReinhardTMO(img, -1, -1, 'local', -1);
 
     gamma = 2.2;
     invGamma = 1.0 / gamma;
@@ -106,8 +110,10 @@ if(~isempty(indx0) && ~isempty(indx1)) %pyramid blending with gamma encoding
     BTMO_which_operator = 'BanterleTMO';
 else
     %Only Reinhard et al.'s operator?
+    length(indx1)
+    length(indx0)
     if(isempty(indx1))
-        imgOut = ReinhardTMO(img, -1, -1, 1, -1);
+        imgOut = ReinhardTMO(img, -1, -1, 'local', -1);
         BTMO_which_operator = 'ReinhardTMO';
         disp('The BanterleTMO is using ReinhardTMO only');
     end

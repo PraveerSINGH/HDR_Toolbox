@@ -1,12 +1,12 @@
-function [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+%       [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       This function computes motion estimation between two consecutive frames
+%       This computes bi-directional motion estimation between frames
 %
 %       input:
-%         - imgCur: current frame
-%         - imgNext: next frame
+%         - img_prev: previous frame
+%         - img_next: next frame
 %         - blockSize: size of the block
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
@@ -31,7 +31,7 @@ function [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearc
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-[r, c, ~] = size(imgCur);
+[r, c, ~] = size(img_prev);
 
 if(~exist('bVisualize', 'var'))
     bVisualize = 0;
@@ -41,7 +41,7 @@ bAuto = 0;
 if(~exist('blockSize', 'var'))
     bAuto = 1;
 else
-    bAuto = strcmp(blockSize, 'auto');
+    bAuto = strcmp('blockSize', 'auto');
 end
 
 if(bAuto)
@@ -72,6 +72,7 @@ uv = zeros(block_r, block_c, 4);
 
 k_vec = [];
 l_vec = [];
+n_vec = [];
 for k=(-shift):shift
 	for l=(-shift):shift
         k_vec = [k_vec, k];
@@ -90,23 +91,26 @@ for i=1:block_r
         dy = 0;
         err = 1e20;
                 
-        i_b1 = (i - 1) * blockSize + 1;
-        i_e1 = min([i_b1 + blockSize - 1, r]);
-        
-        j_b1 = (j - 1) * blockSize + 1;
-        j_e1 = min([j_b1 + blockSize - 1, c]);
-        
-        blockCur = imgCur(i_b1:i_e1, j_b1:j_e1, :);
+        i_b = (i - 1) * blockSize + 1;
+        i_e = min([i_b + blockSize - 1, r]);
+        j_b = (j - 1) * blockSize + 1;
+        j_e = min([j_b + blockSize - 1, c]);
         
         for p=1:vec_n
-            i_b2 = i_b1 + k_vec(p);
-            i_e2 = i_e1 + k_vec(p);            
-            j_b2 = j_b1 + l_vec(p);
-            j_e2 = j_e1 + l_vec(p);
+            i_b_prev = i_b - k_vec(p);
+            i_e_prev = i_e - k_vec(p);            
+            j_b_prev = j_b - l_vec(p);
+            j_e_prev = j_e - l_vec(p);
 
-            if( (i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c) )
+            i_b_next = i_b + k_vec(p);
+            i_e_next = i_e + k_vec(p);            
+            j_b_next = j_b + l_vec(p);
+            j_e_next = j_e + l_vec(p);
+
+            if( (i_b_prev > 0) && (j_b_prev > 0) && (i_e_prev <= r) && (j_e_prev <= c) &&...
+                (i_b_next > 0) && (j_b_next > 0) && (i_e_next <= r) && (j_e_next <= c))
             
-                tmp_err = abs(blockCur - imgNext(i_b2:i_e2, j_b2:j_e2, :));
+                tmp_err = abs(img_prev(i_b_prev:i_e_prev, j_b_prev:j_e_prev, :) - img_next(i_b_next:i_e_next, j_b_next:j_e_next, :));
                 tmp_err = mean(tmp_err(:)) + lambda_reg * n_vec(p);
                 
                 if(tmp_err < err)
@@ -117,12 +121,12 @@ for i=1:block_r
             end
         end
         
-        motionMap(i_b1:i_e1,j_b1:j_e1, 1) = dx;
-        motionMap(i_b1:i_e1,j_b1:j_e1, 2) = dy;
-        motionMap(i_b1:i_e1,j_b1:j_e1, 3) = err;
+        motionMap(i_b:i_e,j_b:j_e,1) = dx;
+        motionMap(i_b:i_e,j_b:j_e,2) = dy;
+        motionMap(i_b:i_e,j_b:j_e,3) = err;
         
-        uv(i, j, 1) = (j_b1 + j_e1) / 2.0;
-        uv(i, j, 2) = (i_b1 + i_e1) / 2.0;
+        uv(i, j, 1) = (j_b + j_e) / 2.0;
+        uv(i, j, 2) = (i_b + i_e) / 2.0;
         uv(i, j, 3) = dx;
         uv(i, j, 4) = dy;
     end

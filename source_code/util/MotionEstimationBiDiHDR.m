@@ -1,12 +1,12 @@
-function [motionMap, uv] = MotionEstimationHDR(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimationBiDiHDR(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       [motionMap, uv] = MotionEstimationHDR(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+%        motionMap = MotionEstimationBiDiHDR(img_prev, img_next, blockSize)
 %
-%       This function computes motion estimation between two consecutive HDR frames
+%       This computes bi-directional motion estimation between HDR frames
 %
 %       input:
-%         - imgCur: source
-%         - imgNext: target
+%         - img_prev: previous frame
+%         - img_next: next frame
 %         - blockSize: size of the block
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
@@ -32,8 +32,6 @@ function [motionMap, uv] = MotionEstimationHDR(imgCur, imgNext, blockSize, maxSe
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-[r, c, ~] = size(imgCur);
-
 if(~exist('bVisualize', 'var'))
     bVisualize = 0;
 end
@@ -46,6 +44,7 @@ else
 end
 
 if(bAuto)
+    [r, c, ~] = size(img_prev);
     nPixels = r * c;
     blockSize = max([2^ceil(log10(nPixels)), 4]);
 end
@@ -58,6 +57,6 @@ if(~exist('lambda_reg', 'var'))
     lambda_reg = 0;
 end
 
-[motionMap, uv] = MotionEstimation(log10(imgCur + 1e-6), log10(imgNext + 1e-6), blockSize, maxSearchRadius, lambda_reg, bVisualize);
+[motionMap, uv] = MotionEstimation(log10(img_prev + 1e-6), log10(img_next + 1e-6), blockSize, maxSearchRadius, lambda_reg, bVisualize);
 
 end
