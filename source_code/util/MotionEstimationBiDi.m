@@ -1,12 +1,12 @@
-function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+%       [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
 %
-%       This computes motion estimation between frames
+%       This computes bi-directional motion estimation between frames
 %
 %       input:
-%         - img1: source
-%         - img2: target
+%         - img_prev: previous frame
+%         - img_next: next frame
 %         - blockSize: size of the block
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
@@ -31,7 +31,7 @@ function [motionMap, uv] = MotionEstimation(img1, img2, blockSize, maxSearchRadi
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-[r, c, ~] = size(img1);
+[r, c, ~] = size(img_prev);
 
 if(~exist('bVisualize', 'var'))
     bVisualize = 0;
@@ -97,20 +97,20 @@ for i=1:block_r
         j_e = min([j_b + blockSize - 1, c]);
         
         for p=1:vec_n
-            i_b1 = i_b - k_vec(p);
-            i_e1 = i_e - k_vec(p);            
-            j_b1 = j_b - l_vec(p);
-            j_e1 = j_e - l_vec(p);
+            i_b_prev = i_b - k_vec(p);
+            i_e_prev = i_e - k_vec(p);            
+            j_b_prev = j_b - l_vec(p);
+            j_e_prev = j_e - l_vec(p);
 
-            i_b2 = i_b + k_vec(p);
-            i_e2 = i_e + k_vec(p);            
-            j_b2 = j_b + l_vec(p);
-            j_e2 = j_e + l_vec(p);
+            i_b_next = i_b + k_vec(p);
+            i_e_next = i_e + k_vec(p);            
+            j_b_next = j_b + l_vec(p);
+            j_e_next = j_e + l_vec(p);
 
-            if( (i_b1 > 0) && (j_b1 > 0) && (i_e1 <= r) && (j_e1 <= c) &&...
-                (i_b2 > 0) && (j_b2 > 0) && (i_e2 <= r) && (j_e2 <= c))
+            if( (i_b_prev > 0) && (j_b_prev > 0) && (i_e_prev <= r) && (j_e_prev <= c) &&...
+                (i_b_next > 0) && (j_b_next > 0) && (i_e_next <= r) && (j_e_next <= c))
             
-                tmp_err = abs(img1(i_b1:i_e1, j_b1:j_e1, :) - img2(i_b2:i_e2, j_b2:j_e2, :));
+                tmp_err = abs(img_prev(i_b_prev:i_e_prev, j_b_prev:j_e_prev, :) - img_next(i_b_next:i_e_next, j_b_next:j_e_next, :));
                 tmp_err = mean(tmp_err(:)) + lambda_reg * n_vec(p);
                 
                 if(tmp_err < err)
