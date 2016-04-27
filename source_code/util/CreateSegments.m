@@ -32,10 +32,10 @@ function imgBin = CreateSegments(img)
 L = lum(img);
 
 %Filtering the image to avoid noise
-L = GaussianFilter(L,1);
+L = GaussianFilter(L, 1);
 
 %Lmax, Lmin
-Lmin = min(L(L>0.0));
+Lmin = min(L(L > 0.0));
 Lmax = max(L(:));
 
 %Max and Min in log10
@@ -47,27 +47,27 @@ sMin = sign(l10Min);
 sMax = sign(l10Max);
 
 %Discretization
-if(sMin>0)
-    l10Min = sMin*floor(abs(l10Min));
+if(sMin > 0)
+    l10Min = sMin * floor(abs(l10Min));
 else
-    l10Min = sMin*ceil(abs(l10Min));
+    l10Min = sMin * ceil(abs(l10Min));
 end
 
-if(sMax>0)
-    l10Max = sMax*ceil(abs(l10Max));
+if(sMax > 0)
+    l10Max = sMax * ceil(abs(l10Max));
 else
-    l10Max = sMax*floor(abs(l10Max));
+    l10Max = sMax * floor(abs(l10Max));
 end
     
 imgBin = zeros(size(L));
 
 [n,m]   = size(L);
-nLevels = l10Max-l10Min+1;
+nLevels = l10Max - l10Min + 1;
 
 for i=l10Min:l10Max %skimming levels
     bMin = 10^i;
-    bMax = 10^(i+1);   
-    imgBin(L>=bMin&L<bMax) = i-l10Min+1;
+    bMax = 10^(i + 1);   
+    imgBin(L >= bMin & L < bMax) = i - l10Min + 1;
 end
 
 %Number of pixels
@@ -88,18 +88,18 @@ for LOOP=1:100
         nc = max(comp(:));
 
         for j=1:nc %For each connected component (CC)
-            [r,c] = find(comp==j);
-            [yy,xx] = size(r);
-            tot = xx*yy;
+            [r, c] = find(comp==j);
+            [yy, xx] = size(r);
+            tot = xx * yy;
         
             %Is it a small CC?
-            if(tot<perCent&&tot>0)
-                listOfNeighbors   = FindNeighbours(i,r,c,tot,imgBin);
-                [imgBin,nlv] = FusionMask(listOfNeighbors,comp,imgBin,j);
+            if(tot < perCent && tot > 0)
+                listOfNeighbors   = FindNeighbours(i, r , c, tot, imgBin);
+                [imgBin, nlv] = FusionMask(listOfNeighbors, comp, imgBin,j);
                 
-                if(nlv>0)%Update
+                if(nlv > 0)%Update
                     %clear('layer');
-                    layer = GenerateMasks(imgBin,nLevels);
+                    layer = GenerateMasks(imgBin, nLevels);
                     comp  = layer(:,:,i);
                 end
             end            
@@ -107,9 +107,9 @@ for LOOP=1:100
     end
     
     %Check for ending
-    delta = imgBinOld-imgBin;    
+    delta = imgBinOld - imgBin;    
     val   = abs(sum(delta(:)));
-    if(val<1e-4)
+    if(val < 1e-4)
         %disp([val,LOOP]);
         break;
     else
@@ -119,7 +119,7 @@ end
 
 %Sanity check
 for i=1:nLevels
-    indx = find(imgBin==i);
+    indx = find(imgBin == i);
     if(~isempty(indx))
         val = round(mean(imgOri(indx)));
         imgBin(indx) = val;
@@ -130,7 +130,7 @@ end
 %clear('layer');
 %clear('comp');
 
-imgBin = imgBin+l10Min-1;
+imgBin = imgBin + l10Min - 1;
 
 end
 
