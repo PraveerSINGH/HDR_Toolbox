@@ -12,7 +12,7 @@ function extOut = fileExtension(filename)
 %        Output:
 %           -extOut: the extension of the file
 %
-%     Copyright (C) 2011-2015  Francesco Banterle
+%     Copyright (C) 2011-2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -31,13 +31,12 @@ function extOut = fileExtension(filename)
 k = strfind(filename, '.');
 
 %there is no extension
-if(size(k) == 0)
-    error('No file extension');
+if(isempty(k))
+    extOut = [];
+else
+    %get the real extension
+    k = k(end);
+    extOut = filename((k + 1):max(size(filename)));
 end
-
-%get the real extension
-k = k(end);
-
-extOut = filename((k + 1):max(size(filename)));
 
 end
