@@ -151,9 +151,7 @@ if(FC_Vis)%Visualization
     set(h, 'Name', FC_title);
     imshow(imgOut, 'InitialMagnification', 'fit');
     colormap(color_map);
-    
-    precision = 4;
-     
+         
     hcb = colorbar('Ticks', 0:(1/4):1 ,'YtickLabel',{sprintf('%3.2f', yticks(1)), sprintf('%3.2f', yticks(2)), sprintf('%3.2f', yticks(3)), sprintf('%3.2f', yticks(4)), sprintf('%3.2f', yticks(5))});
     set(hcb,'FontSize',14);
     set(hcb,'FontName','Arial');
