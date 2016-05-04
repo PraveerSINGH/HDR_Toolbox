@@ -34,7 +34,7 @@ maxFrames = ldrv.totalFrames;
 if(~exist('frameCounter', 'var'))
     frameCounter = ldrv.frameCounter;
 else
-    if(frameCounter<1)
+    if(frameCounter < 1)
         frameCounter = 1;
     end
     
@@ -61,4 +61,5 @@ end
 
 %updating the counter
 ldrv.frameCounter = mod( frameCounter + 1, maxFrames + 1);
+
 end
