@@ -86,7 +86,7 @@ disp('after tone mapping alerting that there is no need of gamma encoding.');
 
 str_cur = pwd();
 try
-    cd([pwd(), '/source_code/IO/']);
+    cd([str_cur, '/source_code/IO/']);
     mex('read_exr.cpp');
     mex('write_exr.cpp');
 catch err
@@ -94,7 +94,7 @@ catch err
 end
 
 try
-    cd([pwd(), '/source_code/util/']);
+    cd([str_cur, '/source_code/util/']);
     mex('bilateralFilterS.cpp');
 catch err
     disp('bilateralFilterS.cpp was not compiled');
