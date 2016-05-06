@@ -72,7 +72,7 @@ if(~exist('tmo_quality', 'var'))
 end
 
 if(~exist('tmo_video_profile', 'var'))
-    tmo_video_profile = 'Motion JPEG AVI';
+    tmo_video_profile = 'MPEG-4';
 end
 
 name = RemoveExt(filenameOutput);
@@ -81,7 +81,7 @@ ext  = fileExtension(filenameOutput);
 bVideo = 0;
 writerObj = 0;
 
-if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
+if(strcmp(ext, 'avi') == 1 | strcmp(ext, 'mp4') == 1)
     bVideo = 1;
     writerObj = VideoWriter(filenameOutput, tmo_video_profile);
     writerObj.FrameRate = hdrv.FrameRate;
