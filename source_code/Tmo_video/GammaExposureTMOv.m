@@ -1,19 +1,18 @@
-function StaticTMOv(hdrv, filenameOutput, tmo_operator, tmo_gamma, tmo_quality, tmo_video_profile)
+function GammaExposureTMOv(hdrv, filenameOutput, tmo_gamma, tmo_fstop, tmo_quality, tmo_video_profile)
 %
 %
-%       StaticTMOv(hdrv, filenameOutput, tmo_operator, tmo_gamma, tmo_quality, tmo_video_profile)
+%       GammaExposureTMOv(hdrv, filenameOutput, tmo_gamma, tmo_fstop, tmo_quality, tmo_video_profile)
 %
-%       A static TMO is applied to an HDR stream. This method does not take into account temporal
-%       coherency, so it may introduce flickering.
+%       This function applies gamma + exposure correction for each frame of the HDR stream
 %
 %       Input:
 %           -hdrv: a HDR video structure; use hdrvread to create a hdrv
 %           structure
 %           -filenameOutput: output filename (if it has an image extension,
 %           single files will be generated)
-%           -tmo_operator: the tone mapping operator to use
 %           -tmo_gamma: gamma for encoding the frame. If it is negative,
 %           sRGB econding is applied
+%           -tmo_fstop: f-stop value
 %           -tmo_quality: the output quality in [1,100]. 100 is the best quality
 %           1 is the lowest quality.%
 %           -tmo_video_profile: the compression profile (encoder) for compressing the stream.
@@ -24,7 +23,7 @@ function StaticTMOv(hdrv, filenameOutput, tmo_operator, tmo_gamma, tmo_quality, 
 %       Output:
 %           -frameOut: the tone mapped frame
 %
-%     Copyright (C) 2013-14  Francesco Banterle
+%     Copyright (C) 2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -44,12 +43,18 @@ function StaticTMOv(hdrv, filenameOutput, tmo_operator, tmo_gamma, tmo_quality, 
 %     account for temporal coherency
 %
 
-if(~exist('tmo_operator', 'var'))
-    tmo_operator = @DragoTMO;
+if(~exist('filenameOutput', 'var'))
+    date_str = strrep(datestr(now()), ' ', '_');
+    date_str = strrep(date_str, ':', '_');
+    filenameOutput = ['static_tmo_output_', date_str, '.avi'];
 end
 
 if(~exist('tmo_gamma', 'var'))
     tmo_gamma = 2.2;
+end
+
+if(~exist('tmo_fstop', 'var'))
+    tmo_fstop = 0.0;
 end
 
 if(~exist('tmo_quality', 'var'))
@@ -82,6 +87,8 @@ end
 
 hdrv = hdrvopen(hdrv, 'r');
 
+exposure = 2^tmo_fstop;
+
 disp('Tone Mapping...');
 for i=1:hdrv.totalFrames
     disp(['Processing frame ',num2str(i)]);
@@ -90,15 +97,12 @@ for i=1:hdrv.totalFrames
     %Only physical values
     frame = RemoveSpecials(frame);
     frame(frame < 0) = 0;    
-    
-    %Tone mapping
-    frameOut = RemoveSpecials(tmo_operator(frame)); 
-    
+            
     %Gamma/sRGB encoding
     if(bsRGB)
-        frameOut = ClampImg(ConvertRGBtosRGB(frameOut, 0), 0, 1);
+        frameOut = ClampImg(ConvertRGBtosRGB(frame * exposure, 0), 0, 1);
     else
-        frameOut = ClampImg(GammaTMO(frameOut, tmo_gamma, 0, 0), 0, 1);
+        frameOut = ClampImg(GammaTMO(frame, tmo_gamma, tmo_fstop, 0), 0, 1);
     end
     
     %Storing 

@@ -94,7 +94,7 @@ beta_clamping_c = (1.0 - beta_clamping);
 for i=1:hdrv.totalFrames
     disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
-    
+        
     %Only physical values
     frame = RemoveSpecials(frame);
     frame(frame < 0) = 0;
