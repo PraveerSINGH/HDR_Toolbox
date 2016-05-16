@@ -1,6 +1,6 @@
-function [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize, me_bidi_mode)
 %
-%       [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+%       [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, maxSearchRadius, lambda_reg, bVisualize, me_bidi_mode)
 %
 %       This computes bi-directional motion estimation between frames
 %
@@ -11,6 +11,9 @@ function [motionMap, uv] = MotionEstimationBiDi(img_prev, img_next, blockSize, m
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
 %         - bVisualize: if it is set to 1 it visualizes the motion field 
+%         - me_bidi_mode: it takes these inputs:
+%               -'ldr': for LDR images
+%               -'hdr': for HDR images
 %
 %       output:
 %         - motionMap: motion map for each pixel
@@ -38,6 +41,7 @@ if(~exist('bVisualize', 'var'))
 end
 
 bAuto = 0;
+
 if(~exist('blockSize', 'var'))
     bAuto = 1;
 else
@@ -59,6 +63,16 @@ end
 
 if(~exist('lambda_reg', 'var'))
     lambda_reg = 0;
+end
+
+if(~exist('me_bidi_mode', 'var'))
+    me_bidi_mode = 'ldr';
+end
+
+switch me_bidi_mode
+    case 'hdr'
+        img_prev = log10(img_prev + 1e-6);
+        img_next = log10(img_next + 1e-6);
 end
 
 shift = round(blockSize * maxSearchRadius);

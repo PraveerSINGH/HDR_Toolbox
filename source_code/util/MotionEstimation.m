@@ -1,6 +1,6 @@
-function [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+function [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize, me_bidi_mode)
 %
-%       [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize)
+%       [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearchRadius, lambda_reg, bVisualize, me_bidi_mode)
 %
 %       This function computes motion estimation between two consecutive frames
 %
@@ -11,6 +11,9 @@ function [motionMap, uv] = MotionEstimation(imgCur, imgNext, blockSize, maxSearc
 %         - maxSearchRadius: search size in blocks
 %         - lambda_reg: regularization coefficient
 %         - bVisualize: if it is set to 1 it visualizes the motion field 
+%         - me_bidi_mode: it takes these inputs:
+%               -'ldr': for LDR images
+%               -'hdr': for HDR images
 %
 %       output:
 %         - motionMap: motion map for each pixel
@@ -59,6 +62,16 @@ end
 
 if(~exist('lambda_reg', 'var'))
     lambda_reg = 0;
+end
+
+if(~exist('me_bidi_mode', 'var'))
+    me_bidi_mode = 'ldr';
+end
+
+switch me_bidi_mode
+    case 'hdr'
+        imgCur = log10(imgCur + 1e-6);
+        imgNext = log10(imgNext + 1e-6);
 end
 
 shift = round(blockSize * maxSearchRadius);
