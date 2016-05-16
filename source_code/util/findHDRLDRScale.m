@@ -1,17 +1,18 @@
-function imgEdge = LaplacianFilter(img)
+function scale = findHDRLDRScale(imgHDR, imgLDR)
 %
 %
-%       imgBlur = LaplacianFilter(img)
+%       scale = findHDRLDRScale(imgHDR, imgLDR)
 %
 %
 %       Input:
-%           -img: the input image
+%           -imgHDR: an HDR image
+%           -imgLDR: an LDR image (in the linear domain)
 %
 %       Output:
-%           -imgEdge: a filtered image
+%           -scale: the scaling factor
 %
 %
-%     Copyright (C) 2011-16  Francesco Banterle
+%     Copyright (C) 2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -27,8 +28,16 @@ function imgEdge = LaplacianFilter(img)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-%Laplacian mask
-H = [-1 -1 -1; -1 8 -1; -1 -1 -1];
-imgEdge = imfilter(img, H, 'replicate');
+if(~isSameImage(imgHDR, imgLDR))
+    error('The input images are different!');
+end
+
+low_threshold =  ( 32.0 / 255.0).^2.2;
+high_threshold = (230.0 / 255.0).^2.2;
+
+indx = find((imgLDR >= low_threshold) & (imgLDR <= high_threshold));
+
+scale = (imgHDR(indx) ./ imgLDR(indx));
+scale = mean(scale(:));
 
 end

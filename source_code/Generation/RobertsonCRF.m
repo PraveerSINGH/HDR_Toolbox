@@ -100,7 +100,7 @@ end
 
 %poly-fit (rational)
 if(bPolyFit)
-    x = (0:255)/255;
+    x = (0:255) / 255;
     ft = fittype( 'rat33' );
     opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
     opts.Display = 'Off';
