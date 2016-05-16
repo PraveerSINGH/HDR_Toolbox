@@ -56,7 +56,14 @@ switch ldrv.type
 end
 
 if(~isempty(frame))
-    frame = single(frame) / 255.0;
+    
+    if(isa(frame, 'uint8'))
+        frame = single(frame) / 255.0;
+    end
+    
+    if(isa(frame, 'uint16'))
+        frame = single(frame) / 65535.0;
+    end
 end
 
 %updating the counter
