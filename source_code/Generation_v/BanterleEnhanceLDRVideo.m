@@ -70,12 +70,12 @@ for i=1:(ldrv.totalFrames - 1)
     %linearization
     img2 = tabledFunction(round(img2 * 255), crf);
              
-    imgHDR = BanterleEnhanceLDRFrame(hdri, img1, img2, 'linear');
+    imgHDR = BanterleEnhanceLDRFrame(img1, img2, hdri, 'linear');
     
     hdrimwrite(imgHDR, [nameOutput, '_', sprintf('%.10d', i), '.', ext]);
     
     %next frame
-    img1 = img2;    
+    img1 = img2;   
 end
 
 ldrclose(ldrv);

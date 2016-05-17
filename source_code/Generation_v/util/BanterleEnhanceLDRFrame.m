@@ -72,7 +72,7 @@ function frameOut = BanterleEnhanceLDRFrame(img1, img2, img_back_hdr, blendMode)
         mask = imdilate(mask, H);
     end
     
-    mask = bilateralFilter(mask, L1, 0, 1.0, 32.0, 0.05);
+    mask = bilateralFilter(mask, L1, 0, 1.0, 64.0, 0.05);
     
     %Avoid inversion      
     mask = GaussianFilter(mask, 2.0);   

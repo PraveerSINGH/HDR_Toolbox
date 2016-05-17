@@ -60,10 +60,10 @@ for i=1:col
         y = y(1:round((n / 100)):n);
     end
     
-    x = [x; 0];
-    y = [y; 0];
+    x = [x; 0; 0];
+    y = [y; 0; 0];
         
-    ft = fittype( 'rat33' );
+    ft = fittype( 'poly3' );
     opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
     opts.Display = 'Off';
     opts.StartPoint = ones(7, 1);
