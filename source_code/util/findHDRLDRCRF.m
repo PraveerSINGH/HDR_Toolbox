@@ -68,7 +68,7 @@ for i=1:col
     opts.Display = 'Off';
     opts.StartPoint = ones(7, 1);
 
-    [xData, yData] = prepareCurveData(x, y);
+    [xData, yData] = prepareCurveData(double(x), double(y));
     [fit_ret, ~] = fit( xData, yData, ft, opts );    
     
     x = (0:255) / 255;

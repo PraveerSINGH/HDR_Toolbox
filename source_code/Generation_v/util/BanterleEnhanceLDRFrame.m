@@ -28,6 +28,10 @@ function frameOut = BanterleEnhanceLDRFrame(img1, img2, img_back_hdr, blendMode)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
+    if(~exist('blendMode', 'var'))
+        blendMode = 'linear';
+    end
+    
     [r, c, col] = size(img1);
     threshold1 = 0.7;
     
@@ -68,10 +72,10 @@ function frameOut = BanterleEnhanceLDRFrame(img1, img2, img_back_hdr, blendMode)
         mask = imdilate(mask, H);
     end
     
-    mask = bilateralFilter(mask,L1);
+    mask = bilateralFilter(mask, L1, 0, 1.0, 32.0, 0.05);
     
     %Avoid inversion      
-    mask = GaussianFilter(mask,2.0);   
+    mask = GaussianFilter(mask, 2.0);   
         
     ref2 = imresize(img_back_hdr, 0.125, 'bilinear');
     ref2 = GaussianFilter(ref2, 4.0);
@@ -87,13 +91,15 @@ function frameOut = BanterleEnhanceLDRFrame(img1, img2, img_back_hdr, blendMode)
         refG = img_back_hdr(:,:,j) .* mask + (1 - mask) .* ref2(:,:,j);
         tmp1 = log2(refG + 1);
         tmp2 = log2(img1(:,:,j) + 1);      
-        
+
         switch blendMode
-            case 'Poisson'
+            case 'poisson'
                 tmp3 = 2.^PoissonBlending(tmp1, tmp2, mask);
-            case 'Linear'
+                
+            case 'linear'
                 tmp3 = 2.^(tmp1 .* mask + (1 - mask) .* tmp2) - 1;
         end
+        
         tmp3(tmp3 < 0) = 0;
         frameOut(:,:,j) = tmp3;
     end
