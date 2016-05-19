@@ -26,6 +26,11 @@ function ldrv = ldrvread(filename)
 %
 
 if(isdir(filename))
+    
+    if(filename(end) == '/')
+       filename(end) = []; 
+    end
+    
     %PNG?
     tmp_list = dir([filename, '/', '*.png']);
     type = 'TYPE_LDR_PNG';

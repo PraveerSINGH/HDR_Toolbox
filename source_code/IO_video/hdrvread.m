@@ -28,6 +28,11 @@ function hdrv = hdrvread(filename)
 hdrv = [];
 
 if(isdir(filename))
+    
+    if(filename(end) == '/')
+       filename(end) = []; 
+    end
+    
     tmp_list = dir([filename, '/', '*.hdr']);
     type = 'TYPE_HDR_RGBE';
     
