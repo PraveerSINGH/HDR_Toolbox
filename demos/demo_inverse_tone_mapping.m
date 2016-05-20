@@ -20,13 +20,10 @@ imshow(img);
 
 disp('2) Apply Huo et al. Expansion Operator:');
 disp('   - the LDR image is assumed to be encoded with gamma = 2.2');
-[imgOut] = HuoPhysEO(img, 3000.0, 0.86, 2.2);
+imgOut = HuoPhysEO(img, 3000.0, 0.86, 2.2);
 
 disp('3) Show the expanded image in false color');
-FalseColor(imgOut,'log',1,-1,2,'Inverse tone mapped LDR image in false color');
+FalseColor(imgOut, 'log', 1, -1, 2, 'Inverse tone mapped LDR image in false color');
 
-disp('4) Save the expanded image into a .pfm:');
-hdrimwrite(imgOut,'Venice01_expanded.pfm');
-
-%disp('5) Save the expand map into a .pfm:');
-%hdrimwrite(expand_map,'Venice01_expand_map.pfm');
+disp('4) Save the expanded image into a .exr:');
+hdrimwrite(imgOut, 'Venice01_expanded.exr');
