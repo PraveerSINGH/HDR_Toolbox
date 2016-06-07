@@ -46,7 +46,7 @@ alpha1  = (((2^pPhi) * pAlpha) / (sMax^2)) * pEpsilon;
 alpha2  = round(1.6^sMax);    
 
 L_tmp = L ./ (L + 1);
-L_adapt = bilateralFilter(L_tmp, [], 0, 1, alpha2, alpha1);
+L_adapt = bilateralFilter(L_tmp, [], 0, 1, alpha2, alpha1 / 2);
 L_adapt = RemoveSpecials(L_adapt ./ (1 - L_adapt));
 
 end

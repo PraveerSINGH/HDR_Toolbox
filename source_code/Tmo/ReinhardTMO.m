@@ -99,8 +99,9 @@ switch pLocal
 end
 
 %Range compression
-pWhite2 = pWhite * pWhite;
-Ld = (Lscaled .* (1 + Lscaled / pWhite2)) ./ (1 + L_adapt);
+%pWhite2 = pWhite * pWhite;
+%Ld = (Lscaled .* (1 + Lscaled / pWhite2)) ./ (1 + L_adapt);
+Ld = Lscaled ./ (1.0 + L_adapt);
 
 %Changing luminance
 imgOut = ChangeLuminance(img, L, Ld);
