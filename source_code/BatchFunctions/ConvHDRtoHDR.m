@@ -36,11 +36,11 @@ lst = dir(['*.', fmtIn]);
 
 for i=1:length(lst)
     tmp_name = lst(i).name;
-    disp(tmpName);
+    disp(tmp_name);
     
     img = hdrimread(tmp_name);
     tmp_name_we = RemoveExt(tmp_name);
-    hdrimwrite(img,[tmp_name_we, fmtOut]);
+    hdrimwrite(img,[tmp_name_we, '.', fmtOut]);
 end
 
 end

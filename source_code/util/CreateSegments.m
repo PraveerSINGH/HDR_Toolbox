@@ -71,11 +71,11 @@ for i=l10Min:l10Max %skimming levels
 end
 
 %Number of pixels
-areaTot=n*m;
+areaTot = n * m;
 
 %Thresholds
 threshold = 0.005;
-perCent = round(threshold*areaTot);
+perCent = round(threshold * areaTot);
 
 %Merging layers...
 imgOri    = imgBin;
