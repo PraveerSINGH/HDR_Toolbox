@@ -28,12 +28,12 @@ function imgOut = ReinhardGaussianFilter(img, s, alpha_i)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-alphaS2 = (alpha_i * s)^2;
+alpha_s_sq = (alpha_i * s)^2;
 
 % %Kernel of the filter
 % s2 = round(s * 5);
 % [X,Y] = meshgrid(-s2:s2, -s2:s2);
-% H = exp(-(X.^2 + Y.^2) / alphaS2) / (pi * alphaS2);
+% H = exp(-(X.^2 + Y.^2) / alpha_s_sq) / (pi * alpha_s_sq);
 % 
 % %Filtering
 % imgOut = imfilter(img, H, 'replicate');
@@ -41,9 +41,9 @@ alphaS2 = (alpha_i * s)^2;
 [r, c, col] = size(img);
 
 [x, y] = meshgrid(1:c, 1:r);
-x = x - round(c / 2);
-y = y - round(r / 2);
-kernel = exp(-(x.^2 + y.^2) / alphaS2) / (pi * alphaS2);
+x = x - (c / 2);
+y = y - (r / 2);
+kernel = exp(-(x.^2 + y.^2) / alpha_s_sq) / (pi * alpha_s_sq);
 kernel_f = fft2(kernel);
 
 imgOut = zeros(size(img));

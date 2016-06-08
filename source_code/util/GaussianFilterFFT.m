@@ -35,8 +35,10 @@ kernel = exp(-((x - c / 2).^2 +  (y - r / 2).^2) / (2 * sigma^2));
 kernel = kernel / sum(kernel(:));
 kernel_f = fft2(kernel);
 
+imgBlur = zeros(size(img));
+
 for i=1:col
-    imgBlur(:,:,i) = ifft2(fft2(img(:,:,i)) .* kernel_f);
+    imgBlur(:,:,i) = fftshift(ifft2(fft2(img(:,:,i)) .* kernel_f));
 end
 
 end
