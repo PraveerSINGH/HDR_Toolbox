@@ -13,7 +13,7 @@ function L_adapt = ReinhardFiltering(L, pAlpha, pPhi, pEpsilon)
 %       Output:
 %           -L_adapt: filtered image
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -51,10 +51,7 @@ constant = (2^pPhi) * pAlpha;
 
 s = 1;
 for i=1:sMax        
-    V_vec(:,:,i) = ReinhardGaussianFilter(L, s, alpha1);       
-     
-    %normalized difference of Gaussian levels
-
+    V_vec(:,:,i) = ReinhardGaussianFilter(L, s, alpha1);
     s = s * 1.6;
 end  
     
