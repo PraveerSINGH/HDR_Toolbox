@@ -29,7 +29,7 @@ set(h, 'Name', 'The Camera Response Function (CRF)');
 plot(0:255, lin_fun(:,1), 'r', 0:255, lin_fun(:,2),'g', 0:255, lin_fun(:,3), 'b');
 
 disp('4) Build the radiance map using the stack and stack_exposure');
-imgHDR = BuildHDR(stack * norm_value, stack_exposure, 'LUT', lin_fun, 'Deb97', 'log');
+imgHDR = BuildHDR(stack, stack_exposure, 'LUT', lin_fun, 'Deb97', 'log');
 
 disp('5) Save the radiance map in the .hdr format');
 hdrimwrite(imgHDR, 'stack_hdr_image.exr');
