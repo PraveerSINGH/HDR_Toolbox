@@ -1,6 +1,6 @@
-function stack = ReadLDRStack(dir_name, format, bNormalization)
+function [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
 %
-%       stack = ReadLDRStack(dir_name, format, bNormalization)
+%       [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
 %
 %       This function reads an LDR stack from a directory, dir_name, given
 %       an image format.
@@ -16,10 +16,11 @@ function stack = ReadLDRStack(dir_name, format, bNormalization)
 %        Output:
 %           -stack: a stack of LDR images, in floating point (single)
 %           format. No normalization is applied.
+%           -norm_value:
 %
 %     This function reads a stack of images from the disk
 %
-%     Copyright (C) 2011-15  Francesco Banterle
+%     Copyright (C) 2011-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -38,6 +39,8 @@ function stack = ReadLDRStack(dir_name, format, bNormalization)
 if(~exist('bNormalization', 'var'))
     bNormalization = 0;
 end
+
+norm_value = 1.0;
 
 list = dir([dir_name, '/*.', format]);
 n = length(list);
