@@ -1,6 +1,6 @@
-function [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
+function [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization, bToSingle)
 %
-%       [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
+%       [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization, bToSingle)
 %
 %       This function reads an LDR stack from a directory, dir_name, given
 %       an image format.
@@ -12,6 +12,7 @@ function [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
 %           'png', 'tiff', 'bmp', etc.
 %           -bNormalization: is a flag for normalizing or not the stack in
 %           [0, 1].
+%           -bToSingle:
 %
 %        Output:
 %           -stack: a stack of LDR images, in floating point (single)
@@ -38,6 +39,14 @@ function [stack, norm_value] = ReadLDRStack(dir_name, format, bNormalization)
 
 if(~exist('bNormalization', 'var'))
     bNormalization = 0;
+end
+
+if(~exist('bToSingle', 'var'))
+    bToSingle = 1;
+end
+
+if(bNormalization)
+    bToSingle = 1;
 end
 
 norm_value = 1.0;
@@ -141,10 +150,14 @@ if(n > 0)
         for i=1:n
             disp(list(i).name);
             %read an image, and convert it into floating-point
-            img = single(imread([dir_name, '/', list(i).name]));  
+            img_tmp = imread([dir_name, '/', list(i).name]);  
 
             %store in the stack
-            stack(:,:,:,i) = img;    
+            if(bToSingle)
+                stack(:,:,:,i) = single(img_tmp);   
+            else
+                stack(:,:,:,i) = img_tmp;   
+            end
         end
 
         if(bNormalization)
