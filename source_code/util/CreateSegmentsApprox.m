@@ -13,7 +13,7 @@ function imgBin = CreateSegmentsApprox(img)
 %       This function segments an image into different dynamic range zones
 %       based on their order of magnitude.
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ guide = log10(L) - min_L + 1;
 imgBin_max = max(guide(:));
 
 for i=1:(maxIterations / 4)
-    disp([i, maxIterations]);
     imgBin = bilateralFilter(imgBin, guide, 0, imgBin_max, 4, 0.25);
 end
 
