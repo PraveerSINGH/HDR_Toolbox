@@ -42,7 +42,7 @@ if(~exist('pEpsilon', 'var'))
 end
 
 %precomputation of 9 filtered images
-sMax = 9; 
+sMax = 8; 
 [r, c] = size(L);
 V_vec = zeros(r, c, sMax);
 

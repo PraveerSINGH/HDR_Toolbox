@@ -41,7 +41,7 @@ if(~exist('pEpsilon', 'var'))
     pEpsilon = 0.05; %as in the original paper
 end
 
-sMax = 9;     
+sMax = 8;     
 tmp = ((2^pPhi) * pAlpha) / (sMax^2);
 L_tmp = L ./ (L + tmp);
 L_adapt = bilateralFilter(L_tmp, [], 0, max(L_tmp(:)), 1.6, pEpsilon);
