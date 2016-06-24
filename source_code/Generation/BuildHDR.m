@@ -8,6 +8,8 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %           -stack: an input stack of LDR images. This has to be set if we
 %           the stack is already in memory and we do not want to load it
 %           from the disk using the tuple (dir_name, format).
+%           If the stack is a single or dobule, values are assumed to be in
+%           the range [0,1].
 %
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s).
@@ -129,13 +131,6 @@ end
 
 if(isa(stack, 'uint16'))
     scale = 65535.0;
-end
-
-if(isa(stack, 'double') | isa(stack, 'single'))
-    max_val = max(stack(:));
-    if(max_val > 1.0) 
-        scale = max_val;
-    end
 end
 
 %is the inverse camera function ok? Do we need to recompute it?

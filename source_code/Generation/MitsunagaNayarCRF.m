@@ -6,7 +6,8 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
 %       Nayar method.
 %
 %        Input:
-%           -stack: a stack of LDR images.
+%           -stack: a stack of LDR images. If the stack is a single or
+%           double values are assumed to be in [0,1].
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s).
 %           -N: polynomial degree of the inverse CRF
@@ -49,6 +50,14 @@ if(isempty(stack_exposure))
 end
 
 col = size(stack, 3);
+
+if(isa(stack, 'uint8'))
+    stack = single(stack) / 255.0;
+end
+
+if(isa(stack, 'uint16'))
+    stack = single(stack) / 65535.0;
+end
 
 %stack sub-sampling
 stack_hist = ComputeLDRStackHistogram(stack);

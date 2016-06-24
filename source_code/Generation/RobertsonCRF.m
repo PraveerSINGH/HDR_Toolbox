@@ -6,7 +6,8 @@ function [lin_fun, max_lin_fun] = RobertsonCRF(stack, stack_exposure, max_iterat
 %       Nayar method.
 %
 %        Input:
-%           -stack: a stack of LDR images
+%           -stack: a stack of LDR images. If the stack is a single or
+%           double values are assumed to be in [0,1].
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s)
 %           -max_iterations: max number of iterations
@@ -69,13 +70,6 @@ if(isa(stack, 'uint16'))
     scale = 65535.0;
 end
 
-if(isa(stack, 'double') | isa(stack, 'single'))
-    max_val = max(stack(:));
-    if(max_val > 1.0) 
-        scale = max_val;
-    end
-end
-
 col =  size(stack, 3);
 lin_fun = zeros(256, col);
 
@@ -89,7 +83,7 @@ for i=1:max_iterations
     end
 
     x_tilde = Update_X(stack, stack_exposure, lin_fun, scale);
-    lin_fun = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun); 
+    lin_fun = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun, scale); 
             
     err = ComputeError(x_tilde, stack, stack_exposure, lin_fun, scale);
     if(err < err_threshold)
@@ -156,7 +150,7 @@ function imgOut = Update_X(stack, stack_exposure, lin_fun, scale)
     imgOut(totWeight < saturation) = -1.0;
 end
 
-function f_out = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun)
+function f_out = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun, scale)
     col = size(x_tilde, 3);
 
     n = length(stack_exposure);
@@ -170,7 +164,7 @@ function f_out = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun)
 
             card_m = 0;
             for k=1:n
-                tmp = stack(:,:,i,k);
+                tmp = round(single(stack(:,:,i,k)) / scale * 255);
 
                 tmp_x_tilde_ind = tmp_x_tilde(tmp == j);
 

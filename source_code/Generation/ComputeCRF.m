@@ -6,7 +6,8 @@ function [lin_fun, max_lin_fun] = ComputeCRF(stack, stack_exposure, nSamples, sa
 %       Malik method.
 %
 %        Input:
-%           -stack: a stack of LDR images
+%           -stack: a stack of LDR images. If the stack is a single or
+%           double values are assumed to be in [0,1].
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s)
 %           -nSamples: number of samples for computing the CRF
@@ -78,7 +79,13 @@ if(size(stack, 4) ~= length(stack_exposure))
     error('stack and stack_exposure have different number of exposures');
 end
 
-stack = normalizeFromAnything(stack);
+if(isa(stack, 'uint8'))
+    stack = single(stack) / 255.0;
+end
+
+if(isa(stack, 'uint16'))
+    stack = single(stack) / 65535.0;
+end
 
 col = size(stack, 3);
 
