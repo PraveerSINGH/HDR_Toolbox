@@ -1,23 +1,24 @@
-function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
+function [lin_fun, pp, err] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
 %
-%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
+%       [lin_fun, pp, err] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
 %
 %       This function computes camera response function using Mitsunaga and
 %       Nayar method.
 %
 %        Input:
 %           -stack: a stack of LDR images. If the stack is a single or
-%           double values are assumed to be in [0,1].
+%           double values are assumed to be in [0,1]
 %           -stack_exposure: an array containg the exposure time of each
-%           image. Time is expressed in second (s).
+%           image. Time is expressed in second (s)
 %           -N: polynomial degree of the inverse CRF
-%           -nSamples: number of samples for computing the CRF.
+%           -nSamples: number of samples for computing the CRF
 %
 %        Output:
-%           -pp: a polynomial encoding the inverse CRF.
-%           -lin_fun: tabled function
+%           -pp: a polynomial encoding the inverse CRF
+%           -lin_fun: tabled CRF
+%           -err: error function
 %
-%     Copyright (C) 2015  Francesco Banterle
+%     Copyright (C) 2015-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -34,11 +35,11 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
 %
 
 if(~exist('nSamples', 'var'))
-    nSamples = 1000;
+    nSamples = 255;
 end
 
 if(~exist('N', 'var'))
-    N = 5;
+    N = 3;
 end
 
 if(isempty(stack))
@@ -76,6 +77,8 @@ function d = MN_d(c, p, q, n)
 end
 
 pp = zeros(col, N + 1);
+
+err = 0.0;
 
 for channel=1:col
     Q = length(stack_exposure);
@@ -116,6 +119,16 @@ for channel=1:col
     c_n = 1.0 - sum(c);
     
     pp(channel, :) = [c_n, c'];
+    
+    %compute err
+    for q=1:(Q-1)
+        R = stack_exposure(q) / stack_exposure(q + 1);
+        for p=1:P
+            e1 = polyval(pp(channel,:), stack_samples(p, q    , channel));
+            e2 = polyval(pp(channel,:), stack_samples(p, q + 1, channel));
+            err = err + (e1 - R * e2).^2;
+        end
+    end
 end
 
 lin_fun = zeros(256, col);
