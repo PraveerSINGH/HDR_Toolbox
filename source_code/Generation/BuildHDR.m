@@ -135,7 +135,7 @@ end
 
 %is the inverse camera function ok? Do we need to recompute it?
 if((strcmp(lin_type, 'LUT') == 1) && isempty(lin_fun))
-    [lin_fun, ~] = ComputeCRF(single(stack) / scale, stack_exposure);        
+    [lin_fun, ~] = DebevecCRF(single(stack) / scale, stack_exposure);        
 end
 
 gamma_k = strfind(lin_type, 'gamma');

@@ -88,6 +88,7 @@ for i=1:length(LumZone)
     mask(BTMO_segments == LumZone(i)) = TMOForZone(i);
 end
 
+imwrite(mask, 'mask.png');
 %check for Drago et al.'s operator
 indx0 = find(mask == 1);
 
@@ -113,7 +114,7 @@ else
     length(indx1)
     length(indx0)
     if(isempty(indx1))
-        imgOut = ReinhardTMO(img, -1, -1, 'local', -1);
+        imgOut = ReinhardTMO(img, -1, -1, 'bilateral', -1);
         BTMO_which_operator = 'ReinhardTMO';
         disp('The BanterleTMO is using ReinhardTMO only');
     end

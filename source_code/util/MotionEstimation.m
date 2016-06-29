@@ -40,7 +40,6 @@ if(~exist('bVisualize', 'var'))
     bVisualize = 0;
 end
 
-bAuto = 0;
 if(~exist('blockSize', 'var'))
     bAuto = 1;
 else
@@ -85,6 +84,7 @@ uv = zeros(block_r, block_c, 4);
 
 k_vec = [];
 l_vec = [];
+n_vec = [];
 for k=(-shift):shift
 	for l=(-shift):shift
         k_vec = [k_vec, k];

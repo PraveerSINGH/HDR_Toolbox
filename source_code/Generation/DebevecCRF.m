@@ -1,6 +1,6 @@
-function [lin_fun, max_lin_fun] = ComputeCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
+function [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
 %
-%       [lin_fun, max_lin_fun] = ComputeCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
+%       [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
 %
 %       This function computes camera response function using Debevec and
 %       Malik method.
@@ -39,9 +39,7 @@ function [lin_fun, max_lin_fun] = ComputeCRF(stack, stack_exposure, nSamples, sa
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%
-%
-%
+
 
 if(~exist('nSamples', 'var'))
     nSamples = 256;
@@ -55,20 +53,16 @@ if(~exist('sampling_strategy', 'var'))
     sampling_strategy = 'Grossberg';
 end
 
-if(isempty(sampling_strategy))
-    sampling_strategy = 'Grossberg';
-end
-
 if(~exist('bNormalize', 'var'))
     bNormalize = 1;
 end
 
 if(isempty(stack))
-    error('ComputeCRF: a stack cannot be empty!');
+    error('DebevecCRF: a stack cannot be empty!');
 end
 
 if(isempty(stack_exposure))
-    error('ComputeCRF: a stack_exposure cannot be empty!');
+    error('DebevecCRF: a stack_exposure cannot be empty!');
 end
 
 if(~exist('smoothing_term', 'var'))
@@ -93,21 +87,7 @@ col = size(stack, 3);
 W = WeightFunction(0:(1 / 255):1, 'Deb97');
 
 %stack sub-sampling
-switch sampling_strategy
-    case 'Grossberg'
-        stack_hist = ComputeLDRStackHistogram(stack);
-        stack_samples = GrossbergSampling(stack_hist, nSamples);
-        
-    case 'RandomSpatial'
-        stack_samples = RandomSpatialSampling(stack, nSamples);
-
-    case 'RegularSpatial'
-        stack_samples = RegularSpatialSampling(stack, nSamples);
-        
-    otherwise
-        stack_hist = ComputeLDRStackHistogram(stack);
-        stack_samples = GrossbergSampling(stack_hist, nSamples);
-end
+stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy );
 
 %recovering the CRF
 lin_fun = zeros(256, col);

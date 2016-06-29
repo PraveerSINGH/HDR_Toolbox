@@ -23,7 +23,7 @@ disp('2) Read exposure values from the exif');
 stack_exposure = ReadLDRStackInfo(name_folder, format);
 
 disp('3) Estimate the Camera Response Function (CRF)');
-[lin_fun, ~] = ComputeCRF(stack, stack_exposure, 256);    
+[lin_fun, ~] = DebevecCRF(stack, stack_exposure, 256);    
 h = figure(1);
 set(h, 'Name', 'The Camera Response Function (CRF)');
 plot(0:255, lin_fun(:,1), 'r', 0:255, lin_fun(:,2),'g', 0:255, lin_fun(:,3), 'b');

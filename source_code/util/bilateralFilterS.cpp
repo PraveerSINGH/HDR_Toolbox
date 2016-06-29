@@ -26,6 +26,7 @@
 
 #include "mex.h"
 #include <random>
+#include <chrono>
 
 #define MAX(a,b) a > b ? a : b
 
@@ -90,7 +91,7 @@ void bilateralFilterS(double *img_in, double *img_edge, double *out, int width, 
 
     int nSamples = 2 * KernelSize(sigma_s);
 
-    std::mt19937 m(0);
+    std::mt19937 m(std::chrono::system_clock::now().time_since_epoch().count());
     float *tmp_out = new float[channels];
     float *tmp_cur = new float[channels];
     float *tmp_cur_edge = new float[channels];

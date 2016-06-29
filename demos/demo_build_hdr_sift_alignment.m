@@ -27,7 +27,7 @@ disp('3) Align the stack using VLFeat''s SIFT');
 stackOut = SiftAlignment(stack, 1);
 
 disp('4) Estimage the CRF');
-[lin_fun, ~] = ComputeCRF(stack, stack_exposure);  
+[lin_fun, ~] = DebevecCRF(stack, stack_exposure);  
 h = figure(1);
 set(h, 'Name', 'The Camera Response Function (CRF)');
 plot(lin_fun);
