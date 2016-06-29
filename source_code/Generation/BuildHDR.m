@@ -218,7 +218,22 @@ if(bSaturation)
     [t, index] = min(stack_exposure);
     
     mask = max(mask, [], 3);
-    slice = stack(:,:,:,index) / (t * scale);
+    
+    tmpStack = ClampImg(single(stack(:,:,:,index)) / scale, 0.0, 1.0);
+
+    switch lin_type
+        case 'gamma'
+            tmpStack = tmpStack.^gamma_value;
+        case 'sRGB'
+            tmpStack = ConvertRGBtosRGB(tmpStack, 1);
+
+        case 'LUT'
+            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
+
+        otherwise
+    end
+    
+    slice = tmpStack / t;
     
     for i=1:col
         tmp = imgOut(:,:,i);
@@ -226,23 +241,6 @@ if(bSaturation)
         tmp(mask == 1) = slice_i(mask == 1);
         imgOut(:,:,i) = tmp;
     end
-    
-%      for i=1:col
-%         slice = stack(:,:,i,index);
-%         max_val = double(max(slice(:))) / (t * scale);
-%  
-%         saturation_value = max_val;
-%  
-%         tmp = imgOut(:,:,i);
-%         tmp_stack = stack(:,:,i,index);
-%         tmp_tw = totWeight(:,:,i);        
-%         
-%         tmp(tmp_tw <= saturation) = slice(tmp_tw <= saturation)/ (t * scale);
-%        % tmp(tmp_tw < saturation & tmp_stack > 0.95) = saturation_value;
-%        % tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
-%          
-%         imgOut(:,:,i) = tmp;
-%     end
 end
 
 %forcing to double type for allowing this image to be used in some MATLAB functions

@@ -1,6 +1,6 @@
-function [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
+function [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, smoothing_term)
 %
-%       [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, bNormalize, smoothing_term)
+%       [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sampling_strategy, smoothing_term)
 %
 %       This function computes camera response function using Debevec and
 %       Malik method.
@@ -16,7 +16,6 @@ function [lin_fun, max_lin_fun] = DebevecCRF(stack, stack_exposure, nSamples, sa
 %               Nayar algorithm (CDF based)
 %               -'RandomSpatial': picking random samples in the image
 %               -'RegularSpatial': picking regular samples in the image
-%           -bNormalize: if 1 it enables function normalization
 %           -smoothing_term: a smoothing term for solving the linear
 %           system
 %
@@ -54,7 +53,7 @@ if(~exist('sampling_strategy', 'var'))
 end
 
 if(~exist('bNormalize', 'var'))
-    bNormalize = 1;
+    bNormalize = 0;
 end
 
 if(isempty(stack))
@@ -93,7 +92,7 @@ stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy );
 lin_fun = zeros(256, col);
 log_stack_exposure = log(stack_exposure);
 
-max_lin_fun = zeros(col, 1);
+max_lin_fun = zeros(1, col);
 
 for i=1:col
     g = gsolve(stack_samples(:,:,i), log_stack_exposure, smoothing_term, W);
@@ -101,10 +100,18 @@ for i=1:col
     
     lin_fun(:,i) = g;
     max_lin_fun(i) = max(g);
-    
-    if(bNormalize && (max_lin_fun(i) > 0.0))
-        lin_fun(:,i) = lin_fun(:,i) / max_lin_fun(i);
-    end
+end
+
+%color correction
+gray = zeros(1,3);
+for i=1:col
+    gray(i) = lin_fun(128, i);
+end
+
+scale = FindChromaticyScale([0.5, 0.5, 0.5], gray);
+
+for i=1:col
+    lin_fun(:,i) = scale(i) * lin_fun(:,i);
 end
 
 end
