@@ -52,10 +52,6 @@ if(~exist('sampling_strategy', 'var'))
     sampling_strategy = 'Grossberg';
 end
 
-if(~exist('bNormalize', 'var'))
-    bNormalize = 0;
-end
-
 if(isempty(stack))
     error('DebevecCRF: a stack cannot be empty!');
 end
@@ -108,7 +104,7 @@ for i=1:col
     gray(i) = lin_fun(128, i);
 end
 
-scale = FindChromaticyScale([0.5, 0.5, 0.5], gray);
+scale = FindChromaticyScale([0.5, 0.5, 0.5], gray)
 
 for i=1:col
     lin_fun(:,i) = scale(i) * lin_fun(:,i);

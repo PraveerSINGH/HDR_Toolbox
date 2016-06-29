@@ -22,6 +22,8 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %                      - 'LUT': the lineraziation function is a look-up
 %                               table defined stored as an array in the 
 %                               lin_fun 
+%                      - 'poly': the lineraziation function is a polynomial
+%                               stored in lin_fun 
 %
 %           -lin_fun: it is the camera response function of the camera that
 %           took the pictures in the stack. If it is empty, [], and 
@@ -152,6 +154,9 @@ end
 %this value is added for numerical stability
 delta_value = 1.0 / 65536.0;
 
+[~, index_sat] = min(stack_exposure);
+slice_sat = [];
+
 %for each LDR image...
 for i=1:n
     tmpStack = ClampImg(single(stack(:,:,:,i)) / scale, 0.0, 1.0);
@@ -159,21 +164,33 @@ for i=1:n
     %computing the weight function    
     weight  = WeightFunction(tmpStack, weight_type, bMeanWeight);
 
-    %imwrite(weight, ['test', num2str(i), '.bmp']);
     %linearization of the image
     switch lin_type
         case 'gamma'
             tmpStack = tmpStack.^gamma_value;
+            
         case 'sRGB'
             tmpStack = ConvertRGBtosRGB(tmpStack, 1);
 
         case 'LUT'
-            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
-
+            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);   
+            
+        case 'poly'
+            for c=1:size(lin_fun, 2)
+                tmpStack(:,:,c) = polyval(lin_fun(:,c), tmpStack(:,:,c));
+            end
+            
         otherwise
     end
+    
+    %fetch exposure time
+    t = stack_exposure(i);     
+    
+    if(i == index_sat)
+        slice_sat = tmpStack / t;
+    end
    
-    %summing things up...
+    %sum things up...
     t = stack_exposure(i);    
     if(t > 0.0)                
         switch merge_type
@@ -215,29 +232,11 @@ end
 
 %handling saturated pixels
 if(bSaturation)
-    [t, index] = min(stack_exposure);
-    
     mask = max(mask, [], 3);
-    
-    tmpStack = ClampImg(single(stack(:,:,:,index)) / scale, 0.0, 1.0);
-
-    switch lin_type
-        case 'gamma'
-            tmpStack = tmpStack.^gamma_value;
-        case 'sRGB'
-            tmpStack = ConvertRGBtosRGB(tmpStack, 1);
-
-        case 'LUT'
-            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
-
-        otherwise
-    end
-    
-    slice = tmpStack / t;
-    
+        
     for i=1:col
         tmp = imgOut(:,:,i);
-        slice_i = slice(:,:,i);
+        slice_i = slice_sat(:,:,i);
         tmp(mask == 1) = slice_i(mask == 1);
         imgOut(:,:,i) = tmp;
     end

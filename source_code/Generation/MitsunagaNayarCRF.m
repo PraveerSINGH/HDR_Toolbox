@@ -69,7 +69,7 @@ if(isa(stack, 'uint16'))
 end
 
 %sorting exposures
-[stack_exposure_sorted, ind] = sort(stack_exposure, 'descend');
+[stack_exposure_sorted, ind] = sort(stack_exposure, 'ascend');
 
 if(sum(abs(stack_exposure_sorted - stack_exposure)) > 0.0)
     stack_sorted = zeros(size(stack));
@@ -89,11 +89,10 @@ stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy );
 if(N > 0)
     [pp, ~] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, N);
 else
-    [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 1);
+    [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 2);
     
-    for i=2:10
+    for i=3:10
         [t_pp, t_err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, i);
-        disp([err, t_err])
         if(t_err < err)
             err = t_err;
             pp = t_pp;
@@ -104,14 +103,14 @@ end
 lin_fun = zeros(256, col);
 
 gray = 0.5 * ones(1,3);
-for i=1:col
-    gray(i) = polyval(pp(i,:), gray(i));
+for c=1:col
+    gray(c) = polyval(pp(:,c), gray(c));
 end
 
 scale = FindChromaticyScale([0.5, 0.5, 0.5], gray);
 
-for i=1:col
-    lin_fun(:,i) = scale(i) * polyval(pp(i,:), 0:(1.0 / 255.0):1);
+for c=1:col
+    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0:(1.0 / 255.0):1);
 end
 
 end

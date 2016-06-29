@@ -44,7 +44,7 @@ function d = MN_d(c, q, n)
     d = M_q.^n - R(q) * (M_q_p.^n);
 end
 
-pp = zeros(col, N + 1);
+pp = zeros(N + 1, col);
 
 
 threshold = 1e-3;
@@ -66,7 +66,7 @@ for c=1:col
     bLoop = 1;
 
     while(bLoop)
-        R_prev = R;        
+              
         A = zeros(N, N);
         b = zeros(N, 1);
 
@@ -89,31 +89,31 @@ for c=1:col
         coeff = A \ b;    
         coeff_n = 1.0 - sum(coeff);
 
-        pp(c, :) = [coeff_n, coeff'];
+        pp(:,c) = [coeff_n, coeff'];
         
         %threhold
-        f_1 = polyval(pp(c,:),      x);
-        f_2 = polyval(pp_prev(c,:), x);
+        f_1 = polyval(pp(:,c),      x);
+        f_2 = polyval(pp_prev(:,c), x);
         bLoop = max(abs(f_1 - f_2) > threshold);
                     
         if(bLoop) 
+            pp_prev = pp;
+                        
             %update R
             for q=1:(Q - 1)
-                R(i) = 0.0;
-                e1 = polyval(pp(c,:), stack_samples(:, q    , c));
-                e2 = polyval(pp(c,:), stack_samples(:, q + 1, c));
-                R(i) = R(i) + sum(e1 ./ e2);
-            end
-            
-            pp_prev = pp;
+                R(q) = 0.0;
+                e1 = polyval(pp(:,c), stack_samples(:, q    , c));
+                e2 = polyval(pp(:,c), stack_samples(:, q + 1, c));
+                R(q) = R(q) + sum(e1 ./ e2);
+            end            
         end
     end
     
     %compute err
     for q=1:(Q - 1)
-        e1 = polyval(pp(c,:), stack_samples(:, q    , c));
-        e2 = polyval(pp(c,:), stack_samples(:, q + 1, c));
-        err = err + sum((e1 - R_prev(q) * e2).^2);
+        e1 = polyval(pp(:,c), stack_samples(:, q    , c));
+        e2 = polyval(pp(:,c), stack_samples(:, q + 1, c));
+        err = err + sum((e1 - R(q) * e2).^2);
     end
 end
 
