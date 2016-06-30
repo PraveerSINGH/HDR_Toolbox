@@ -65,6 +65,7 @@ for c=1:col
     R = R0;
     bLoop = 1;
 
+    iter = 0;
     while(bLoop)
               
         A = zeros(N, N);
@@ -105,7 +106,13 @@ for c=1:col
                 e1 = polyval(pp(:,c), stack_samples(:, q    , c));
                 e2 = polyval(pp(:,c), stack_samples(:, q + 1, c));
                 R(q) = R(q) + sum(e1 ./ e2);
-            end            
+            end   
+            
+            iter = iter + 1;
+            
+            if(iter > 10)
+                bLoop = 0;
+            end
         end
     end
     

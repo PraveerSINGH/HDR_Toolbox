@@ -68,6 +68,7 @@ for c=1:col
     R = R0;
     bLoop = 1;
 
+    iter = 0;
     while(bLoop)
         R_prev = R;        
         A = zeros(N, N);
@@ -120,6 +121,12 @@ for c=1:col
             end
             
             pp_prev = pp;
+            
+            iter = iter + 1;
+            
+            if(iter > 15)
+                bLoop = 0;
+            end
         end
     end
     

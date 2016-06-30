@@ -149,6 +149,7 @@ if(gamma_k == 1)
     end
     
     lin_type = 'gamma';
+    lin_fun = gamma_value;
 end
 
 %this value is added for numerical stability
@@ -165,23 +166,7 @@ for i=1:n
     weight  = WeightFunction(tmpStack, weight_type, bMeanWeight);
 
     %linearization of the image
-    switch lin_type
-        case 'gamma'
-            tmpStack = tmpStack.^gamma_value;
-            
-        case 'sRGB'
-            tmpStack = ConvertRGBtosRGB(tmpStack, 1);
-
-        case 'LUT'
-            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);   
-            
-        case 'poly'
-            for c=1:size(lin_fun, 2)
-                tmpStack(:,:,c) = polyval(lin_fun(:,c), tmpStack(:,:,c));
-            end
-            
-        otherwise
-    end
+    tmpStack = RemoveCRF(tmpStack, lin_type, lin_fun);
     
     %fetch exposure time
     t = stack_exposure(i);     

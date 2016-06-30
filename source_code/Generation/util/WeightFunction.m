@@ -78,7 +78,9 @@ switch weight_type
         sigma_sq_2 = sigma * sigma * 2;
         weight = exp(-4 * (img - mu).^2 / sigma_sq_2);
         
+%        shift_val = exp(-4 * (0.0 - mu).^2 / sigma_sq_2);
         shift_val = exp(-4 * (0.0 - mu).^2 / sigma_sq_2);
+%        scale_val = exp(-4 * (0.5 - mu).^2 / sigma_sq_2);
         scale_val = exp(-4 * (0.5 - mu).^2 / sigma_sq_2);
         
         weight = (weight - shift_val) / (scale_val - shift_val);

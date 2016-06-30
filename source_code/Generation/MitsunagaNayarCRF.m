@@ -39,11 +39,11 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, s
 %
 
 if(~exist('nSamples', 'var'))
-    nSamples = 256;
+    nSamples = 1024;
 end
 
 if(~exist('sampling_strategy', 'var'))
-    sampling_strategy = 'Grossberg';
+    sampling_strategy = 'RegularSpatial';
 end
 
 if(~exist('N', 'var'))
@@ -69,7 +69,7 @@ if(isa(stack, 'uint16'))
 end
 
 %sorting exposures
-[stack_exposure_sorted, ind] = sort(stack_exposure, 'ascend');
+[stack_exposure_sorted, ind] = sort(stack_exposure, 'descend');
 
 if(sum(abs(stack_exposure_sorted - stack_exposure)) > 0.0)
     stack_sorted = zeros(size(stack));
@@ -102,7 +102,7 @@ end
 
 lin_fun = zeros(256, col);
 
-gray = 0.5 * ones(1,3);
+gray = 0.5 * ones(1, col);
 for c=1:col
     gray(c) = polyval(pp(:,c), gray(c));
 end
