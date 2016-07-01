@@ -39,7 +39,7 @@ if(~exist('bPhotoshopCompatibility', 'var'))
 end
 
 %open the file
-fid = fopen(filename, 'w', endian_mode);
+fid = fopen(filename, 'W', endian_mode);
 
 [n, m, c] = size(img);
 
