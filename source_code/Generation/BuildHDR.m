@@ -34,7 +34,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %               - 'all':   weight is set to 1
 %               - 'hat':   hat function 1-(2x-1)^12
 %               - 'Deb97': Debevec and Malik 97 weight function
-%               - 'Gauss': Gaussian function as weight function.
+%               - 'Robertson': a Gaussian function as weight function.
 %                          This function produces good results when some 
 %                          under-exposed or over-exposed images are present
 %                          in the stack.

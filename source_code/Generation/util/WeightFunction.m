@@ -10,9 +10,7 @@ function weight = WeightFunction(img, weight_type, bMeanWeight, bounds)
 %               - 'hat': hat function 1-(2x-1)^12
 %               - 'box': weight is set to 1 in [bounds(1), bounds(2)]
 %               - 'Deb97': Debevec and Malik 97 weight function
-%               - 'Gauss': Gaussian (mu = 0.5, sigma=0.15) 
-%               - 'Robertson': Robertson Gaussian (mu = 0.5, sigma=0.15)
-%               with shifting and scaling
+%               - 'Robertson': a Gaussian with shifting and scaling
 %           -bMeanWeight:
 %           -bounds: range of valid values for Deb97 and box
 %
@@ -64,26 +62,13 @@ switch weight_type
     case 'box'
         weight = ones(size(img));
         weight(img < bounds(1)) = 0.0;
-        weight(img > bounds(2)) = 0.0;
-        
-    case 'Gauss'
-        mu = 0.5;
-        sigma = 0.5;
-        sigma_sq_2 = sigma * sigma * 2;
-        weight = exp(-4 * (img - mu).^2 / sigma_sq_2);
+        weight(img > bounds(2)) = 0.0;        
         
     case 'Robertson'
-        mu = 0.5;
-        sigma = 0.5;
-        sigma_sq_2 = sigma * sigma * 2;
-        weight = exp(-4 * (img - mu).^2 / sigma_sq_2);
-        
-%        shift_val = exp(-4 * (0.0 - mu).^2 / sigma_sq_2);
-        shift_val = exp(-4 * (0.0 - mu).^2 / sigma_sq_2);
-%        scale_val = exp(-4 * (0.5 - mu).^2 / sigma_sq_2);
-        scale_val = exp(-4 * (0.5 - mu).^2 / sigma_sq_2);
-        
-        weight = (weight - shift_val) / (scale_val - shift_val);
+        shift    = exp(-4);
+        scaleDiv = (1.0 - shift);
+        t = x - 0.5;
+        weight = (exp(-16.0 * (t .* t) ) - shift) / scaleDiv;
             
     case 'hat'
         weight = 1 - (2 * img - 1).^12;
