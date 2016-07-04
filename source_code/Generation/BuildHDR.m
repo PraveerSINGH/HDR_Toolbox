@@ -201,24 +201,19 @@ if(strcmp(merge_type, 'log') == 1)
 end
 
 %checking for saturated pixels
-bSaturation = 0;
 saturation = 1e-4;
 
 if(~isempty(totWeight <= saturation))
-    bSaturation = 1;
+    disp('WARNING: the stack has saturated pixels!');
+
     mask = zeros(size(totWeight));
     mask(totWeight <= saturation) = 1;
-    disp('WARNING: the stack has saturated pixels!');
+    mask = max(mask, [], 3);
     
     if(exist('debug_mode', 'var'))
         imwrite(mask, 'saturation_mask.bmp');
     end
-end
 
-%handling saturated pixels
-if(bSaturation)
-    mask = max(mask, [], 3);
-        
     for i=1:col
         tmp = imgOut(:,:,i);
         slice_i = slice_sat(:,:,i);
