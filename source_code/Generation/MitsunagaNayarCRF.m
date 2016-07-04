@@ -84,7 +84,7 @@ if(sum(abs(stack_exposure_sorted - stack_exposure)) > 0.0)
     clear('stack_exposure_sorted');
 end
 
-stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy );
+stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy );
 
 if(N > 0)
     [pp, ~] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, N);

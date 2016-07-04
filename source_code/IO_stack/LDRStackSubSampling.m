@@ -1,6 +1,6 @@
-function stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy )
+function stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy )
 %
-%       stack_samples = LDRStackSubSampling(stack, nSamples, sampling_strategy )
+%       stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy )
 %
 %       This function subsamples a stack
 %
@@ -45,6 +45,9 @@ if(~exist('sampling_strategy', 'var'))
     sampling_strategy = 'Grossberg';
 end
 
+[~, sort_index] = sort(stack_exposure, 'descend');
+sort_index = sort_index';
+
 %stack sub-sampling
 switch sampling_strategy
     case 'Grossberg'
@@ -52,14 +55,15 @@ switch sampling_strategy
         stack_samples = GrossbergSampling(stack_hist, nSamples);
         
     case 'RandomSpatial'
-        stack_samples = RandomSpatialSampling(stack, nSamples);
+        stack_samples = RandomSpatialSampling(stack, sort_index, nSamples);
+        stack_samples = round(stack_samples * 255);
 
     case 'RegularSpatial'
-        stack_samples = RegularSpatialSampling(stack, nSamples);
+        stack_samples = RegularSpatialSampling(stack, sort_index, nSamples);
+        stack_samples = round(stack_samples * 255);
         
     otherwise
-        stack_hist = ComputeLDRStackHistogram(stack);
-        stack_samples = GrossbergSampling(stack_hist, nSamples);
+        error('LDRStackSubSampling: A sampling strategy neeeds to be specified.');
 end
 
 end

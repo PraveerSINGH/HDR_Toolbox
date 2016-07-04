@@ -86,7 +86,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 
 %merge type, if it is not set the default is 'log'
 if(~exist('merge_type', 'var'))
-    merge_type = 'linear';
+    merge_type = 'log';
 end
 
 if(~exist('bMeanWeight', 'var'))

@@ -84,7 +84,7 @@ hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
 for i=1:hdrv.totalFrames
-    disp(['Processing frame ',num2str(i)]);
+    disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
     
     %Only physical values
