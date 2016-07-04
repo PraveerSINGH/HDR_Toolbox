@@ -27,10 +27,10 @@ disp('3) Read exposure values from the exif');
 stack_exposure = ReadLDRStackInfo(name_folder, format);
 
 disp('4) Estimate the Camera Response Function (CRF)');
-[lin_fun, ~] = DebevecCRF(stack, stack_exposure);    
+[lin_fun, ~] = DebevecCRF(stackOut, stack_exposure);    
 h = figure(1);
 set(h, 'Name', 'The Camera Response Function (CRF)');
-plot(lin_fun);
+plot(0:255, lin_fun(:,1), 'r', 0:255, lin_fun(:,2),'g', 0:255, lin_fun(:,3), 'b');
 
 disp('5) Build the radiance map using the stack and stack_exposure');
 [imgHDR, lin_fun] = BuildHDR(stackOut, stack_exposure, 'LUT', lin_fun, 'Gauss', 'linear', 0);
