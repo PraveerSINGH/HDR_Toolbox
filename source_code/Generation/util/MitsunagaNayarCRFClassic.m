@@ -60,6 +60,8 @@ for q=1:(Q - 1)
     R0(q) = stack_exposure(q) / stack_exposure(q + 1);
 end
 
+max_iterations = 10;
+
 for c=1:col
     
     R = R0;
@@ -102,15 +104,14 @@ for c=1:col
                         
             %update R
             for q=1:(Q - 1)
-                R(q) = 0.0;
                 e1 = polyval(pp(:,c), stack_samples(:, q    , c));
                 e2 = polyval(pp(:,c), stack_samples(:, q + 1, c));
-                R(q) = R(q) + sum(e1 ./ e2);
+                R(q) = sum(e1 ./ e2);
             end   
             
             iter = iter + 1;
             
-            if(iter > 10)
+            if(iter > max_iterations)
                 bLoop = 0;
             end
         end

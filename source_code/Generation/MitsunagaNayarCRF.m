@@ -39,7 +39,7 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, s
 %
 
 if(~exist('nSamples', 'var'))
-    nSamples = 1024;
+    nSamples = 256;
 end
 
 if(~exist('sampling_strategy', 'var'))
@@ -69,7 +69,7 @@ if(isa(stack, 'uint16'))
 end
 
 %sorting exposures
-[stack_exposure_sorted, ind] = sort(stack_exposure, 'descend');
+[stack_exposure_sorted, ind] = sort(stack_exposure, 'ascend');
 
 if(sum(abs(stack_exposure_sorted - stack_exposure)) > 0.0)
     stack_sorted = zeros(size(stack));

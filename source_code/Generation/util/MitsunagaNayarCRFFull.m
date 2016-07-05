@@ -45,7 +45,6 @@ end
 
 pp = zeros(col, N + 1);
 
-
 threshold = 1e-3;
 
 err = 0.0;
@@ -62,6 +61,8 @@ for q1=1:(Q - 1)
         end
     end
 end
+
+max_iterations = 10;
 
 for c=1:col
     
@@ -112,10 +113,9 @@ for c=1:col
             for q1=1:(Q - 1)
                 for q2=1:(Q - 1)
                     if(q1 ~= q2)
-                        R(q1, q2) = 0.0;
                         e1 = polyval(pp(c,:), stack_samples(:, q1, c));
                         e2 = polyval(pp(c,:), stack_samples(:, q2, c));
-                        R(q1, q2) = R(q1, q2) + sum(e1 ./ e2);
+                        R(q1, q2) = sum(e1 ./ e2);
                     end
                 end
             end
@@ -124,7 +124,7 @@ for c=1:col
             
             iter = iter + 1;
             
-            if(iter > 15)
+            if(iter > max_iterations)
                 bLoop = 0;
             end
         end

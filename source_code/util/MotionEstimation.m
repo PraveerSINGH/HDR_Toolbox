@@ -69,7 +69,7 @@ end
 
 switch me_bidi_mode
     case 'hdr'
-        imgCur = log10(imgCur + 1e-6);
+        imgCur  = log10(imgCur  + 1e-6);
         imgNext = log10(imgNext + 1e-6);
 end
 
