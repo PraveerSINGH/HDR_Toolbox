@@ -80,7 +80,7 @@ for i=1:n
                     tmpStack = ConvertRGBtosRGB(tmpStack, 1);
 
                 case 'tabledDeb97'
-                    tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
+                    tmpStack = tabledFunction(tmpStack, lin_fun);            
                 otherwise
             end
           

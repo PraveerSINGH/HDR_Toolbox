@@ -68,7 +68,7 @@ for i=1:(ldrv.totalFrames - 1)
     [img2, ldrv] = ldrvGetFrame(ldrv, i + 1);
     
     %linearization
-    img2 = tabledFunction(round(img2 * 255), crf);
+    img2 = tabledFunction(img2, crf);
              
     imgHDR = BanterleEnhanceLDRFrame(img1, img2, hdri, 'linear');
     

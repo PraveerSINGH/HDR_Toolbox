@@ -44,7 +44,7 @@ switch lin_type
         imgOut = ConvertRGBtosRGB(img, 1);
 
     case 'LUT'
-        imgOut = tabledFunction(round(img * 255), lin_fun);   
+        imgOut = tabledFunction(img, lin_fun);   
 
     case 'poly'
         imgOut = zeros(size(img));

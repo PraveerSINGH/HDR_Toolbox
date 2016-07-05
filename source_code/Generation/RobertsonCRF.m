@@ -134,7 +134,7 @@ function imgOut = Update_X(stack, stack_exposure, lin_fun, scale)
 
         %computing the weight function    
         weight  = WeightFunction(tmpStack, 'Gauss', 0);
-        tmpStack = tabledFunction(round(tmpStack * 255), lin_fun); 
+        tmpStack = tabledFunction(tmpStack, lin_fun); 
 
         %summing things up...
         t = stack_exposure(i);    
@@ -197,7 +197,7 @@ function err = ComputeError(x_tilde, stack, stack_exposure, lin_fun, scale)
     
        %computing the weight function    
        weight  = WeightFunction(tmpStack, 'Gauss', 0);
-       tmpStack = tabledFunction(round(tmpStack * 255), lin_fun); 
+       tmpStack = tabledFunction(tmpStack, lin_fun); 
        
        x_slice = ClampImg(stack_exposure(i) * x_tilde, 0.0, 1.0);
        

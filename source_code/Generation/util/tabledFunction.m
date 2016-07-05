@@ -30,11 +30,16 @@ function imgOut = tabledFunction(img, table)
 col = size(img, 3);
 
 total_values = size(table, 1);
-x = 0 : (total_values - 1);
+delta = 1.0 / (total_values - 1);
+x = 0 : delta : 1;
 imgOut = zeros(size(img));
 
 for i=1:col
     imgOut(:,:,i) = interp1(x, table(:, i), img(:,:,i), 'nearest', 'extrap');
+end
+
+end
+
 %     work = zeros(size(img(:,:,i)));
 %     
 %     values = unique(img(:,:,i));
@@ -46,6 +51,3 @@ for i=1:col
 %     end
 %     
 %     img(:,:,i) = work;
-end
-
-end
