@@ -68,22 +68,10 @@ if(isa(stack, 'uint16'))
     stack = single(stack) / 65535.0;
 end
 
-%sorting exposures
-[stack_exposure_sorted, ind] = sort(stack_exposure, 'ascend');
+%sort stack
+[stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
-if(sum(abs(stack_exposure_sorted - stack_exposure)) > 0.0)
-    stack_sorted = zeros(size(stack));
-    for i=1:length(stack_exposure)
-        stack_sorted(:,:,:,i) = stack(:,:,:,ind(i)); 
-    end
-    
-    stack = stack_sorted;
-    stack_exposure = stack_exposure_sorted;
-        
-    clear('stack_sorted');
-    clear('stack_exposure_sorted');
-end
-
+%subsample stack
 stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy );
 
 if(N > 0)
