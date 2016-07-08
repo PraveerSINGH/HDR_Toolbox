@@ -2,18 +2,30 @@ function image_target = reExpose(img_source, source_exposure, target_exposure, l
 %
 %       image_target = reExpose(img_source, source_exposure, target_exposure, lin_type, lin_fun)
 %       
-%       This function re-exposes an LDR image set        
-%       with respect to the target image.
+%       This function re-exposes an LDR source image with respect to the target image.
 %
 %        Input:
 %           -img_source:
 %           -source_exposure:
 %           -target_exposure:
-%           -lin_type:
-%           -lin_fun:
+%           -lin_type: the linearization function:
+%                      - 'linear': images are already linear
+%                      - 'gamma2.2': gamma function 2.2 is used for
+%                                    linearization;
+%                      - 'sRGB': images are encoded using sRGB
+%                      - 'LUT': the lineraziation function is a look-up
+%                               table defined stored as an array in the 
+%                               lin_fun 
+%                      - 'poly': the lineraziation function is a polynomial
+%                               stored in lin_fun 
+%
+%           -lin_fun: it is the camera response function of the camera that
+%           took the pictures in the stack. If it is empty, [], and 
+%           type is 'LUT' it will be estimated using Debevec and Malik's
+%           method.
 %
 %        Output:
-%           -image_target:
+%           -image_target: the re-exposed image
 %
 %     Copyright (C) 2015  Damla Ezgi Akcora
 % 
