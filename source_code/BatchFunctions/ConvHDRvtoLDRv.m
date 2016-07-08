@@ -7,10 +7,12 @@ function ConvHDRvtoLDRv(hdrv, filenameOutput, fstops, ldrv_gamma, ldrv_quality, 
 %
 %        Input:
 %           -hdrv:
-%           -nameOut:
-%           -fmtOut:
+%           -filenameOutput:
+%           -fstops:
 %           -ftops:
 %           -ldrv_gamma:
+%           -ldrv_quality:
+%           -ldrv_video_profile:
 %
 %
 %     Copyright (C) 2016  Francesco Banterle
@@ -65,19 +67,25 @@ if(strcmp(ext, 'avi') == 1 | strcmp(ext, 'mp4') == 1)
     open(writerObj);
 end
 
-hdrv = hdrvopen(hdrv, 'r');
+if(bVideo == 0)
+    mkdir([name,'_img']);
+end
 
-disp('Tone Mapping...');
+hdrv = hdrvopen(hdrv, 'r');
 
 n = length(fstops);
 
 for i=1:hdrv.totalFrames
     disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
+        
     frame(frame < 0) = 0;
     
-    j = mod(i, n);
+    frame = imresize(frame, 0.5, 'bilinear');
     
+    
+    j = mod(i, n) + 1;
+   
     frameOut = frame * 2^fstops(j);
     
     %Gamma/sRGB encoding
@@ -86,21 +94,16 @@ for i=1:hdrv.totalFrames
     else
         frameOut = ClampImg(GammaTMO(frameOut, ldrv_gamma, 0, 0), 0, 1);
     end
-    
+      
     %Storing 
     if(bVideo)
         writeVideo(writerObj, frameOut);
     else
-        nameOut = [name, sprintf('%.10d',i), '.', ext];
+        nameOut = [name, '_img/frame_', sprintf('%.10d',i), '.', ext];
         imwrite(frameOut, nameOut);
-    end    
-    
-    %Storing 
-    if(bVideo)
-        writeVideo(writerObj, frameOut);
-    else
-        nameOut = [name, sprintf('%.10d',i), '.', ext];
-        imwrite(frameOut, nameOut);
+
+        nameOut = [name, '_img/frame_', sprintf('%.10d',i), '.exr'];
+        hdrimwrite(frame, nameOut);
     end    
 end
 
