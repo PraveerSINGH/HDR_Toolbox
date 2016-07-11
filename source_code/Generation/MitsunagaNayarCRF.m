@@ -45,7 +45,7 @@ if(~exist('nSamples', 'var'))
 end
 
 if(~exist('sampling_strategy', 'var'))
-    sampling_strategy = 'Grossberg';
+    sampling_strategy = 'RegularSpatial';
 end
 
 if(~exist('N', 'var'))
@@ -108,15 +108,15 @@ end
 
 lin_fun = zeros(256, col);
 
-gray = 128 * ones(1, col);
+gray = 0.5 * ones(1, col);
 for c=1:col
     gray(c) = polyval(pp(:,c), gray(c));
 end
 
-scale = FindChromaticyScale([128, 128, 128], gray);
+scale = FindChromaticyScale([0.5, 0.5, 0.5], gray);
 
 for c=1:col
-    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0:1:255);
+    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0.0:1.0/255.0:1.0);
 end
 
 end

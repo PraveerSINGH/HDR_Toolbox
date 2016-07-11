@@ -34,11 +34,13 @@ col = size(stack_samples, 3);
 
 Q = length(stack_exposure);
 
+Mmax = 1.0;
+
 %recovering the CRF
 function d = MN_d(c, q1, q2, n)
 
-    M_q   = stack_samples(:, q1, c) + 1.0;
-    M_q_p = stack_samples(:, q2, c) + 1.0;
+    M_q   = stack_samples(:, q1, c)/255.0;
+    M_q_p = stack_samples(:, q2, c)/255.0;
 
     d = M_q.^n - R(q1, q2) * (M_q_p.^n);
 end
@@ -51,8 +53,7 @@ err = 0.0;
 
 pp_prev = zeros(N + 1, col);
 
-%x = 0:(1.0 / 255.0):1;
-x = 1.0:1.0:256.0;
+x = 0:(1.0 / 255.0):Mmax;
 %x = 1.0:(1.0 / 255.0):2.0;
 
 R0 = ones(Q - 1, Q - 1);
@@ -93,33 +94,33 @@ for c=1:col
             for q1=1:(Q - 1)
                 for q2=1:(Q - 1)
                     if(q1 ~= q2)
-                        b(i) = b(i) - sum(MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
+                        b(i) = b(i) - sum(Mmax * MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
                     end
                 end
             end
         end  
 
         coeff = A \ b;    
-        coeff_n = 1.0 - sum(coeff);
+        coeff_n = Mmax - sum(coeff);
 
-        pp(:, c) = [coeff', coeff_n];
-        pp(:, c) = flip(pp(:,c)');
+        pp(:,c) = [coeff', coeff_n];
+        pp(:,c) = flip(pp(:,c)');
         
         %threhold
-        f_1 = polyval(pp(:, c),      x);
-        f_2 = polyval(pp_prev(:, c), x);
+        f_1 = polyval(pp(:,c),      x);
+        f_2 = polyval(pp_prev(:,c), x);
         bLoop = max(abs(f_1 - f_2)) > threshold;
                     
-        %update R
-        for q1=1:(Q - 1)
-            for q2=1:(Q - 1)
-                if(q1 ~= q2)
-                    e1 = polyval(pp(:,c), stack_samples(:, q1, c) + 1.0);
-                    e2 = polyval(pp(:,c), stack_samples(:, q2, c) + 1.0);
-                    R(q1, q2) = sum(e1 ./ e2);
-                end
-            end
-        end
+%         %update R
+%         for q1=1:(Q - 1)
+%             for q2=1:(Q - 1)
+%                 if(q1 ~= q2)
+%                     e1 = polyval(pp(:,c), stack_samples(:, q1, c)/255.0);
+%                     e2 = polyval(pp(:,c), stack_samples(:, q2, c)/255.0);
+%                     R(q1, q2) = sum(e1 ./ e2);
+%                 end
+%             end
+%         end
         
         pp_prev = pp;
         
@@ -134,8 +135,8 @@ for c=1:col
     for q1=1:(Q - 1)
         for q2=1:(Q - 1)
             if(q1 ~= q2)
-                e1 = polyval(pp(:, c), stack_samples(:, q1, c) + 1.0);
-                e2 = polyval(pp(:, c), stack_samples(:, q2, c) + 1.0);
+                e1 = polyval(pp(:, c), stack_samples(:, q1, c)/255.0);
+                e2 = polyval(pp(:, c), stack_samples(:, q2, c)/255.0);
                 err = err + sum((e1 - R(q1, q2) * e2).^2);
             end
         end

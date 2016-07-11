@@ -34,12 +34,14 @@ col = size(stack_samples, 3);
 
 Q = length(stack_exposure);
 
+Mmax = 1.0;
+
 %recovering the CRF
 function d = MN_d(c, q, n)
     q_p = q + 1;
 
-    M_q   = stack_samples(:, q  , c) + 1.0;
-    M_q_p = stack_samples(:, q_p, c) + 1.0;
+    M_q   = stack_samples(:, q  , c)/255.0;
+    M_q_p = stack_samples(:, q_p, c)/255.0;
 
     d = M_q.^n - R(q) * (M_q_p.^n);
 end
@@ -53,9 +55,7 @@ err = 0.0;
 
 pp_prev = zeros(N + 1, col);
 
-%x = 0:(1.0 / 255.0):1;
-x = 1.0:1.0:256.0;
-%x = 1.0:(1.0 / 255.0):2.0;
+x = 0.0:(1.0 / 255.0):Mmax;
 
 R0 = zeros(Q - 1, 1);
 for q=1:(Q - 1)
@@ -87,12 +87,12 @@ for c=1:col
             
             %init b
             for q=1:(Q - 1)
-                b(i) = b(i) - sum(MN_d(c, q, i - 1) .* MN_d(c, q, N));
+                b(i) = b(i) - sum(Mmax * MN_d(c, q, i - 1) .* MN_d(c, q, N));
             end
         end  
 
         coeff = A \ b;    
-        coeff_n = 1.0 - sum(coeff);
+        coeff_n = Mmax - sum(coeff);
 
         pp(:,c) = [coeff', coeff_n];
         pp(:,c) = flip(pp(:,c)');
@@ -104,12 +104,12 @@ for c=1:col
                     
         pp_prev = pp;
                         
-        %update R
-        for q=1:(Q - 1)
-            e1 = polyval(pp(:,c), stack_samples(:, q    , c) + 1.0);
-            e2 = polyval(pp(:,c), stack_samples(:, q + 1, c) + 1.0);
-            R(q) = sum(e1 ./ e2);
-        end
+%         %update R
+%         for q=1:(Q - 1)
+%             e1 = polyval(pp(:,c), stack_samples(:, q    , c)/255.0);
+%             e2 = polyval(pp(:,c), stack_samples(:, q + 1, c)/255.0);
+%             R(q) = sum(e1 ./ e2);
+%         end
         
         iter = iter + 1;
         
@@ -120,8 +120,8 @@ for c=1:col
     
     %compute err
     for q=1:(Q - 1)
-        e1 = polyval(pp(:,c), stack_samples(:, q    , c) + 1.0);
-        e2 = polyval(pp(:,c), stack_samples(:, q + 1, c) + 1.0);
+        e1 = polyval(pp(:,c), stack_samples(:, q    , c)/255.0);
+        e2 = polyval(pp(:,c), stack_samples(:, q + 1, c)/255.0);
         err = err + sum((e1 - R(q) * e2).^2);
     end
 end
