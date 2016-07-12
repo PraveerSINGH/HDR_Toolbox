@@ -34,6 +34,8 @@ col = size(stack_samples, 3);
 
 Q = length(stack_exposure);
 
+Mmax = 1.0;
+
 %recovering the CRF
 function d = MN_d(c, q1, q2, n)
 
@@ -81,17 +83,17 @@ for c=1:col
         for q1=1:(Q - 1)
             for q2=1:(Q - 1)
                 if(q1 ~= q2)
-                    b(i) = b(i) - sum(MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
+                    b(i) = b(i) - sum(Mmax * MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
                 end
             end
         end
     end  
 
     coeff = A \ b;    
-    coeff_n = 1.0 - sum(coeff);
+    coeff_n = Mmax - sum(coeff);
 
     pp(:,c) = flip([coeff; coeff_n]);
-                        
+
     %compute err
     for q1=1:(Q - 1)
         for q2=1:(Q - 1)
@@ -104,11 +106,6 @@ for c=1:col
                 e1 = polyval(pp(:, c), s1(indx));
                 e2 = polyval(pp(:, c), s2(indx));
                 err = err + sum((e1 - R(q1, q2) * e2).^2);
-                
-                
-%                 e1 = polyval(pp(:, c), stack_samples(:, q1, c));
-%                 e2 = polyval(pp(:, c), stack_samples(:, q2, c));
-%                 err = err + sum((e1 - R(q1, q2) * e2).^2);
             end
         end
     end

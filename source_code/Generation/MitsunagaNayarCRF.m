@@ -45,7 +45,7 @@ if(~exist('nSamples', 'var'))
 end
 
 if(~exist('sampling_strategy', 'var'))
-    sampling_strategy = 'Grossberg';
+    sampling_strategy = 'RegularSpatial';
 end
 
 if(~exist('N', 'var'))
@@ -74,7 +74,6 @@ if(isa(stack, 'uint16'))
     stack = single(stack) / 65535.0;
 end
 
-max(stack(:))
 %sort stack
 [stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
@@ -122,6 +121,6 @@ scale = FindChromaticyScale(mid_value, gray);
 
 for c=1:col
     lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0:(1/255):1);
-end 
+end
 
 end
