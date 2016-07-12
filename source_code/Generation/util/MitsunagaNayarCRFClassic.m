@@ -34,6 +34,8 @@ col = size(stack_samples, 3);
 
 Q = length(stack_exposure);
 
+Mmax = 1.0;
+
 %recovering the CRF
 function d = MN_d(c, q, n)
     q_p = q + 1;
@@ -74,12 +76,12 @@ for c=1:col
 
         %init b
         for q=1:(Q - 1)
-            b(i) = b(i) - sum(MN_d(c, q, i - 1) .* MN_d(c, q, N));
+            b(i) = b(i) - sum(Mmax * MN_d(c, q, i - 1) .* MN_d(c, q, N));
         end
     end  
 
     coeff = A \ b;    
-    coeff_n = 1.0 - sum(coeff);
+    coeff_n = Mmax - sum(coeff);
 
     pp(:,c) = flip([coeff; coeff_n]);
       

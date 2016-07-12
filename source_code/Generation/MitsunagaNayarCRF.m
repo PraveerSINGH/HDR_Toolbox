@@ -74,7 +74,6 @@ if(isa(stack, 'uint16'))
     stack = single(stack) / 65535.0;
 end
 
-max(stack(:))
 %sort stack
 [stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 

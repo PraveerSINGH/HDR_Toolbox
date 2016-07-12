@@ -41,7 +41,7 @@ GammaTMO(ReinhardTMO(imgHDR, 0.18), 2.2, 0, 1);
 
 
 disp('7) Estimate the polynomial Camera Response Function (CRF)');
-[lin_fun_poly, pp] = MitsunagaNayarCRF(stack, stack_exposure, 2, 1000, true);
+[lin_fun_poly, pp] = MitsunagaNayarCRF(stack, stack_exposure, -6, 1000, 'Grossberg', true);
 h = figure(3);
 set(h, 'Name', 'The polynomial Camera Response Function (CRF)');
 plot(0:255, lin_fun_poly(:,1), 'r', 0:255, lin_fun_poly(:,2),'g', 0:255, lin_fun_poly(:,3), 'b');
