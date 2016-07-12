@@ -1,6 +1,6 @@
-function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, full, sampling_strategy)
+function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull)
 %
-%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy)
+%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull)
 %
 %       This function computes camera response function using Mitsunaga and
 %       Nayar method.
@@ -49,11 +49,11 @@ if(~exist('sampling_strategy', 'var'))
 end
 
 if(~exist('N', 'var'))
-    N = -1;
+    N = -3;
 end
 
-if(~exist('full', 'var'))
-    full = false;
+if(~exist('bFull', 'var'))
+    bFull = false;
 end
 
 if(isempty(stack))
@@ -74,31 +74,35 @@ if(isa(stack, 'uint16'))
     stack = single(stack) / 65535.0;
 end
 
+max(stack(:))
 %sort stack
 [stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
 %subsample stack
-stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy );
+stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 1);
+
+stack_samples = stack_samples / 255.0;
 
 if(N > 0)
-    if (full)
+    if (bFull)
         [pp, ~] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N);
     else
         [pp, ~] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, N);
     end
 else
-    if (full)
+    if (bFull)
         [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, 1);
     else
         [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 1);
     end
     
-    for i=2:-N
-        if (full)
+    for i=2:6
+        if (bFull)
             [t_pp, t_err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, i);
         else
             [t_pp, t_err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, i);
         end
+        
         if(t_err < err)
             err = t_err;
             pp = t_pp;
@@ -108,15 +112,16 @@ end
 
 lin_fun = zeros(256, col);
 
-gray = 0.5 * ones(1, col);
+mid_value = 0.5 * ones(1, col);
+gray = mid_value;
 for c=1:col
     gray(c) = polyval(pp(:,c), gray(c));
 end
 
-scale = FindChromaticyScale([0.5, 0.5, 0.5], gray);
+scale = FindChromaticyScale(mid_value, gray);
 
 for c=1:col
-    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0.0:1.0/255.0:1.0);
+    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0:(1/255):1);
 end
 
 end

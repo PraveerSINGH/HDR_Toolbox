@@ -134,6 +134,7 @@ function imgOut = Update_X(stack, stack_exposure, lin_fun, scale)
 
         %computing the weight function    
         weight  = WeightFunction(tmpStack, 'Gauss', 0);
+        
         tmpStack = tabledFunction(tmpStack, lin_fun); 
 
         %summing things up...

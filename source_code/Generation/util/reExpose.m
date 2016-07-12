@@ -25,7 +25,8 @@ function image_target = reExpose(img_source, source_exposure, target_exposure, l
 %           method.
 %
 %        Output:
-%           -image_target: the re-exposed image
+%           -image_target: the re-exposed image with gamma encoding
+%           (1.0/2.2)
 %
 %     Copyright (C) 2015  Damla Ezgi Akcora
 % 
