@@ -61,4 +61,8 @@ for i=1:nSamples
     end 
 end
 
+t_min = 0.05;
+t_max = 1.0 - t_min;
+stackOut(stackOut < t_min | stackOut > t_max) = -1.0;
+
 end

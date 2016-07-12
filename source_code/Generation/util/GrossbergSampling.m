@@ -56,11 +56,12 @@ for i=1:stackSize
     end
 end
 
-stackOut = zeros(nSamples, stackSize, col);
+delta = 1.0 / (nSamples - 1);
+u = 0.0:delta:1.0;
 
-u = 0:(1.0 / (nSamples - 1)):1;
+stackOut = zeros(length(u), stackSize, col);
 
-for i=1:nSamples
+for i=1:length(u)
     for j=1:col
         for k=1:stackSize
            [~, val] = min(abs(stack(:,j,k) - u(i)));

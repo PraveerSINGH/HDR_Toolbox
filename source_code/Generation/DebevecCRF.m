@@ -82,7 +82,7 @@ col = size(stack, 3);
 W = WeightFunction(0:(1 / 255):1, 'Deb97');
 
 %stack sub-sampling
-stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy );
+stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0);
 
 %recovering the CRF
 lin_fun = zeros(256, col);

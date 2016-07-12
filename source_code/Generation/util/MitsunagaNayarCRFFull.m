@@ -37,23 +37,17 @@ Q = length(stack_exposure);
 %recovering the CRF
 function d = MN_d(c, q1, q2, n)
 
-    M_q   = stack_samples(:, q1, c) + 1.0;
-    M_q_p = stack_samples(:, q2, c) + 1.0;
+    M_q   = stack_samples(:, q1, c);
+    M_q_p = stack_samples(:, q2, c);
 
-    d = M_q.^n - R(q1, q2) * (M_q_p.^n);
+    indx = find(M_q > 0.0 & M_q_p > 0.0);
+
+    d = M_q(indx).^n - R(q1, q2) * (M_q_p(indx).^n);
 end
 
 pp = zeros(N + 1, col);
 
-threshold = 1e-3;
-
 err = 0.0;
-
-pp_prev = zeros(N + 1, col);
-
-%x = 0:(1.0 / 255.0):1;
-x = 1.0:1.0:256.0;
-%x = 1.0:(1.0 / 255.0):2.0;
 
 R0 = ones(Q - 1, Q - 1);
 for q1=1:(Q - 1)
@@ -64,79 +58,57 @@ for q1=1:(Q - 1)
     end
 end
 
-max_iterations = 10;
-
 for c=1:col
     
     R = R0;
-    bLoop = 1;
+    A = zeros(N, N);
+    b = zeros(N, 1);
 
-    iter = 0;
-    while(bLoop)
-        A = zeros(N, N);
-        b = zeros(N, 1);
-
-        for i=1:N
-            %init A
-            for j=1:N
-                for q1=1:(Q - 1)
-                    for q2=1:(Q - 1)
-                        if(q1 ~= q2)
-                            delta  = MN_d(c, q1, q2, j - 1) - MN_d(c, q1, q2, N);
-                            A(i,j) = A(i,j) + sum(MN_d(c, q1, q2, i - 1) .* delta);
-                        end
-                    end
-                end
-            end
-            
-            %init b
+    for i=1:N
+        %init A
+        for j=1:N
             for q1=1:(Q - 1)
                 for q2=1:(Q - 1)
                     if(q1 ~= q2)
-                        b(i) = b(i) - sum(MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
+                        delta  = MN_d(c, q1, q2, j - 1) - MN_d(c, q1, q2, N);
+                        A(i,j) = A(i,j) + sum(MN_d(c, q1, q2, i - 1) .* delta);
                     end
                 end
             end
-        end  
+        end
 
-        coeff = A \ b;    
-        coeff_n = 1.0 - sum(coeff);
-
-        pp(:, c) = [coeff', coeff_n];
-        pp(:, c) = flip(pp(:,c)');
-        
-        %threhold
-        f_1 = polyval(pp(:, c),      x);
-        f_2 = polyval(pp_prev(:, c), x);
-        bLoop = max(abs(f_1 - f_2)) > threshold;
-                    
-        %update R
+        %init b
         for q1=1:(Q - 1)
             for q2=1:(Q - 1)
                 if(q1 ~= q2)
-                    e1 = polyval(pp(:,c), stack_samples(:, q1, c) + 1.0);
-                    e2 = polyval(pp(:,c), stack_samples(:, q2, c) + 1.0);
-                    R(q1, q2) = sum(e1 ./ e2);
+                    b(i) = b(i) - sum(MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
                 end
             end
         end
-        
-        pp_prev = pp;
-        
-        iter = iter + 1;
-        
-        if(iter > max_iterations)
-            bLoop = 0;
-        end
-    end
-    
+    end  
+
+    coeff = A \ b;    
+    coeff_n = 1.0 - sum(coeff);
+
+    pp(:,c) = flip([coeff; coeff_n]);
+                        
     %compute err
     for q1=1:(Q - 1)
         for q2=1:(Q - 1)
             if(q1 ~= q2)
-                e1 = polyval(pp(:, c), stack_samples(:, q1, c) + 1.0);
-                e2 = polyval(pp(:, c), stack_samples(:, q2, c) + 1.0);
+                s1 = stack_samples(:, q1, c);
+                s2 = stack_samples(:, q2, c);   
+
+                indx = find(s1 > 0.0 & s2 > 0.0);
+                        
+                e1 = polyval(pp(:, c), s1(indx));
+                e2 = polyval(pp(:, c), s2(indx));
                 err = err + sum((e1 - R(q1, q2) * e2).^2);
+                
+                
+%                 e1 = polyval(pp(:, c), stack_samples(:, q1, c));
+%                 e2 = polyval(pp(:, c), stack_samples(:, q2, c));
+%                 err = err + sum((e1 - R(q1, q2) * e2).^2);
             end
         end
     end

@@ -31,6 +31,14 @@ if(size(stack, 4) ~= length(stack_exposure))
     error('stack and stack_exposure have different number of exposures');
 end
 
+if(isa(stack, 'uint8'))
+    stack = single(stack) / 255.0;
+end
+
+if(isa(stack, 'uint16'))
+    stack = single(stack) / 65535.0;
+end
+
 [~, ~, col, n] = size(stack);
 
 [stack, stack_exposure] = SortStack( stack, stack_exposure, 'ascend');
@@ -64,7 +72,7 @@ k = stack_exposure(i + 1) / stack_exposure(i);
 for c=1:col
     img1 = stack(:,:,c,i);
     img2 = stack(:,:,c,i + 1);
-    
+
     try
         f = fit(img1(:), img2(:), 'poly1');
 
@@ -73,7 +81,7 @@ for c=1:col
         %             
 
         gamma(c) = log(f.p1) / log(k);
-        alpha(c) = f.p2 / (1 - k^tmp_gamma);
+        alpha(c) = f.p2 / (1 - k^gamma(c));
     catch expr
         error(['MannPicardCRF: ', expr]);
     end
