@@ -78,7 +78,7 @@ end
 [stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
 %subsample stack
-stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 1);
+stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.05);
 
 stack_samples = stack_samples / 255.0;
 

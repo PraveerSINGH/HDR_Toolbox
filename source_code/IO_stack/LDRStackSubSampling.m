@@ -1,6 +1,6 @@
-function stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, bRemovelOutliers )
+function stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, outliers_percentage )
 %
-%       stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, bRemovelOutliers )
+%       stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, outliers_percentage )
 %
 %       This function subsamples a stack
 %
@@ -13,7 +13,7 @@ function stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sa
 %               Nayar algorithm (CDF based)
 %               -'RandomSpatial': picking random samples in the image
 %               -'RegularSpatial': picking regular samples in the image
-%               -bRemovelOutliers:
+%               -outliers_percentage:
 %
 %        Output:
 %           -stack_samples: sub-sampled stack
@@ -34,8 +34,8 @@ function stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sa
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-if(~exist('bRemovelOutliers', 'var'))
-    bRemovelOutliers = 0;    
+if(~exist('outliers_percentage', 'var'))
+    outliers_percentage = 0;    
 end
 
 if(isempty(stack))
@@ -71,8 +71,8 @@ switch sampling_strategy
         error('LDRStackSubSampling: A sampling strategy neeeds to be specified.');
 end
 
-if(bRemovelOutliers)
-    t_min = 0.05;
+if(outliers_percentage > 0.0)
+    t_min = outliers_percentage;
     t_max = 1.0 - t_min;
     stack_samples(stack_samples < (t_min * 255.0) | stack_samples > (t_max * 255)) = -1.0;
 end

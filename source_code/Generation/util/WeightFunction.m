@@ -67,7 +67,7 @@ switch weight_type
     case 'Robertson'
         shift    = exp(-4);
         scaleDiv = (1.0 - shift);
-        t = x - 0.5;
+        t = img - 0.5;
         weight = (exp(-16.0 * (t .* t) ) - shift) / scaleDiv;
             
     case 'hat'
