@@ -61,53 +61,80 @@ if(~exist('bPolyFit', 'var'))
 end
 
 if(isa(stack, 'double'))
-    stack = uint8(round(stack * 255));
+    stack = uint8(ClampImg(round(stack * 255), 0, 255));
 end
 
 if(isa(stack, 'single'))
-    stack = uint8(round(stack * 255));
+    stack = uint8(ClampImg(round(stack * 255), 0, 255));
 end
 
 if(isa(stack, 'uint16'))
     stack = uint8(stack / 255);
 end
 
-col =  size(stack, 3);
+col = size(stack, 3);
+
 lin_fun = zeros(256, col);
- 
+
 for i=1:col
     lin_fun(:, i) = (0:255) / 255;
+end
+
+global minM;
+global maxM;
+
+x = (0:255) / 255;
+
+w = WeightFunction(x, 'Robertson', 0);
+
+minM = 0;
+for m=0:255
+    if(w(m + 1) > 0.0)
+        minM = m;
+        break;
+    end
+end
+
+maxM = 255;
+for m=255:-1:0
+    if(w(m + 1) > 0.0)
+        maxM = m;
+        break;
+    end
+end
+
+global stack_min;
+global stack_max;
+
+[~, t_min] = min(stack_exposure);
+[~, t_max] = max(stack_exposure);
+stack_min = ClampImg(single(stack(:,:,:,t_min)) / 255.0, 0.0, 1.0);
+stack_max = ClampImg(single(stack(:,:,:,t_max)) / 255.0, 0.0, 1.0);
+
+global minSatTime;
+
+minSatTime = 1e10 * ones(col, 1);
+
+for j=1:col
+    for i=1:length(stack_exposure)
+        tmp = stack(:,:,j,i);
+        
+        if(~isempty(find(tmp == 255)))
+            if(stack_exposure(i) < minSatTime(j))
+                minSatTime(j) = stack_exposure(i);
+            end
+        end
+    end
 end
 
 for i=1:max_iterations
     lin_fun_prev = lin_fun;
     
-    %iCRF normalization step
-    for j=1:col
-        lf = lin_fun(:, j);
-        
-        [~, index_min] = min(lf(lf > 0.0));
-        [~, index_max] = max(lf(lf > 0.0));
-        
-        index = index_min + round((index_max - index_min) / 2);
-        
-        mid = lf(index);
-        
-        if(mid == 0.0)
-            while(k < 256 && lf(index) == 0.0)
-                index = index + 1;
-            end
-            
-            mid = lf(index);
-        end
-        
-        if(mid > 0.0)
-            lin_fun(:,j) = lin_fun(:,j) / mid;
-        end
-    end
+    %normalization CRF
+    lin_fun = Normalization(lin_fun);
 
     %update X
-    x_tilde = Update_X(stack, stack_exposure, lin_fun, scale);
+    x_tilde = Update_X(stack, stack_exposure, lin_fun);
     
     %update the iCRF
     lin_fun = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun); 
@@ -116,11 +143,10 @@ for i=1:max_iterations
     delta = (lin_fun_prev - lin_fun).^2;
     err = mean(delta(:));
     
+    disp([i, err]);
     if(err < err_threshold)
         break;
     end
-    
-    disp([i, err]);
 end
 
 % %poly-fit (rational)
@@ -140,33 +166,109 @@ end
 
 end
 
+function lin_fun = Normalization(lin_fun)
+    col = size(lin_fun, 2);
+    
+    for j=1:col
+        lf = lin_fun(:, j);
+        
+        index_min = 1;
+        for minIndx=1:256
+            if(lf(minIndx) > 0.0)
+                index_min = minIndx;
+                break;
+            end
+        end
+        
+        index_max = 256;
+        for maxIndx=256:-1:1
+            if(lf(maxIndx) > 0.0)
+                index_max = maxIndx;
+                break;
+            end
+        end        
+
+        index = index_min + round((index_max - index_min) / 2);
+        
+        mid = lf(index);
+        
+        if(mid == 0.0)
+            while(index < 256 && lf(index) == 0.0)
+                index = index + 1;
+            end
+            
+            mid = lf(index);
+        end
+        
+        if(mid > 0.0)
+            lin_fun(:,j) = lin_fun(:,j) / mid;
+        end
+    end
+end
+
 function imgOut = Update_X(stack, stack_exposure, lin_fun)
+    global stack_min;
+    global stack_max;
+    global minM;
+    global maxM;
+
     [r, c, col, n] = size(stack);
 
     %for each LDR image...
     imgOut    = zeros(r, c, col, 'single');
     totWeight = zeros(r, c, col, 'single');
-    
-    for i=1:n
-        tmpStack = ClampImg(single(stack(:,:,:,i)) / 255.0, 0.0, 1.0);
 
+    max_t = -ones(r, c, col);
+    min_t = 1e10 * ones(r, c, col);
+    
+    for i=1:n        
+        t = stack_exposure(i);   
+        m = stack(:,:,:,i);
+        
+        indx = find(m > maxM);
+        min_t(indx) = min(min_t(indx), t); 
+        
+        indx = find(m < minM);        
+        max_t(indx) = max(max_t(indx), t); 
+ 
+        %normalizing m values in [0,1]
+        tmpStack = ClampImg(single(m) / 255.0, 0.0, 1.0);
+        
         %computing the weight function    
         weight  = WeightFunction(tmpStack, 'Robertson', 0);
         
         tmpStack = tabledFunction(tmpStack, lin_fun); 
 
-        %summing things up...
-        t = stack_exposure(i);    
-        if(t > 0.0)                
-            imgOut = imgOut + (weight .* tmpStack) * t;
-            totWeight = totWeight + weight * t * t;
+        %summing things up... 
+        indx = find(tmpStack > stack_min & tmpStack < stack_max);
+        
+        if(t > 0.0 && ~isempty(indx))                 
+            imgOut(indx) = imgOut(indx) + (weight(indx) .* tmpStack(indx)) * t;
+            totWeight(indx) = totWeight(indx) + weight(indx) * t * t;
         end
     end
 
-    saturation = 1e-4;
-
     imgOut = imgOut ./ totWeight;
-    imgOut(totWeight < saturation) = -1.0;
+    
+    %taking care of saturated pixels
+    saturation = 1e-4;
+    imgOut(totWeight < saturation & totWeight > 0.0) = -1.0;
+
+    for i=1:col
+        io = imgOut(:,:,i);
+        tw = totWeight(:,:,i);
+        mxt = max_t(:,:,i);
+        mnt = min_t(:,:,i);
+        
+        indx = find(tw == 0.0 & mxt > -1.0);
+        io(indx) = lin_fun(minM, i) ./ mxt(indx);
+        
+        indx = find(tw == 0.0 & mnt < 1e10);
+        io(indx) = lin_fun(maxM, i) ./ mnt(indx);        
+        
+        imgOut(:,:,i) = io;
+    end
+        
 end
 
 function f_out = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun)
@@ -175,31 +277,57 @@ function f_out = Update_lin_fun(x_tilde, stack, stack_exposure, lin_fun)
     n = length(stack_exposure);
     f_out = zeros(size(lin_fun));
 
-    for i=1:col
-        tmp_x_tilde = x_tilde(:,:,i);
-                       
-        for j=0:255
-            jp1 = j + 1;
+    global minSatTime;
 
-            card_m = 0;
+    for i=1:col
+        x_tilde_i = x_tilde(:,:,i);
+            
+        cardEm = zeros(256, 1);
+        sumEm = zeros(256, 1);
+        
+        %for m values in [0,254]
+        for m=0:254
+            mp = m + 1;
+
             for k=1:n
                 t = stack_exposure(k);
                 
                 tmp = stack(:,:,i,k);
 
-                tmp_x_tilde_ind = tmp_x_tilde(tmp == j & tmp_x_tilde > 0.0);
+                x = x_tilde_i((tmp == m) & (x_tilde_i > 0.0));
+                
+                sumEm(mp) = sumEm(mp) + t * sum(x(:));
 
-                ind = find(tmp_x_tilde_ind >= 0.0);  
-                f_out(jp1, i) = f_out(jp1, i) + t * sum(tmp_x_tilde_ind(ind));
+                cardEm(mp) = cardEm(mp) + length(x(:));
+            end  
+        end
+        
+        %for m = 255
+        cardEm(256) = 1; 
+        
+        m = 255;
+        sumEm(256) = 1e10;
+        for k=1:n
+        	t = stack_exposure(k);
+            
+            tmp = stack(:,:,i,k);
 
-                card_m = card_m + length(ind);
+            x = x_tilde_i((tmp == m) & (x_tilde_i > 0.0));            
+            
+            if(~isempty(x) & (t == minSatTime))
+               sumEm(256) = min([sumEm(256); t * x(:)]);
             end
-
-            if(card_m > 0.0)
-                f_out(jp1, i) = f_out(jp1, i) / card_m;
+        end        
+                
+        %computing f_out + filling
+        prev = 0.0;
+        for m=1:256
+            if(cardEm(m) > 0.0)
+                f_out(m,i) = sumEm(m) / cardEm(m);
+                prev = f_out(m,i);
             else
-                f_out(jp1, i) = 0.0;
-            end    
+                f_out(m,i) = prev;
+            end
         end
     end
 end
