@@ -1,6 +1,6 @@
-function lin_fun = RobertsonCRF(stack, stack_exposure, max_iterations, err_threshold, bNormalize, bPolyFit)
+function [lin_fun, max_lin_fun] = RobertsonCRF(stack, stack_exposure, max_iterations, err_threshold, bNormalize)
 %
-%       lin_fun = RobertsonCRF(stack, stack_exposure, max_iterations, err_threshold, bNormalize, bPolyFit)
+%       [lin_fun, max_lin_fun] = RobertsonCRF(stack, stack_exposure, max_iterations, err_threshold, bNormalize)
 %
 %       This function computes camera response function using Mitsunaga and
 %       Nayar method.
@@ -13,8 +13,6 @@ function lin_fun = RobertsonCRF(stack, stack_exposure, max_iterations, err_thres
 %           -max_iterations: max number of iterations
 %           -err_threshold: threshold after which the function can stop
 %           -bNormalize: if 1 it enables function normalization
-%           -bPolyFit: if it is set to 1, a polynomial fit will be computed;
-%           otherwise it will not (default)
 %
 %        Output:
 %           -lin_fun: tabled function
@@ -45,19 +43,15 @@ if(isempty(stack_exposure))
 end
 
 if(~exist('err_threshold', 'var'))
-    err_threshold = 1e-7;
+    err_threshold = 1e-5;
 end
 
 if(~exist('bNormalize', 'var'))
-    bNormalize = 1;
+    bNormalize = 0;
 end
 
 if(~exist('max_iterations', 'var'))
-    max_iterations = 5;
-end
-
-if(~exist('bPolyFit', 'var'))
-    bPolyFit = 0;
+    max_iterations = 15;
 end
 
 if(isa(stack, 'double'))
@@ -143,26 +137,36 @@ for i=1:max_iterations
     delta = (lin_fun_prev - lin_fun).^2;
     err = mean(delta(:));
     
-    disp([i, err]);
+    %disp([i, err]);
+    
     if(err < err_threshold)
         break;
     end
 end
 
-% %poly-fit (rational)
-% if(bPolyFit)
-%     x = (0:255) / 255;
-%     ft = fittype( 'rat33' );
-%     opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
-%     opts.Display = 'Off';
-%     opts.StartPoint = ones(7, 1);
-% 
-%     for i=1:col    
-%         [xData, yData] = prepareCurveData(x', lin_fun(:,i));
-%         [fit_ret, ~] = fit( xData, yData, ft, opts );    
-%         lin_fun(:,i) = feval(fit_ret, x');
-%     end
-% end
+max_lin_fun = max(lin_fun(256,:));
+
+if(bNormalize)    
+    for i=1:col
+        lin_fun(:,i) = lin_fun(:,i) / max_lin_fun;
+    end
+    
+    lin_fun = ClampImg(lin_fun, 0.0, 1.0);
+end
+
+%poly-fit (rational)
+if(bPolyFit)
+    ft = fittype( 'rat33' );
+    opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+    opts.Display = 'Off';
+    opts.StartPoint = ones(7, 1);
+
+    for i=1:col    
+        [xData, yData] = prepareCurveData(x', lin_fun(:,i));
+        [fit_ret, ~] = fit( xData, yData, ft, opts );    
+        lin_fun(:,i) = feval(fit_ret, x');
+    end
+end
 
 end
 
