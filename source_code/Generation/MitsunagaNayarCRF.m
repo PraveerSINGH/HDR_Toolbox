@@ -1,6 +1,6 @@
-function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull)
+function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull, maxIterations)
 %
-%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull)
+%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull, maxIterations)
 %
 %       This function computes camera response function using Mitsunaga and
 %       Nayar method.
@@ -19,6 +19,8 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, s
 %               Nayar algorithm (CDF based)
 %               -'RandomSpatial': picking random samples in the image
 %               -'RegularSpatial': picking regular samples in the image
+%           -bFull:
+%           -maxIterations:
 %
 %        Output:
 %           -pp: a polynomial encoding the inverse CRF
@@ -56,6 +58,10 @@ if(~exist('bFull', 'var'))
     bFull = false;
 end
 
+if(~exist('maxIterations', 'var'))
+    maxIterations = -1;
+end
+
 if(isempty(stack))
     error('MitsunagaNayarCRF: a stack cannot be empty!');
 end
@@ -78,7 +84,11 @@ end
 [stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
 %subsample stack
-stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.05);
+if(maxIterations > 1)
+    stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.08);
+else
+    stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.01);
+end
 
 stack_samples = stack_samples / 255.0;
 
@@ -90,16 +100,16 @@ if(N > 0)
     end
 else
     if (bFull)
-        [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, 1);
+        [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, 1, maxIterations);
     else
-        [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 1);
+        [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 1, maxIterations);
     end
     
     for i=2:6
         if (bFull)
-            [t_pp, t_err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, i);
+            [t_pp, t_err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, i, maxIterations);
         else
-            [t_pp, t_err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, i);
+            [t_pp, t_err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, i, maxIterations);
         end
         
         if(t_err < err)

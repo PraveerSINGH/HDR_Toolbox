@@ -144,7 +144,7 @@ for i=1:max_iterations
     end
 end
 
-max_lin_fun = max(lin_fun(256,:));
+max_lin_fun = max(lin_fun(:));
 
 if(bNormalize)    
     for i=1:col

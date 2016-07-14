@@ -1,4 +1,4 @@
-function [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N)
+function [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N, maxIterations)
 %
 %       [pp, err] = MitsunagaNayarCRFFull(stack, stack_exposure, N, nSamples, sampling_strategy)
 %
@@ -9,6 +9,7 @@ function [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N)
 %           -stack_samples: a stack of samples from LDR images
 %           -nSamples: number of samples for computing the CRF
 %           -N: polynomial degree of the inverse CRF
+%           -maxIterations: 
 %
 %        Output:
 %           -pp: a polynomial encoding the inverse CRF
@@ -30,6 +31,12 @@ function [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
+if(~exist('maxIterations', 'var'))
+    maxIterations = -1;
+end
+
+threshold = 1e-4;
+
 col = size(stack_samples, 3);
 
 Q = length(stack_exposure);
@@ -48,7 +55,10 @@ function d = MN_d(c, q1, q2, n)
 end
 
 pp = zeros(N + 1, col);
+pp_prev = zeros(N + 1, col);
 
+x = (0:255) / 255;
+ 
 err = 0.0;
 
 R0 = ones(Q - 1, Q - 1);
@@ -63,36 +73,70 @@ end
 for c=1:col
     
     R = R0;
-    A = zeros(N, N);
-    b = zeros(N, 1);
+    
+    bLoop = 1;
+    iter = 0;
+    
+    while(bLoop)
+        A = zeros(N, N);
+        b = zeros(N, 1);
 
-    for i=1:N
-        %init A
-        for j=1:N
-            for q1=1:(Q - 1)
-                for q2=1:(Q - 1)
-                    if(q1 ~= q2)
-                        delta  = MN_d(c, q1, q2, j - 1) - MN_d(c, q1, q2, N);
-                        A(i,j) = A(i,j) + sum(MN_d(c, q1, q2, i - 1) .* delta);
+        for i=1:N
+            %init A
+            for j=1:N
+                for q1=1:(Q - 1)
+                    for q2=1:(Q - 1)
+                        if(q1 ~= q2)
+                            delta  = MN_d(c, q1, q2, j - 1) - MN_d(c, q1, q2, N);
+                            A(i,j) = A(i,j) + sum(MN_d(c, q1, q2, i - 1) .* delta);
+                        end
                     end
                 end
             end
-        end
 
-        %init b
-        for q1=1:(Q - 1)
-            for q2=1:(Q - 1)
-                if(q1 ~= q2)
-                    b(i) = b(i) - sum(Mmax * MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
+            %init b
+            for q1=1:(Q - 1)
+                for q2=1:(Q - 1)
+                    if(q1 ~= q2)
+                        b(i) = b(i) - sum(Mmax * MN_d(c, q1, q2, i - 1) .* MN_d(c, q1, q2, N));
+                    end
                 end
             end
-        end
-    end  
+        end  
 
-    coeff = A \ b;    
-    coeff_n = Mmax - sum(coeff);
+        coeff = A \ b;    
+        coeff_n = Mmax - sum(coeff);
 
-    pp(:,c) = flip([coeff; coeff_n]);
+        pp(:,c) = flip([coeff; coeff_n]);
+        
+        f_1 = polyval(pp(:,c),      x);
+        f_2 = polyval(pp_prev(:,c), x);
+        bLoop = max(abs(f_1 - f_2) > threshold);
+        
+        bLoop = bLoop & (iter < maxIterations);
+        
+        if(bLoop)
+            pp_prev = pp;
+
+            %update R
+            for q=1:(Q - 1)
+                for q2=1:(Q - 1)
+                    if(q1 ~= q2)
+                        s1 = stack_samples(:, q1    , c);
+                        s2 = stack_samples(:, q2, c);   
+                        
+                        indx = find(s1 > 0.0 & s2 > 0.0);                
+
+                        e1 = polyval(pp(:,c), s1(indx));
+                        e2 = polyval(pp(:,c), s2(indx));
+                        R(q1, q2) = sum(e1) / sum(e2);
+                    end
+                end
+            end
+            
+            iter = iter + 1;
+        end                
+    end
 
     %compute err
     for q1=1:(Q - 1)
