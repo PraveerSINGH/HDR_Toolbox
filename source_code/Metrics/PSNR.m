@@ -1,3 +1,4 @@
+
 function val = PSNR(imgReference, imgDistorted)
 %
 %
@@ -63,6 +64,7 @@ imgDistorted = ClampImg(imgDistorted, 0, 1);
 
 valueMSE = MSE(imgReference, imgDistorted);
 
-val = 10 * log10(1.0 / valueMSE);
+%val = 10 * log10(1.0 / valueMSE);
+val = - 10 * log10(valueMSE);
 
 end

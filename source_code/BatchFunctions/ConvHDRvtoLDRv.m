@@ -80,10 +80,7 @@ for i=1:hdrv.totalFrames
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
         
     frame(frame < 0) = 0;
-    
-    frame = imresize(frame, 0.5, 'bilinear');
-    
-    
+       
     j = mod(i, n) + 1;
    
     frameOut = frame * 2^fstops(j);

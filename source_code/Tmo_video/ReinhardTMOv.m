@@ -1,7 +1,7 @@
-function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_gamma, tmo_quality, tmo_video_profile)
+function ReinhardTMOv(hdrv, filenameOutput, tmo_alpha, tmo_white, tmo_gamma, tmo_quality, tmo_video_profile)
 %
 %
-%      KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_gamma, tmo_quality, tmo_video_profile)
+%      ReinhardTMOv(hdrv, filenameOutput, tmo_alpha, tmo_white, tmo_gamma, tmo_quality, tmo_video_profile)
 %
 %
 %       Input:
@@ -9,10 +9,8 @@ function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_g
 %           structure
 %           -filenameOutput: output filename (if it has an image extension,
 %           single files will be generated)
-%           -tmo_alpha_coeff: \alpha_A, \alpha_B, \alpha_C coefficients
-%           costants in the paper (Equation 3a, 3b, and 3c)
-%           -tmo_dn_clamping: a boolean value (0 or 1) for setting black
-%           and white levels clamping
+%           -tmo_alpha:
+%           -tmo_white: 
 %           -tmo_gamma: gamma for encoding the frame
 %           -tmo_quality: the output quality in [1,100]. 100 is the best quality
 %           1 is the lowest quality.%
@@ -43,12 +41,12 @@ function KiserTMOv(hdrv, filenameOutput, tmo_alpha_coeff, tmo_dn_clamping, tmo_g
 %
 %
 
-if(~exist('tmo_alpha_coeff', 'var'))
-    tmo_alpha_coeff = 0.98;
+if(~exist('tmo_alpha', 'var'))
+    tmo_alpha = 0.5;
 end
 
-if(~exist('tmo_dn_clamping', 'var'))
-    tmo_dn_clamping = 0;
+if(~exist('tmo_white', 'var'))
+    tmo_white = 1e6;
 end
 
 if(~exist('tmo_gamma', 'var'))
@@ -86,10 +84,8 @@ end
 hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
-tmo_alpha_coeff_c = 1.0 - tmo_alpha_coeff;
 
-beta_clamping   = 0.999;
-beta_clamping_c = (1.0 - beta_clamping);
+beta = 0.5;
 
 for i=1:hdrv.totalFrames
     disp(['Processing frame ', num2str(i)]);
@@ -98,46 +94,20 @@ for i=1:hdrv.totalFrames
     %Only physical values
     frame = RemoveSpecials(frame);
     frame(frame < 0) = 0;
-    
-    if(tmo_dn_clamping)%Clamping black and white levels
-        L = RemoveSpecials(lum(frame));
-        %computing CDF's histogram 
-        [histo, bound, ~] = HistogramHDR(L, 256, 'log10', [], 1);  
-        histo_cdf = cumsum(histo);
-        histo_cdf = histo_cdf/max(histo_cdf(:));
-        [~, ind] = min(abs(histo_cdf - beta_clamping));
-        maxL = 10^(ind * (bound(2) - bound(1)) / 256 + bound(1));
-
-        [~, ind] = min(abs(histo_cdf-beta_clamping_c));
-        minL = 10^(ind * (bound(2) - bound(1)) / 256 + bound(1));
-
-        frame(frame > maxL) = maxL;
-        frame(frame < minL) = minL;
-        frame = frame - minL;
-    end
-   
+     
     %computing statistics for the current frame
     L = lum(frame);
-    Lav = logMean(L);
-    A = max(L(:)) - Lav;
-    B = Lav - min(L(:));
+    Lav_cur = logMean(L);
    
     if(i == 1)
-        Aprev = A;
-        Bprev = B;
-        aprev = 0.18 * 2^(2 * (B - A) / (A + B));
+        Lav_prev = Lav_cur;
     end
-    
-    %temporal average
-    An = tmo_alpha_coeff_c * Aprev + tmo_alpha_coeff * A;
-    Bn = tmo_alpha_coeff_c * Bprev + tmo_alpha_coeff * B;
 
-    a = 0.18 * 2^(2 * (Bn - An) / (An + Bn));
-    an = tmo_alpha_coeff_c * aprev + tmo_alpha_coeff * a;
+    Lav = Lav_prev * (1 - beta) + beta * Lav_cur;
     
     %tone mapping
-    [frameOut, ~, ~] = ReinhardTMO(frame, an);
-
+    [frameOut, ~, ~] = ReinhardTMO(frame, tmo_alpha, tmo_white, 'global', -1, Lav);
+    
     %Gamma/sRGB encoding
     if(bsRGB)
         frameOut = ClampImg(ConvertRGBtosRGB(frameOut, 0), 0, 1);
@@ -152,9 +122,7 @@ for i=1:hdrv.totalFrames
     end
     
     %updating for the next frame
-    Aprev = A;
-    Bprev = B;
-    aprev = a;   
+    Lav_prev = Lav;
 end
 disp('OK');
 
