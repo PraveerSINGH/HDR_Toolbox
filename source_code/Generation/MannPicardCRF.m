@@ -2,8 +2,9 @@ function [lin_fun, gamma_param] = MannPicardCRF(stack, stack_exposure)
 %
 %       lin_fun = MannPicardCRF(stack, stack_exposure)
 %
-%       This function computes camera response function using Debevec and
-%       Malik method.
+%       This function computes camera response function using Mann and
+%       Picard methods.
+%
 %        Input:
 %           -stack: a stack of LDR images. If the stack is a single or
 %           double values are assumed to be in [0,1].
