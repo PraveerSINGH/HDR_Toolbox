@@ -106,7 +106,12 @@ for i=1:n
     end
     
     if(wC > 0.0)
-        L = mean(imageStack(:,:,:,i),3);  
+        if(size(imageStack(:,:,:,i), 3) > 1)
+            L = mean(imageStack(:,:,:,i), 3);
+        else
+            L = imageStack(:,:,:,i);
+        end
+
         weightC = MertensContrast(L);
         weight(:,:,i) = weight(:,:,i) .* (weightC.^wC);
     end
