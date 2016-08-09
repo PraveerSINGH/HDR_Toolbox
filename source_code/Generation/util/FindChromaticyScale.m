@@ -32,6 +32,8 @@ if((l_m ~= l_I) || isempty(M) || isempty(I))
     error('FindChromaticyScale: input colors have different color channels.');
 end
 
+try
+
 function err = residualFunction(p)
     I_c = I .* p;
     
@@ -42,6 +44,10 @@ function err = residualFunction(p)
 end
 
 opts = optimset('Display', 'none', 'TolFun', 1e-8, 'TolX', 1e-8);
-scale = fminsearch(@residualFunction, [1.0, 1.0, 1.0], opts);
+scale = fminsearch(@residualFunction, ones(l_m, 1), opts);
+
+catch expr
+ scale = ones(l_m, 1);
+end
 
 end
