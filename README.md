@@ -40,6 +40,9 @@ A few operators (e.g. Mertens et al.'s operator) return gamma encoded values,
 so there is no need to apply gamma to them; in this case a message (e.g. a Warning) is displayed
 after tone mapping alerting that there is no need of gamma encoding.
 
+NOTE ON PULL REQUESTS:
+=====================
+Please, send your pull requests to the develop branch.
 
 REFERENCE:
 ==========
