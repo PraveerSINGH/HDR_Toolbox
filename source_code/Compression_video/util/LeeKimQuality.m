@@ -35,12 +35,12 @@ function QP_Ratio = LeeKimQuality(QP_LDR)
 
 if(QP_LDR<1.0)
     %quality value is assumed to be in [0,1] so it is scaled in [0,100]
-    QP_LDR = round(QP_LDR*100);
+    QP_LDR = round(QP_LDR * 100);
 end
 
-QP_Ratio = 0.77*QP_LDR+13.42; %Equation 6 of the original paper
+QP_Ratio = 0.77 * QP_LDR + 13.42; %Equation 6 of the original paper
 
-if(QP_Ratio>100)
+if(QP_Ratio > 100)
     QP_Ratio = 100;
 end
 

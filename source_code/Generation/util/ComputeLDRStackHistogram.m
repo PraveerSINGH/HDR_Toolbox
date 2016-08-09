@@ -41,8 +41,8 @@ for i=1:n
             tmp = uint8(ClampImg(round(tmp * 255), 0.0, 255.0));
         end
         
-        if(isa(stack, 'uint16'))
-            stack = uint8(ClampImg(round(tmp / 255), 0, 255));
+        if(isa(tmp, 'uint16'))
+            tmp = uint8(ClampImg(round(tmp / 255), 0, 255));
             disp('Warning: is this a 16-bit image? The maximum is set to 65535.');
         end
         

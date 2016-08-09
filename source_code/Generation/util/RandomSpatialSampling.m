@@ -1,10 +1,11 @@
-function stackOut = RandomSpatialSampling(stack, nSamples)
+function stackOut = RandomSpatialSampling(stack, sort_index, nSamples)
 %
 %       stackOut = RandomSpatialSampling(stack, nSamples)
 %
 %
 %        Input:
 %           -stack: a stack of LDR images; 4-D array where values are
+%           -sort_index: 
 %           -nSamples: the number of samples for sampling the stack
 %
 %        Output:
@@ -41,20 +42,27 @@ end
 
 stackOut = zeros(nSamples, stackSize, col);
 
-r_quart = round(r / 4);
-c_quart = round(c / 4);
-r_half  = round(r / 2);
-c_half  = round(c / 2);
-
-X = ClampImg(round(rand(nSamples, 1) * c_half) + c_quart, 1, c);
-Y = ClampImg(round(rand(nSamples, 1) * r_half) + r_quart, 1, r);
+X = ClampImg(round(rand(nSamples, 1) * c), 1, c);
+Y = ClampImg(round(rand(nSamples, 1) * r), 1, r);
 
 for i=1:nSamples
+    tmp = zeros(stackSize, col);
     for j=1:col
         for k=1:stackSize
-           stackOut(i,k,j) = round(stack(Y(i), X(i), j, k) * 255);
+           tmp(k,j) = stack(Y(i), X(i), j, k);
         end
     end
+               
+    check = checkMonotonicity(sort_index, tmp);
+    
+    if(check > 0)
+        stackOut(c,:,:) = tmp;
+        c = c + 1;
+    end 
 end
+
+t_min = 0.05;
+t_max = 1.0 - t_min;
+stackOut(stackOut < t_min | stackOut > t_max) = -1.0;
 
 end

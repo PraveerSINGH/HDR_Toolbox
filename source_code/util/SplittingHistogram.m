@@ -5,7 +5,7 @@ function pivot = SplittingHistogram(histo)
 %
 %
 %        Input:
-%           -histo: input histogram
+%           -histo: an input histogram
 %
 %        Output:
 %           -pivot: the pivot value for splitting the histogram in two
@@ -30,14 +30,14 @@ function pivot = SplittingHistogram(histo)
 
 n     = length(histo);
 pivot = n;
-diff  = sum(histo)*2;
+diff  = sum(histo) * 2;
 
-for i=1:(n-1)
+for i=1:(n - 1)
     s0 = sum(histo(1:i));
-    s1 = sum(histo((i+1):end));
-    tmpDiff = abs(s1-s0);
+    s1 = sum(histo((i + 1):end));
+    tmpDiff = abs(s1 - s0);
     
-    if(tmpDiff<diff)
+    if(tmpDiff < diff)
         pivot = i;
         diff  = tmpDiff;
     end    

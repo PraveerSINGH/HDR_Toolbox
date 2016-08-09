@@ -31,14 +31,14 @@ function [frame, hdrv] = hdrvGetFrame(hdrv, frameCounter)
 %which frame?
 maxFrames = hdrv.totalFrames;
 
-if(~exist('frameCounter','var'))
+if(~exist('frameCounter', 'var'))
     frameCounter = hdrv.frameCounter;
 else
-    if(frameCounter<1)
+    if(frameCounter < 1)
         frameCounter = 1;
     end
     
-    if(frameCounter>maxFrames)
+    if(frameCounter > maxFrames)
         frameCounter = maxFrames;
     end
 end
@@ -74,5 +74,5 @@ switch hdrv.type
 end
 
 %updating the counter
-hdrv.frameCounter = mod( frameCounter + 1, maxFrames+1 );
+hdrv.frameCounter = mod(frameCounter + 1, maxFrames + 1);
 end

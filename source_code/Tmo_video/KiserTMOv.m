@@ -52,10 +52,10 @@ if(~exist('tmo_dn_clamping', 'var'))
 end
 
 if(~exist('tmo_gamma', 'var'))
-    tmo_gamma = 2.2;
+    tmo_gamma = -2.2;
 end
 
-if(tmo_gamma<0)
+if(tmo_gamma < 0)
     bsRGB = 1;
 else
     bsRGB = 0;
@@ -66,7 +66,7 @@ if(~exist('tmo_quality', 'var'))
 end
 
 if(~exist('tmo_video_profile', 'var'))
-    tmo_video_profile = 'Motion JPEG AVI';
+    tmo_video_profile = 'MPEG-4';
 end
 
 name = RemoveExt(filenameOutput);
@@ -75,7 +75,7 @@ ext  = fileExtension(filenameOutput);
 bVideo = 0;
 writerObj = 0;
 
-if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
+if(strcmp(ext, 'avi') == 1 | strcmp(ext, 'mp4') == 1)
     bVideo = 1;
     writerObj = VideoWriter(filenameOutput, tmo_video_profile);
     writerObj.FrameRate = hdrv.FrameRate;
@@ -94,10 +94,10 @@ beta_clamping_c = (1.0 - beta_clamping);
 for i=1:hdrv.totalFrames
     disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
-    
+        
     %Only physical values
     frame = RemoveSpecials(frame);
-    frame(frame<0) = 0;
+    frame(frame < 0) = 0;
     
     if(tmo_dn_clamping)%Clamping black and white levels
         L = RemoveSpecials(lum(frame));
@@ -106,10 +106,10 @@ for i=1:hdrv.totalFrames
         histo_cdf = cumsum(histo);
         histo_cdf = histo_cdf/max(histo_cdf(:));
         [~, ind] = min(abs(histo_cdf - beta_clamping));
-        maxL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
+        maxL = 10^(ind * (bound(2) - bound(1)) / 256 + bound(1));
 
         [~, ind] = min(abs(histo_cdf-beta_clamping_c));
-        minL = 10^(ind*(bound(2) - bound(1)) / 256 + bound(1));
+        minL = 10^(ind * (bound(2) - bound(1)) / 256 + bound(1));
 
         frame(frame > maxL) = maxL;
         frame(frame < minL) = minL;

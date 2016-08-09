@@ -1,9 +1,10 @@
-function stackOut = RegularSpatialSampling(stack, nSamples)
+function stackOut = RegularSpatialSampling(stack, sort_index, nSamples)
 %
-%       stackOut = RegularSpatialSampling(stack, nSamples)
+%       stackOut = RegularSpatialSampling(stack, sort_index, nSamples)
 %
 %
 %        Input:
+%           -stack_exposure:
 %           -stack: a stack of LDR images; 4-D array where values are
 %           -nSamples: the number of samples for sampling the stack
 %
@@ -41,28 +42,34 @@ end
 
 stackOut = zeros(nSamples, stackSize, col);
 
-r_quart = round(r / 4);
-c_quart = round(c / 4);
-r_half  = round(r / 2);
-c_half  = round(c / 2);
-
 f = round(sqrt(nSamples) + 1);
-rate_x = max([ceil(c_half / f), 1]);
-rate_y = max([ceil(r_half / f), 1]);
+rate_x = max([ceil(c / f), 1]);
+rate_y = max([ceil(r / f), 1]);
 
-[X, Y] = meshgrid(c_quart:rate_x:(c_quart + c_half), r_quart:rate_y:(r_quart + r_half));
+[X, Y] = meshgrid(1:rate_x:c, 1:rate_y:r);
  
-X = X(:);
-Y = Y(:);
+X = round(X(:));
+Y = round(Y(:));
 
 nSamples = length(X);
 
+c = 1;
 for i=1:nSamples
+    tmp = zeros(stackSize, col);
     for j=1:col
         for k=1:stackSize
-           stackOut(i,k,j) = round(stack(Y(i), X(i), j, k) * 255);
+           tmp(k,j) = stack(Y(i), X(i), j, k);
         end
     end
+               
+    check = checkMonotonicity(sort_index, tmp);
+    
+    if(check > 0)
+        stackOut(c,:,:) = tmp;
+        c = c + 1;
+    end
 end
+
+stackOut(c : end, :, :) = [];
 
 end

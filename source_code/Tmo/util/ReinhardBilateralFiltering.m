@@ -38,15 +38,15 @@ if(~exist('pPhi', 'var'))
 end
 
 if(~exist('pEpsilon', 'var'))
-    pEpsilon = 0.05;%as in the original paper
+    pEpsilon = 0.05; %as in the original paper
 end
 
-sMax    = 8;     
-alpha1  = (((2^pPhi) * pAlpha) / (sMax^2)) * pEpsilon;
-alpha2  = round(1.6^sMax);    
+sMax = 8;     
+tmp = ((2^pPhi) * pAlpha) / (sMax^2);
+L_tmp = L ./ (L + tmp);
+L_adapt = bilateralFilter(L_tmp, [], 0, 1.0, 1.6, pEpsilon / 2.0);
+%L_adapt = bilateralFilterS(L_tmp, [], 4, alpha1  );
 
-L_tmp = L ./ (L + 1);
-L_adapt = bilateralFilter(L_tmp, [], 0, 1, alpha2, alpha1);
-L_adapt = L_adapt ./ (1 - L_adapt);
+L_adapt = RemoveSpecials(L_adapt * tmp ./ (1 - L_adapt));
 
 end

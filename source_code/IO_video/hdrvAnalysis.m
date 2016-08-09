@@ -28,10 +28,10 @@ function [hm_v, max_v, min_v, mean_v] = hdrvAnalysis(hdrv)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-hm_v   = [];
-max_v  = [];
-min_v  = [];
-mean_v = [];
+hm_v   = zeros(hdrv.totalFrames, 1);
+max_v  = zeros(hdrv.totalFrames, 1);
+min_v  = zeros(hdrv.totalFrames, 1);
+mean_v = zeros(hdrv.totalFrames, 1);
 
 bClose = 0;
 
@@ -42,7 +42,7 @@ end
 
 disp('Video Analysis...');
 for i=1:hdrv.totalFrames
-    disp(['Processing Frame: ',num2str(i)]);
+    disp(['Processing Frame: ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
     
     %Only physical values
@@ -50,12 +50,12 @@ for i=1:hdrv.totalFrames
     frame(frame<0) = 0;   
     
     L = RemoveSpecials(lum(frame));
-    L(L<0.0) = 0;
+    L(L < 0.0) = 0;
     
-    hm_v   = [hm_v,   logMean(L)];
-    max_v  = [max_v,  max(L(:))];
-    min_v  = [min_v,  min(L(:))];
-    mean_v = [mean_v, mean(L(:))];
+    hm_v(i)   = logMean(L);
+    max_v(i)  = max(L(:));
+    min_v(i)  = min(L(:));
+    mean_v(i) = mean(L(:));
 end
 
 disp('done');

@@ -28,11 +28,11 @@ function lstOut = pyrLst2OP(lstIn1, lstIn2, fun)
 
 n = length(lstIn1);
 
-lstOut=[];
+lstOut = [];
 
 for i=1:n
-    p=fun(lstIn1(i), lstIn2(i));
-    lstOut=[lstOut, p];
+    p = fun(lstIn1(i), lstIn2(i));
+    lstOut = [lstOut, p];
 end
 
 end

@@ -38,19 +38,19 @@ function imgOut = HuoPhysEO(img, hou_max_luminance, hou_n, gammaRemoval)
 %is it a three color channels image?
 check13Color(img);
 
-if(~exist('gammaRemoval','var'))
+if(~exist('gammaRemoval', 'var'))
     gammaRemoval = -1.0;
 end
 
-if(~exist('hou_max_luminance','var'))
+if(~exist('hou_max_luminance', 'var'))
     hou_max_luminance = 3000.0;%as in the original paper
 end
 
-if(~exist('hou_n','var'))
+if(~exist('hou_n', 'var'))
     hou_n = 0.86;%as in the original paper
 end
 
-if(gammaRemoval>0.0)
+if(gammaRemoval > 0.0)
     img = img.^gammaRemoval;
 end
 
@@ -64,11 +64,11 @@ L_s_l_1 = bilateralFilter(L_l  ,   [], 0.0, 1.0, 16.0, 0.3);
 L_s_l   = bilateralFilter(L_s_l_1, [], 0.0, 1.0, 10.0, 0.1);
 
 %Computing parameters
-sigma = hou_max_luminance*sigma_l;
-L_s_h = hou_max_luminance*L_s_l;
+sigma = hou_max_luminance * sigma_l;
+L_s_h = hou_max_luminance * L_s_l;
 
 %Expanding luminance
-L_h = ((L_l/max_L_l).*((L_s_h.^hou_n+sigma^hou_n)).^(1.0/hou_n));
+L_h = ((L_l / max_L_l) .* ((L_s_h.^hou_n + sigma^hou_n)).^(1.0 / hou_n));
 
 %Generate the final image with the new luminance
 imgOut = ChangeLuminance(img, L_l, L_h);

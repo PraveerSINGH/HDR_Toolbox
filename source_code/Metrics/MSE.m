@@ -48,8 +48,8 @@ if(isa(imgDistorted, 'uint16'))
     imgDistorted = double(imgDistorted) / 65535.0;
 end
 
-deltaSquare = (imgReference - imgDistorted).^2;
+delta_sq = (imgReference - imgDistorted).^2;
 
-val = mean(deltaSquare(:));
+val = mean(delta_sq(:));
 
 end

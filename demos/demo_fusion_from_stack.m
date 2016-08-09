@@ -26,7 +26,7 @@ set(h, 'Name', 'Raman and Chaudhuri exposure fusion (no need of gamma encoding)'
 GammaTMO(imgTMO, 1.0, 0, 1);
 
 disp('3) Saving the tone mapped image as a PNG.');
-imwrite(imgTMO, 'venice_calle_raman_TMO.png');
+imwrite(imgTMO, 'office_raman_TMO.png');
 
 %Mertens's method
 disp('4) Applying Fusion Operator by Mertens et al to images in stack folder');
@@ -38,7 +38,7 @@ set(h,'Name','Mertens et al. exposure fusion (no need of gamma encoding)');
 GammaTMO(imgTMO, 1.0, 0, 1);
 
 disp('6) Saving the tone mapped image as a PNG.');
-imwrite(imgTMO, 'venice_calle_mertens_TMO.png');
+imwrite(imgTMO, 'office_mertens_TMO.png');
 
 %Bruce's method
 disp('7) Applying Fusion Operator by Bruce to images in stack folder');
@@ -50,5 +50,5 @@ set(h,'Name','Bruce exposure blend (no need of gamma encoding)');
 GammaTMO(imgTMO, 1.0, 0, 1);
 
 disp('9) Saving the tone mapped image as a PNG.');
-imwrite(imgTMO, 'venice_calle_bruce_TMO.png');
+imwrite(imgTMO, 'office_bruce_TMO.png');
 

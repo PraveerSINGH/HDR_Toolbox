@@ -18,7 +18,7 @@ name_folder = 'stack_alignment';
 format = 'jpg';
 
 disp('1) Read a stack of LDR images');
-stack = ReadLDRStack(name_folder, format);
+[stack, norm_value] = ReadLDRStack(name_folder, format, 1);
 
 disp('2) Read exposure values from the EXIF');
 stack_exposure = ReadLDRStackInfo(name_folder, format);
@@ -27,10 +27,10 @@ disp('3) Align the stack using VLFeat''s SIFT');
 stackOut = SiftAlignment(stack, 1);
 
 disp('4) Estimage the CRF');
-[lin_fun, ~] = ComputeCRF(stack, stack_exposure);  
+[lin_fun, ~] = DebevecCRF(stackOut, stack_exposure);  
 h = figure(1);
 set(h, 'Name', 'The Camera Response Function (CRF)');
-plot(lin_fun);
+plot(0:255, lin_fun(:,1), 'r', 0:255, lin_fun(:,2),'g', 0:255, lin_fun(:,3), 'b');
 
 disp('5) Build the radiance map using the stack and stack_exposure');
 imgHDR = BuildHDR(stackOut, stack_exposure, 'LUT', lin_fun, 'Gauss', 'linear');

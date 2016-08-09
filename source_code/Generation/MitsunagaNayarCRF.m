@@ -1,22 +1,32 @@
-function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
+function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull, maxIterations)
 %
-%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
+%       [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples, sampling_strategy, bFull, maxIterations)
 %
 %       This function computes camera response function using Mitsunaga and
 %       Nayar method.
 %
 %        Input:
-%           -stack: a stack of LDR images.
+%           -stack: a stack of LDR images. If the stack is a single or
+%           double values are assumed to be in [0,1]
 %           -stack_exposure: an array containg the exposure time of each
-%           image. Time is expressed in second (s).
+%           image. Time is expressed in second (s)
 %           -N: polynomial degree of the inverse CRF
-%           -nSamples: number of samples for computing the CRF.
+%           -nSamples: number of samples for computing the CRF
+%           -full: true for using all esposure ratios while building the 
+%               Mitsunaga&Nayar matrix, false for using successive ratios
+%           -sampling_strategy: how to select samples:
+%               -'Grossberg': picking samples according to Grossberg and
+%               Nayar algorithm (CDF based)
+%               -'RandomSpatial': picking random samples in the image
+%               -'RegularSpatial': picking regular samples in the image
+%           -bFull:
+%           -maxIterations:
 %
 %        Output:
-%           -pp: a polynomial encoding the inverse CRF.
-%           -lin_fun: tabled function
+%           -pp: a polynomial encoding the inverse CRF
+%           -lin_fun: tabled CRF
 %
-%     Copyright (C) 2015  Francesco Banterle
+%     Copyright (C) 2015-16  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -33,11 +43,23 @@ function [lin_fun, pp] = MitsunagaNayarCRF(stack, stack_exposure, N, nSamples)
 %
 
 if(~exist('nSamples', 'var'))
-    nSamples = 1000;
+    nSamples = 256;
+end
+
+if(~exist('sampling_strategy', 'var'))
+    sampling_strategy = 'RegularSpatial';
 end
 
 if(~exist('N', 'var'))
-    N = 5;
+    N = -3;
+end
+
+if(~exist('bFull', 'var'))
+    bFull = false;
+end
+
+if(~exist('maxIterations', 'var'))
+    maxIterations = -1;
 end
 
 if(isempty(stack))
@@ -50,69 +72,65 @@ end
 
 col = size(stack, 3);
 
-%stack sub-sampling
-stack_hist = ComputeLDRStackHistogram(stack);
-stack_samples = GrossbergSampling(stack_hist, nSamples);
-
-%recovering the CRF
-function d = MN_d(c, p, q, n)
-    q_p = q + 1;
-    R_q_q_p = stack_exposure(q) / stack_exposure(q_p);
-
-    
-    M_q = stack_samples(p, q, c);
-    M_q_p = stack_samples(p, q_p, c);
-    
-    d = M_q^n - R_q_q_p * (M_q_p^n);
+if(isa(stack, 'uint8'))
+    stack = single(stack) / 255.0;
 end
 
-pp = zeros(col, N + 1);
+if(isa(stack, 'uint16'))
+    stack = single(stack) / 65535.0;
+end
 
-for channel=1:col
-    Q = length(stack_exposure);
-    P = nSamples;
+%sort stack
+[stack, stack_exposure ] = SortStack( stack, stack_exposure, 'ascend');
 
-    %Matrix A
-    A = zeros(N, N);
-    for j=1:N
-        for i=1:N
+%subsample stack
+if(maxIterations > 1)
+    stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.08);
+else
+    stack_samples = LDRStackSubSampling(stack, stack_exposure, nSamples, sampling_strategy, 0.01);
+end
 
-            A(i,j) = 0;
+stack_samples = stack_samples / 255.0;
 
-            for q=1:(Q - 1)
-                for p=1:P
-                    delta  = MN_d(channel, p, q, j - 1) - MN_d(channel, p, q, N);
-                    A(i,j) = A(i,j) + MN_d(channel, p, q, i - 1) * delta;
-                end
-            end
-
-        end
+if(N > 0)
+    if (bFull)
+        [pp, ~] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, N);
+    else
+        [pp, ~] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, N);
+    end
+else
+    if (bFull)
+        [pp, err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, 1, maxIterations);
+    else
+        [pp, err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, 1, maxIterations);
     end
     
-    %b
-    b = zeros(N, 1);
-    for i=1:N
-        b(i) = 0;
-
-        for q=1:(Q - 1)
-            for p=1:P
-                b(i) = b(i) + MN_d(channel, p, q, i - 1) * MN_d(channel, p, q, N);
-            end
+    for i=2:6
+        if (bFull)
+            [t_pp, t_err] = MitsunagaNayarCRFFull(stack_samples, stack_exposure, i, maxIterations);
+        else
+            [t_pp, t_err] = MitsunagaNayarCRFClassic(stack_samples, stack_exposure, i, maxIterations);
         end
-    end   
-    
-    b = -b;
-    
-    c = A \ b;    
-    c_n = 1.0 - sum(c);
-    
-    pp(channel, :) = [c_n, c'];
+        
+        if(t_err < err)
+            err = t_err;
+            pp = t_pp;
+        end
+    end
 end
 
 lin_fun = zeros(256, col);
 
-for i=1:col
-    lin_fun(:,i) = polyval(pp(i,:), 0:(1.0 / 255.0):1);
+mid_value = 0.5 * ones(1, col);
+gray = mid_value;
+for c=1:col
+    gray(c) = polyval(pp(:,c), gray(c));
+end
+
+scale = FindChromaticyScale(mid_value, gray);
+
+for c=1:col
+    lin_fun(:,c) = scale(c) * polyval(pp(:,c), 0:(1/255):1);
 end
 
 end

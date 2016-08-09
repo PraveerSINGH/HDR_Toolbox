@@ -9,7 +9,7 @@ function ldrv = ldrvopen(ldrv, permission)
 %           permissions.
 %
 %        Output:
-%           -ldrv: a LDR video structure.
+%           -ldrv: an LDR video structure.
 %
 %        This function opens the video stream for reading frames
 %

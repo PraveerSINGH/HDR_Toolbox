@@ -44,12 +44,6 @@ function StaticTMOv(hdrv, filenameOutput, tmo_operator, tmo_gamma, tmo_quality, 
 %     account for temporal coherency
 %
 
-if(~exist('filenameOutput', 'var'))
-    date_str = strrep(datestr(now()), ' ', '_');
-    date_str = strrep(date_str, ':', '_');
-    filenameOutput = ['static_tmo_output_', date_str, '.avi'];
-end
-
 if(~exist('tmo_operator', 'var'))
     tmo_operator = @DragoTMO;
 end
@@ -63,7 +57,7 @@ if(~exist('tmo_quality', 'var'))
 end
 
 if(~exist('tmo_video_profile', 'var'))
-    tmo_video_profile = 'Motion JPEG AVI';
+    tmo_video_profile = 'MPEG-4';
 end
 
 if(tmo_gamma < 0)
@@ -78,7 +72,7 @@ ext = fileExtension(filenameOutput);
 bVideo = 0;
 writerObj = 0;
 
-if(strfind(ext, 'avi') | strfind(ext, 'mp4'))
+if(strcmp(ext, 'avi') == 1 | strcmp(ext, 'mp4') == 1)
     bVideo = 1;
     writerObj = VideoWriter(filenameOutput, tmo_video_profile);
     writerObj.FrameRate = hdrv.FrameRate;
@@ -90,7 +84,7 @@ hdrv = hdrvopen(hdrv, 'r');
 
 disp('Tone Mapping...');
 for i=1:hdrv.totalFrames
-    disp(['Processing frame ',num2str(i)]);
+    disp(['Processing frame ', num2str(i)]);
     [frame, hdrv] = hdrvGetFrame(hdrv, i);
     
     %Only physical values

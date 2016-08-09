@@ -29,7 +29,7 @@ function imgOut = SaturatedPixels(img, min, max)
 %
 
 imgOut = ones(size(img));
-imgOut(find(img < min)) = 0;
-imgOut(find(img > max)) = 0;
+imgOut(img < min) = 0;
+imgOut(img > max) = 0;
 
 end

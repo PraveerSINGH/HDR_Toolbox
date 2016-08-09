@@ -1,7 +1,7 @@
-function [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPhi)
+function [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPhi, Lwa_ext)
 %
 %
-%      [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPhi)
+%      [imgOut, pAlpha, pWhite] = ReinhardTMO(img, pAlpha, pWhite, pLocal, pPhi, Lwa_ext)
 %
 %
 %       Input:
@@ -78,7 +78,11 @@ else
 end
 
 %Logarithmic mean calcultaion
-Lwa = logMean(L);
+if(~exist('Lwa_ext', 'var'))
+    Lwa = logMean(L);
+else
+    Lwa = Lwa_ext;
+end
 
 %Scale luminance using alpha and logarithmic mean
 Lscaled = (pAlpha * L) / Lwa;
@@ -101,6 +105,7 @@ end
 %Range compression
 pWhite2 = pWhite * pWhite;
 Ld = (Lscaled .* (1 + Lscaled / pWhite2)) ./ (1 + L_adapt);
+%Ld = Lscaled ./ (1.0 + L_adapt);
 
 %Changing luminance
 imgOut = ChangeLuminance(img, L, Ld);

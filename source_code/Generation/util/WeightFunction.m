@@ -1,6 +1,6 @@
-function weight = WeightFunction(img, weight_type, bMeanWeight, bounds)
+function weight = WeightFunction(img, weight_type, bMeanWeight, bounds, pp)
 %
-%       weight = WeightFunction(img, weight_type)
+%       weight = WeightFunction(img, weight_type, bMeanWeight, bounds, pp)
 %
 %
 %        Input:
@@ -8,11 +8,13 @@ function weight = WeightFunction(img, weight_type, bMeanWeight, bounds)
 %           -weight_type:
 %               - 'all': weight is set to 1
 %               - 'hat': hat function 1-(2x-1)^12
+%               - 'poly': 
 %               - 'box': weight is set to 1 in [bounds(1), bounds(2)]
 %               - 'Deb97': Debevec and Malik 97 weight function
-%               - 'Gauss': Gaussian (mu = 0.5, sigma=0.15) 
+%               - 'Robertson': a Gaussian with shifting and scaling
 %           -bMeanWeight:
 %           -bounds: range of valid values for Deb97 and box
+%           -pp:
 %
 %        Output:
 %           -weight: the output weight function for a given LDR image
@@ -62,16 +64,24 @@ switch weight_type
     case 'box'
         weight = ones(size(img));
         weight(img < bounds(1)) = 0.0;
-        weight(img > bounds(2)) = 0.0;
+        weight(img > bounds(2)) = 0.0;        
         
-    case 'Gauss'
-        mu = 0.5;
-        sigma = 0.5;
-        sigma_sq_2 = sigma * sigma * 2;
-        weight = exp(-4 * (img - mu).^2 / sigma_sq_2);
-        
+    case 'Robertson'
+        shift    = exp(-4);
+        scaleDiv = (1.0 - shift);
+        t = img - 0.5;
+        weight = (exp(-16.0 * (t .* t) ) - shift) / scaleDiv;
+            
     case 'hat'
         weight = 1 - (2 * img - 1).^12;
+        
+    case 'poly'              
+        weight = zeros(size(img));
+        
+        for i=1:size(img, 3)
+            d_pp = polyder(pp(:, i));
+            weight(:,:,i) = polyval(pp(:, i), img) ./ polyval(d_pp, img);
+        end
         
     case 'Deb97'
         Zmin = bounds(1);

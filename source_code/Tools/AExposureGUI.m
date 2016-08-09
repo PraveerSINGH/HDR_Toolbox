@@ -1,6 +1,6 @@
-function [img_cur_exp, exposure] = AExposureGUI(img)
+function [img_cur_exp, exposure] = AExposureGUI(img, gamma_diplay)
 %
-%        [img_cur_exp, exposure] = AExposureGUI(img)
+%        [img_cur_exp, exposure] = AExposureGUI(img, gamma_diplay)
 %
 %        This function allows to explore the dynamic range in an image,
 %        img. This is achieved by clicking with the left mouse button into
@@ -9,6 +9,7 @@ function [img_cur_exp, exposure] = AExposureGUI(img)
 %
 %        Input:
 %           -img: an HDR image
+%           -gamma_diplay: display gamma value
 %
 %        Output:
 %           -img_cur_exp: the input image with the last selected exposure
@@ -30,11 +31,15 @@ function [img_cur_exp, exposure] = AExposureGUI(img)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
+if(~exist('gamma_diplay', 'var'))
+    gamma_diplay = 2.2;
+end
+
 L = lum(img);
 
 bFlag = 1;
 
-invGamma = 1.0 / 2.2;
+invGamma = 1.0 / gamma_diplay;
 exposure = 0.25 / (mean(L(:)) + 1e-6);
 kernelSize = 7;
 
@@ -50,8 +55,12 @@ while(bFlag)
         y = round(real(y));
         disp(['Pixel value: [', num2str(img(y,x,:)),']']);
         block = L((y - kernelSize):(y + kernelSize),(x - kernelSize):(x + kernelSize));
-        exposure = 0.25/mean(block(:));
-        disp(['Exposure: ',num2str(exposure)]);
+        
+        exposure = 0.25 / mean(block(:));
+        
+        disp(['Exposure: ', num2str(exposure), 's']);
+        disp(['F-stop: ', num2str(log2(exposure))]);
+        
         img_cur_exp = (img * exposure);
         
         if(button == 3)

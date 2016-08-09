@@ -8,6 +8,8 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %           -stack: an input stack of LDR images. This has to be set if we
 %           the stack is already in memory and we do not want to load it
 %           from the disk using the tuple (dir_name, format).
+%           If the stack is a single or dobule, values are assumed to be in
+%           the range [0,1].
 %
 %           -stack_exposure: an array containg the exposure time of each
 %           image. Time is expressed in second (s).
@@ -20,6 +22,8 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %                      - 'LUT': the lineraziation function is a look-up
 %                               table defined stored as an array in the 
 %                               lin_fun 
+%                      - 'poly': the lineraziation function is a polynomial
+%                               stored in lin_fun 
 %
 %           -lin_fun: it is the camera response function of the camera that
 %           took the pictures in the stack. If it is empty, [], and 
@@ -30,7 +34,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 %               - 'all':   weight is set to 1
 %               - 'hat':   hat function 1-(2x-1)^12
 %               - 'Deb97': Debevec and Malik 97 weight function
-%               - 'Gauss': Gaussian function as weight function.
+%               - 'Robertson': a Gaussian function as weight function.
 %                          This function produces good results when some 
 %                          under-exposed or over-exposed images are present
 %                          in the stack.
@@ -82,7 +86,7 @@ function [imgOut, lin_fun] = BuildHDR(stack, stack_exposure, lin_type, lin_fun, 
 
 %merge type, if it is not set the default is 'log'
 if(~exist('merge_type', 'var'))
-    merge_type = 'linear';
+    merge_type = 'log';
 end
 
 if(~exist('bMeanWeight', 'var'))
@@ -131,16 +135,9 @@ if(isa(stack, 'uint16'))
     scale = 65535.0;
 end
 
-if(isa(stack, 'double') | isa(stack, 'single'))
-    max_val = max(stack(:));
-    if(max_val > 1.0) 
-        scale = max_val;
-    end
-end
-
 %is the inverse camera function ok? Do we need to recompute it?
 if((strcmp(lin_type, 'LUT') == 1) && isempty(lin_fun))
-    [lin_fun, ~] = ComputeCRF(single(stack) / scale, stack_exposure);        
+    [lin_fun, ~] = DebevecCRF(single(stack) / scale, stack_exposure);        
 end
 
 gamma_k = strfind(lin_type, 'gamma');
@@ -152,10 +149,14 @@ if(gamma_k == 1)
     end
     
     lin_type = 'gamma';
+    lin_fun = gamma_value;
 end
 
 %this value is added for numerical stability
 delta_value = 1.0 / 65536.0;
+
+[~, index_sat] = min(stack_exposure);
+slice_sat = [];
 
 %for each LDR image...
 for i=1:n
@@ -164,21 +165,17 @@ for i=1:n
     %computing the weight function    
     weight  = WeightFunction(tmpStack, weight_type, bMeanWeight);
 
-    %imwrite(weight, ['test', num2str(i), '.bmp']);
     %linearization of the image
-    switch lin_type
-        case 'gamma'
-            tmpStack = tmpStack.^gamma_value;
-        case 'sRGB'
-            tmpStack = ConvertRGBtosRGB(tmpStack, 1);
-
-        case 'LUT'
-            tmpStack = tabledFunction(round(tmpStack * 255), lin_fun);            
-
-        otherwise
+    tmpStack = RemoveCRF(tmpStack, lin_type, lin_fun);
+    
+    %fetch exposure time
+    t = stack_exposure(i);     
+    
+    if(i == index_sat)
+        slice_sat = tmpStack / t;
     end
    
-    %summing things up...
+    %sum things up...
     t = stack_exposure(i);    
     if(t > 0.0)                
         switch merge_type
@@ -204,50 +201,25 @@ if(strcmp(merge_type, 'log') == 1)
 end
 
 %checking for saturated pixels
-bSaturation = 0;
 saturation = 1e-4;
 
 if(~isempty(totWeight <= saturation))
-    bSaturation = 1;
+    disp('WARNING: the stack has saturated pixels!');
+
     mask = zeros(size(totWeight));
     mask(totWeight <= saturation) = 1;
-    disp('WARNING: the stack has saturated pixels!');
+    mask = max(mask, [], 3);
     
     if(exist('debug_mode', 'var'))
         imwrite(mask, 'saturation_mask.bmp');
     end
-end
 
-%handling saturated pixels
-if(bSaturation)
-    [t, index] = min(stack_exposure);
-    
-    mask = max(mask, [], 3);
-    slice = stack(:,:,:,index) / (t * scale);
-    
     for i=1:col
         tmp = imgOut(:,:,i);
-        slice_i = slice(:,:,i);
+        slice_i = slice_sat(:,:,i);
         tmp(mask == 1) = slice_i(mask == 1);
         imgOut(:,:,i) = tmp;
     end
-    
-%      for i=1:col
-%         slice = stack(:,:,i,index);
-%         max_val = double(max(slice(:))) / (t * scale);
-%  
-%         saturation_value = max_val;
-%  
-%         tmp = imgOut(:,:,i);
-%         tmp_stack = stack(:,:,i,index);
-%         tmp_tw = totWeight(:,:,i);        
-%         
-%         tmp(tmp_tw <= saturation) = slice(tmp_tw <= saturation)/ (t * scale);
-%        % tmp(tmp_tw < saturation & tmp_stack > 0.95) = saturation_value;
-%        % tmp(tmp_tw < saturation & tmp_stack < 0.5) = 0.0;
-%          
-%         imgOut(:,:,i) = tmp;
-%     end
 end
 
 %forcing to double type for allowing this image to be used in some MATLAB functions

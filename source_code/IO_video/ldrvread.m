@@ -9,7 +9,7 @@ function ldrv = ldrvread(filename)
 %        Output:
 %           -ldrv: a LDR video structure
 %
-%     Copyright (C) 2013  Francesco Banterle
+%     Copyright (C) 2013-2016  Francesco Banterle
 % 
 %     This program is free software: you can redistribute it and/or modify
 %     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,11 @@ function ldrv = ldrvread(filename)
 %
 
 if(isdir(filename))
+    
+    if(filename(end) == '/')
+       filename(end) = []; 
+    end
+    
     %PNG?
     tmp_list = dir([filename, '/', '*.png']);
     type = 'TYPE_LDR_PNG';
@@ -41,16 +46,21 @@ if(isdir(filename))
         type = 'TYPE_LDR_JPEG';
     end
     
-    %JPEG 2000?
+    %JPEG-2000?
     if(isempty(tmp_list))
         tmp_list = dir([filename, '/', '*.jp2']);
-        type = 'TYPE_LDR_JPEG_2000';
+        
+        if(isempty(tmp_list))
+            type = 'TYPE_NONE';
+        else
+            type = 'TYPE_LDR_JPEG_2000';
+        end
     end
     
     totalFrames = length(tmp_list);
     
     ldrv = struct('type', type, 'path', filename, 'list', tmp_list, ...
-                  'totalFrames', totalFrames, 'FrameRate', 30, ...
+                  'totalFrames', totalFrames, 'FrameRate', 24, ...
                   'frameCounter', 1, 'streamOpen', 0, 'permission', 'u');
 else
     stream = VideoReader(filename);

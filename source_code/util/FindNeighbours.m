@@ -31,27 +31,27 @@ function listOfNeighbors = FindNeighbours(i,r,c,tot,imgBin)
 %
 
 %Neighbors
-mX=[-1,0,1, -1,1, -1,0,1];
-mY=[1,1,1,  0,0,  -1,-1,-1];
+mX = [-1, 0, 1, -1, 1, -1,  0,  1];
+mY = [ 1, 1, 1,  0, 0, -1, -1, -1];
 
 listOfNeighbors = [];
 
-[h,w] = size(imgBin);
+[h, w] = size(imgBin);
 
 for k=1:tot
     for counter=1:8
-        cX=c(k)+mX(counter);
-        cY=r(k)+mY(counter);
+        cX = c(k) + mX(counter);
+        cY = r(k) + mY(counter);
 
-        if((cY>h)||(cY<1)||(cX>w)||(cX<1))
-            n1=i;
+        if((cY > h) || (cY < 1) || (cX > w) || (cX < 1))
+            n1 = i;
         else
-            n1=imgBin(cY,cX);
+            n1 = imgBin(cY, cX);
         end
         
-        if(n1~=i)%inserting in the list of neighbors
-            queryLV = find(listOfNeighbors==n1);
-            if(min(size(queryLV))==0)
+        if(n1 ~= i)%inserting in the list of neighbors
+            queryLV = find(listOfNeighbors == n1);
+            if(min(size(queryLV)) == 0)
                 listOfNeighbors = [listOfNeighbors, n1];
             end
         end
