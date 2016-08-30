@@ -51,6 +51,7 @@ folder = [folder, cellstr('Tmo/util')];
 folder = [folder, cellstr('Tmo_video')];
 folder = [folder, cellstr('Tools')];
 folder = [folder, cellstr('util')];
+folder = [folder, cellstr('VirtualPhotograph')];
 
 for i=1:length(folder)
     addpath([pwd(), '/source_code/', char(folder(i))], '-begin');
